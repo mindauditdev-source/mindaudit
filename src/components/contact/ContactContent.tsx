@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { 
   MapPin, 
@@ -8,12 +9,63 @@ import {
   CheckCircle2, 
   ArrowRight,
   ChevronDown,
-  MessageSquare
+  MessageSquare,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 export function ContactContent() {
+  const [formData, setFormData] = useState({
+    nombre: '',
+    email: '',
+    asunto: '',
+    mensaje: '',
+    privacidad: false
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.privacidad) {
+      alert('Debe aceptar la política de privacidad');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      const response = await fetch('/api/send-contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setFormData({
+          nombre: '',
+          email: '',
+          asunto: '',
+          mensaje: '',
+          privacidad: false
+        });
+      } else {
+        setSubmitStatus('error');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="flex flex-col w-full bg-[#f8fafc] pb-20 min-h-screen">
       {/* Title Section */}
@@ -116,61 +168,108 @@ export function ContactContent() {
                     <p className="text-slate-500 text-sm">Le responderemos en el menor tiempo posible.</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">Nombre</label>
-                        <input 
-                            type="text" 
-                            placeholder="Su nombre" 
-                            className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#0f4c81]/5 focus:border-[#0f4c81] outline-none transition-all text-sm font-medium" 
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">Email</label>
-                        <input 
-                            type="email" 
-                            placeholder="correo@ejemplo.com" 
-                            className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#0f4c81]/5 focus:border-[#0f4c81] outline-none transition-all text-sm font-medium" 
-                        />
-                    </div>
-                </div>
+                {submitStatus === 'success' && (
+                  <div className="bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5" />
+                    <p className="text-sm font-medium">¡Mensaje enviado correctamente! Nos pondremos en contacto pronto.</p>
+                  </div>
+                )}
 
-                <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">Asunto</label>
-                    <div className="relative">
-                        <select className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#0f4c81]/5 focus:border-[#0f4c81] outline-none transition-all text-sm font-medium appearance-none cursor-pointer text-slate-500">
-                            <option value="">Seleccione el motivo de su consulta...</option>
-                            <option value="info">Información General</option>
-                            <option value="partners">Programa de Partners</option>
-                            <option value="rrhh">Recursos Humanos / Empleo</option>
-                            <option value="soporte">Soporte Técnico Portal</option>
-                            <option value="otros">Otros</option>
-                        </select>
-                        <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
-                    </div>
-                </div>
+                {submitStatus === 'error' && (
+                  <div className="bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl">
+                    <p className="text-sm font-medium">Hubo un error al enviar el mensaje. Por favor, inténtelo de nuevo.</p>
+                  </div>
+                )}
 
-                <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">Mensaje</label>
-                    <textarea 
-                        rows={6}
-                        placeholder="Escriba aquí su mensaje o consulta..." 
-                        className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#0f4c81]/5 focus:border-[#0f4c81] outline-none transition-all text-sm font-medium resize-none"
-                    ></textarea>
-                </div>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                          <label className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">Nombre</label>
+                          <input 
+                              type="text" 
+                              placeholder="Su nombre"
+                              value={formData.nombre}
+                              onChange={(e) => setFormData({...formData, nombre: e.target.value})}
+                              required
+                              className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#0f4c81]/5 focus:border-[#0f4c81] outline-none transition-all text-sm font-medium" 
+                          />
+                      </div>
+                      <div className="space-y-2">
+                          <label className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">Email</label>
+                          <input 
+                              type="email" 
+                              placeholder="correo@ejemplo.com"
+                              value={formData.email}
+                              onChange={(e) => setFormData({...formData, email: e.target.value})}
+                              required
+                              className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#0f4c81]/5 focus:border-[#0f4c81] outline-none transition-all text-sm font-medium" 
+                          />
+                      </div>
+                  </div>
 
-                <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-4">
-                    <div className="flex items-center gap-3">
-                        <input type="checkbox" id="privacidad_contacto" className="h-5 w-5 rounded border-slate-200 text-[#0f4c81] focus:ring-[#0f4c81]" />
-                        <label htmlFor="privacidad_contacto" className="text-xs text-slate-500">
-                            He leído y acepto la <Link href="#" className="underline hover:text-slate-900">política de privacidad</Link>
-                        </label>
-                    </div>
-                    <Button className="bg-[#0f4c81] hover:bg-[#0d3d68] text-white px-10 h-14 rounded-xl font-bold flex items-center gap-2 group transition-all text-md shadow-lg">
-                        Enviar Consulta
-                        <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                    </Button>
-                </div>
+                  <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">Asunto</label>
+                      <div className="relative">
+                          <select 
+                            value={formData.asunto}
+                            onChange={(e) => setFormData({...formData, asunto: e.target.value})}
+                            className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#0f4c81]/5 focus:border-[#0f4c81] outline-none transition-all text-sm font-medium appearance-none cursor-pointer text-slate-500"
+                          >
+                              <option value="">Seleccione el motivo de su consulta...</option>
+                              <option value="info">Información General</option>
+                              <option value="partners">Programa de Partners</option>
+                              <option value="rrhh">Recursos Humanos / Empleo</option>
+                              <option value="soporte">Soporte Técnico Portal</option>
+                              <option value="otros">Otros</option>
+                          </select>
+                          <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
+                      </div>
+                  </div>
+
+                  <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">Mensaje</label>
+                      <textarea 
+                          rows={6}
+                          placeholder="Escriba aquí su mensaje o consulta..."
+                          value={formData.mensaje}
+                          onChange={(e) => setFormData({...formData, mensaje: e.target.value})}
+                          required
+                          className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#0f4c81]/5 focus:border-[#0f4c81] outline-none transition-all text-sm font-medium resize-none"
+                      ></textarea>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-4">
+                      <div className="flex items-center gap-3">
+                          <input 
+                            type="checkbox" 
+                            id="privacidad_contacto" 
+                            checked={formData.privacidad}
+                            onChange={(e) => setFormData({...formData, privacidad: e.target.checked})}
+                            className="h-5 w-5 rounded border-slate-200 text-[#0f4c81] focus:ring-[#0f4c81]" 
+                          />
+                          <label htmlFor="privacidad_contacto" className="text-xs text-slate-500">
+                              He leído y acepto la <Link href="#" className="underline hover:text-slate-900">política de privacidad</Link>
+                          </label>
+                      </div>
+                      <Button 
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="bg-[#0f4c81] hover:bg-[#0d3d68] text-white px-10 h-14 rounded-xl font-bold flex items-center gap-2 group transition-all text-md shadow-lg disabled:opacity-50"
+                      >
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="h-5 w-5 animate-spin" />
+                              Enviando...
+                            </>
+                          ) : (
+                            <>
+                              Enviar Consulta
+                              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                            </>
+                          )}
+                      </Button>
+                  </div>
+                </form>
               </CardContent>
             </Card>
           </div>
