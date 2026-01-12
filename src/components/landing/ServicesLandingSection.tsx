@@ -7,25 +7,25 @@ export function ServicesLandingSection() {
     {
       icon: Landmark,
       title: 'Auditoría Financiera',
-      description: 'Análisis exhaustivo de estados financieros asegurando el cumplimiento normativo y la salud fiscal.',
+      description: 'Auditamos sus cuentas anuales individuales y consolidadas con el máximo rigor técnico y cumplimiento.',
       link: '/servicios#financiera'
     },
     {
       icon: FileText,
-      title: 'Justificación de Subvenciones',
-      description: 'Verificación experta para subvenciones de fondos públicos, asegurando que todos los gastos cumplan con criterios estrictos.',
+      title: 'Auditoría de Subvenciones',
+      description: 'Revisión y justificación de cuentas para ayudas públicas y fondos europeos con total garantía de cumplimiento.',
       link: '/servicios#subvenciones'
     },
     {
       icon: Recycle,
-      title: 'Informes Ecoembes',
-      description: 'Auditorías especializadas de declaración de residuos de envases para el cumplimiento empresarial sostenible.',
+      title: 'Auditoría Ecoembes',
+      description: 'Verificación experta de declaraciones de envases y cumplimiento normativo medioambiental.',
       link: '/servicios#ecoembes'
     },
     {
       icon: BarChart3,
       title: 'Due Diligence',
-      description: 'Investigación y análisis profundo del negocio para fusiones, adquisiciones e inversiones.',
+      description: 'Análisis financiero exhaustivo para minimizar riesgos en procesos de compraventa y fusiones.',
       link: '/servicios#due-diligence'
     }
   ];
