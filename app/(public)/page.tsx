@@ -1,6 +1,6 @@
 import { Hero } from '@/components/landing/Hero';
 import { Accreditations } from '@/components/landing/Accreditations';
-import { ServicesSection } from '@/components/landing/ServicesSection';
+import { ServicesLandingSection } from '@/components/landing/ServicesLandingSection';
 import { WhyChooseUs } from '@/components/landing/WhyChooseUs';
 import { TrustedBy } from '@/components/landing/TrustedBy';
 import { CTASection } from '@/components/landing/CTASection';
@@ -10,7 +10,7 @@ export default function LandingPage() {
     <>
       <Hero />
       <Accreditations />
-      <ServicesSection />
+      <ServicesLandingSection />
       <WhyChooseUs />
       <TrustedBy />
       <CTASection />

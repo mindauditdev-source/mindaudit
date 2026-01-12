@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { Menu, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
@@ -12,7 +12,7 @@ export function Header() {
   const navigation = [
     { name: "Servicios", href: "/servicios" },
     { name: "Nosotros", href: "/sobre-nosotros" },
-    { name: "Blog", href: "/blog" },
+    { name: "Partners", href: "/partners" },
     { name: "Contacto", href: "/contacto" },
   ];
 
@@ -21,13 +21,12 @@ export function Header() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <span className="text-xl font-bold">M</span>
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="flex aspect-square size-9 items-center justify-center rounded-lg bg-[#0f4c81] text-white">
+              <ShieldCheck className="h-6 w-6" />
             </div>
             <div className="flex flex-col leading-none">
-              <span className="text-lg font-bold">MindAudit</span>
-              <span className="text-xs text-muted-foreground">SPAIN SLP</span>
+              <span className="text-xl font-bold tracking-tight text-[#0f4c81]">MindAudit Spain</span>
             </div>
           </Link>
 
@@ -43,7 +42,7 @@ export function Header() {
               </Link>
             ))}
             <Button asChild size="sm" className="ml-4">
-              <Link href="/login">Access Partner</Link>
+              <Link href="/login">Acceso Partner</Link>
             </Button>
           </nav>
 
@@ -79,7 +78,7 @@ export function Header() {
                   ))}
                   <Button asChild className="mt-4 w-full">
                     <Link href="/login" onClick={() => setIsOpen(false)}>
-                      Access Partner
+                      Acceso Partner
                     </Link>
                   </Button>
                 </nav>
