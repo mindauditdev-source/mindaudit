@@ -153,3 +153,5 @@ Si continúas el desarrollo:
 2. Usa `(public)` layout para páginas informativas.
 3. Usa `(dashboard)` layout para las apps privadas.
 4. **NO** crees estilos CSS arbitrarios, usa Tailwind utility classes.
+5. **ESTRICTAMENTE PROHIBIDO** el uso de `any`. Define interfaces o tipos claros.
+6. **REUTILIZACIÓN:** Usa siempre el componente `@/components/ui/form-input` para todos los campos de formularios para mantener la consistencia estética y de validación.
