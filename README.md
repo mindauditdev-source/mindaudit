@@ -145,7 +145,7 @@ Para más detalles, consulta [.agent/workflows/architecture.md](.agent/workflows
 
 - Node.js 18+
 - pnpm (recomendado) / npm / yarn
-- PostgreSQL 14+
+- Cuenta en [Supabase](https://supabase.com) (gratis)
 
 ### Instalación
 
@@ -156,21 +156,60 @@ cd mindaudit-spain
 
 # Instalar dependencias
 pnpm install
-
-# Configurar variables de entorno
-cp .env.example .env.local
-# Editar .env.local con tus credenciales
-
-# Configurar base de datos
-pnpm prisma generate
-pnpm prisma migrate dev
-pnpm prisma db seed
-
-# Iniciar servidor de desarrollo
-pnpm dev
 ```
 
+### Configuración de Base de Datos (Supabase)
+
+**📚 Guía completa:** Ver [`SETUP_CHECKLIST.md`](SETUP_CHECKLIST.md) o [`docs/SUPABASE_SETUP.md`](docs/SUPABASE_SETUP.md)
+
+**Pasos rápidos:**
+
+1. **Crear proyecto en Supabase**
+
+   - Ir a [https://supabase.com](https://supabase.com)
+   - Crear nuevo proyecto
+   - Copiar credenciales (Database URL, API keys)
+
+2. **Configurar variables de entorno**
+
+   ```bash
+   # Copiar template
+   cp .env.example .env.local
+
+   # Editar .env.local con tus credenciales de Supabase
+   # Ver SETUP_CHECKLIST.md para instrucciones detalladas
+   ```
+
+3. **Ejecutar migraciones**
+
+   ```bash
+   # Generar cliente de Prisma
+   pnpm db:generate
+
+   # Crear tablas en Supabase
+   pnpm db:migrate
+
+   # Poblar con datos de prueba
+   pnpm db:seed
+   ```
+
+4. **Iniciar servidor de desarrollo**
+   ```bash
+   pnpm dev
+   ```
+
 La aplicación estará disponible en `http://localhost:3000`
+
+### Credenciales de Prueba
+
+Después de ejecutar `pnpm db:seed`:
+
+| Rol       | Email                | Password   |
+| --------- | -------------------- | ---------- |
+| Admin     | admin@mindaudit.es   | admin123   |
+| Auditor   | auditor@mindaudit.es | auditor123 |
+| Partner 1 | partner1@example.com | partner123 |
+| Partner 2 | partner2@example.com | partner123 |
 
 ---
 
@@ -310,10 +349,23 @@ La aplicación estará disponible en `http://localhost:3000`
 
 ## 📚 Documentación
 
-- [Arquitectura](.agent/workflows/architecture.md) - Arquitectura detallada del proyecto
-- [Componentes](src/components/README.md) - Guía de componentes
-- [Servicios](src/services/README.md) - Servicios de negocio
-- [Types](src/types/README.md) - Sistema de tipos TypeScript
+### Guías de Configuración
+
+- [**SETUP_CHECKLIST.md**](SETUP_CHECKLIST.md) - ✅ Checklist paso a paso para configurar Supabase
+- [**QUICK_START_DB.md**](QUICK_START_DB.md) - 🚀 Guía rápida de 3 pasos
+- [**docs/SUPABASE_SETUP.md**](docs/SUPABASE_SETUP.md) - 📖 Guía completa de Supabase
+
+### Arquitectura y Diseño
+
+- [**Arquitectura**](.agent/workflows/architecture.md) - Arquitectura detallada del proyecto
+- [**docs/DATABASE_SCHEMA.md**](docs/DATABASE_SCHEMA.md) - 🗄️ Diagrama de base de datos
+- [**docs/DATABASE_INTEGRATION_STATUS.md**](docs/DATABASE_INTEGRATION_STATUS.md) - 📊 Estado de integración
+
+### Desarrollo
+
+- [**Componentes**](src/components/README.md) - Guía de componentes
+- [**Servicios**](src/services/README.md) - Servicios de negocio
+- [**Types**](src/types/README.md) - Sistema de tipos TypeScript
 
 ---
 
@@ -325,13 +377,14 @@ pnpm dev              # Iniciar servidor de desarrollo
 pnpm build            # Build de producción
 pnpm start            # Iniciar servidor de producción
 pnpm lint             # Linter
-pnpm type-check       # Verificar tipos TypeScript
 
 # Base de datos
-pnpm prisma:generate  # Generar cliente Prisma
-pnpm prisma:migrate   # Ejecutar migraciones
-pnpm prisma:studio    # Abrir Prisma Studio
-pnpm prisma:seed      # Poblar base de datos
+pnpm db:generate      # Generar cliente Prisma
+pnpm db:migrate       # Crear y aplicar migraciones
+pnpm db:push          # Push schema sin migración (desarrollo)
+pnpm db:seed          # Poblar base de datos con datos de prueba
+pnpm db:studio        # Abrir Prisma Studio (GUI)
+pnpm db:reset         # Resetear base de datos (¡cuidado!)
 
 # Testing (por implementar)
 pnpm test             # Ejecutar tests
@@ -343,36 +396,42 @@ pnpm test:coverage    # Coverage de tests
 
 ## 🌐 Variables de Entorno
 
+**📚 Ver guía completa:** [`docs/SUPABASE_SETUP.md`](docs/SUPABASE_SETUP.md)
+
 Crea un archivo `.env.local` con las siguientes variables:
 
 ```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/mindaudit"
+# Database (Supabase)
+DATABASE_URL="postgresql://postgres.[REF]:[PASSWORD]@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.[REF]:[PASSWORD]@db.[REF].supabase.co:5432/postgres"
 
 # NextAuth
 NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-secret-key"
+NEXTAUTH_SECRET="your-secret-key-generate-with-openssl"
 
-# Email
-EMAIL_SERVER_HOST="smtp.hostinger.com"
-EMAIL_SERVER_PORT=587
-EMAIL_SERVER_USER="info@mindaudit.es"
-EMAIL_SERVER_PASSWORD="your-password"
-EMAIL_FROM="info@mindaudit.es"
+# Email (Resend)
+RESEND_API_KEY="re_your_resend_api_key"
+EMAIL_FROM="noreply@mindaudit.es"
+EMAIL_REPLY_TO="info@mindaudit.es"
 
-# Storage (AWS S3 / Cloudinary / Vercel Blob)
-STORAGE_PROVIDER="s3"
-AWS_ACCESS_KEY_ID="your-key"
-AWS_SECRET_ACCESS_KEY="your-secret"
-AWS_REGION="eu-west-1"
-AWS_BUCKET_NAME="mindaudit-files"
+# Supabase Storage
+NEXT_PUBLIC_SUPABASE_URL="https://[REF].supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 
 # Integrations
 CALENDLY_API_KEY="your-calendly-key"
 TRUSTPILOT_API_KEY="your-trustpilot-key"
 
-# Analytics
-NEXT_PUBLIC_GA_ID="G-XXXXXXXXXX"
+# Feature Flags
+NEXT_PUBLIC_ENABLE_MAGIC_LINKS="true"
+NEXT_PUBLIC_ENABLE_CALENDLY="true"
+```
+
+**Generar NEXTAUTH_SECRET:**
+
+```bash
+openssl rand -base64 32
 ```
 
 ---
@@ -422,36 +481,51 @@ Propiedad de MindAudit Spain SLP. Todos los derechos reservados.
 
 ## 🎯 Roadmap
 
-### Fase 1: Fundación ✅
+### Fase 0: Arquitectura Base ✅ COMPLETADA
 
 - [x] Estructura de carpetas
 - [x] Configuración base
+- [x] **Schema de base de datos (Prisma + Supabase)**
+- [x] **Configuración de Supabase**
+- [x] **Seed de datos de prueba**
+- [x] **Documentación completa**
+
+### Fase 1: Fundación 🚧 EN PROGRESO
+
+- [x] Configuración técnica
 - [ ] Sistema de diseño
 - [ ] Landing page
-- [ ] Autenticación
+- [ ] Autenticación básica
 
-### Fase 2: Panel Partner 🚧
+### Fase 2: Autenticación 📋 PENDIENTE
+
+- [ ] NextAuth configuration
+- [ ] Login/Register forms
+- [ ] Magic links
+- [ ] Auth middleware
+
+### Fase 3: Panel Partner 📋 PENDIENTE
 
 - [ ] Dashboard del partner
 - [ ] Gestión de clientes
 - [ ] Solicitud de presupuestos
 - [ ] Sistema de consultas
 
-### Fase 3: Panel Auditor 📋
+### Fase 4: Panel Auditor 📋 PENDIENTE
 
 - [ ] Dashboard del auditor
 - [ ] Gestión de partners
 - [ ] Respuesta a presupuestos
 - [ ] Métricas
 
-### Fase 4: Funcionalidades Avanzadas 📋
+### Fase 5: Funcionalidades Avanzadas 📋 PENDIENTE
 
 - [ ] Upload de documentos
 - [ ] Integración Calendly
 - [ ] Sistema de facturación
 - [ ] Notificaciones
 
-### Fase 5: Deploy 📋
+### Fase 6: Deploy 📋 PENDIENTE
 
 - [ ] Testing
 - [ ] Optimización

@@ -1,0 +1,549 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================
+// AUTHENTICATION & USERS
+// ============================================
+
+enum UserRole {
+  PARTNER // Asociado/Despacho Profesional
+  AUDITOR // MindAudit Spain
+  ADMIN   // Superadministrador
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  name          String
+  role          UserRole   @default(PARTNER)
+  status        UserStatus @default(PENDING_VERIFICATION)
+  hashedPassword String?   // Null si usa magic link
+  emailVerified DateTime?
+  image         String?
+  
+  // Relaciones
+  partner       Partner?
+  auditor       Auditor?
+  
+  // Timestamps
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  lastLoginAt   DateTime?
+  
+  // Índices
+  @@index([email])
+  @@index([role])
+  @@index([status])
+  @@map("users")
+}
+
+// ============================================
+// PARTNERS (Asociados/Despachos)
+// ============================================
+
+enum PartnerStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_APPROVAL
+}
+
+model Partner {
+  id              String        @id @default(cuid())
+  userId          String        @unique
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Información de la empresa
+  companyName     String
+  cif             String        @unique
+  address         String?
+  city            String?
+  province        String?
+  postalCode      String?
+  phone           String?
+  website         String?
+  
+  // Estado y valoración
+  status          PartnerStatus @default(PENDING_APPROVAL)
+  rating          Float?        @default(0) // 0-5 estrellas
+  totalCommissions Decimal      @default(0) @db.Decimal(10, 2)
+  
+  // Documentos
+  contractUrl     String?
+  contractSignedAt DateTime?
+  
+  // Relaciones
+  clients         Client[]
+  budgets         Budget[]
+  consultations   Consultation[]
+  meetings        Meeting[]
+  invoices        Invoice[]
+  documents       Document[]
+  
+  // Timestamps
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  @@index([userId])
+  @@index([cif])
+  @@index([status])
+  @@map("partners")
+}
+
+// ============================================
+// AUDITORS (MindAudit Spain)
+// ============================================
+
+model Auditor {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Información profesional
+  specialization  String?
+  certifications  String[] // Array de certificaciones
+  
+  // Relaciones
+  meetings        Meeting[]
+  newsCreated     News[]
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@map("auditors")
+}
+
+// ============================================
+// CLIENTS (Clientes aportados por Partners)
+// ============================================
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+  PROSPECT
+  CONVERTED
+}
+
+model Client {
+  id              String       @id @default(cuid())
+  partnerId       String
+  partner         Partner      @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  
+  // Información de la empresa
+  companyName     String
+  cif             String
+  contactName     String
+  contactEmail    String
+  contactPhone    String?
+  address         String?
+  city            String?
+  province        String?
+  postalCode      String?
+  
+  // Información fiscal
+  fiscalYears     Int[]        // Array de años fiscales [2023, 2024]
+  employees       Int?
+  revenue         Decimal?     @db.Decimal(12, 2)
+  
+  // Estado
+  status          ClientStatus @default(PROSPECT)
+  notes           String?      @db.Text
+  
+  // Relaciones
+  budgets         Budget[]
+  documents       Document[]
+  
+  // Timestamps
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  @@index([partnerId])
+  @@index([cif])
+  @@index([status])
+  @@map("clients")
+}
+
+// ============================================
+// BUDGETS (Presupuestos)
+// ============================================
+
+enum BudgetStatus {
+  PENDING      // Pendiente de respuesta
+  IN_REVIEW    // En revisión por auditor
+  APPROVED     // Aprobado
+  REJECTED     // Rechazado
+  EXPIRED      // Expirado
+}
+
+enum ServiceType {
+  AUDIT_ACCOUNTS              // Auditoría de cuentas anuales
+  AUDIT_CONSOLIDATED          // Auditoría de cuentas consolidadas
+  AUDIT_VOLUNTARY             // Auditoría voluntaria
+  AUDIT_SUBSIDIES             // Auditoría de subvenciones
+  REVIEW_ACCOUNTS             // Revisión limitada de cuentas
+  AGREED_PROCEDURES           // Procedimientos acordados
+  DUE_DILIGENCE              // Due diligence
+  FORENSIC_AUDIT             // Auditoría forense
+  IT_AUDIT                   // Auditoría informática
+  INTERNAL_AUDIT             // Auditoría interna
+  COMPLIANCE_AUDIT           // Auditoría de cumplimiento
+  SUSTAINABILITY_AUDIT       // Auditoría de sostenibilidad
+  QUALITY_AUDIT              // Auditoría de calidad
+  RISK_ASSESSMENT            // Evaluación de riesgos
+  INTERNAL_CONTROL           // Control interno
+  FRAUD_PREVENTION           // Prevención de fraude
+  OTHER                      // Otros servicios
+}
+
+model Budget {
+  id              String        @id @default(cuid())
+  clientId        String
+  client          Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  partnerId       String
+  partner         Partner       @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  
+  // Información del presupuesto
+  serviceType     ServiceType
+  fiscalYears     Int[]         // Años fiscales solicitados
+  description     String?       @db.Text
+  specialRequests String?       @db.Text
+  urgency         Boolean       @default(false)
+  
+  // Estado y respuesta
+  status          BudgetStatus  @default(PENDING)
+  amount          Decimal?      @db.Decimal(10, 2)
+  responseNotes   String?       @db.Text
+  validUntil      DateTime?
+  
+  // Comisión del partner
+  commissionRate  Decimal?      @db.Decimal(5, 2) // Porcentaje
+  commissionAmount Decimal?     @db.Decimal(10, 2)
+  
+  // Fechas importantes
+  respondedAt     DateTime?
+  approvedAt      DateTime?
+  
+  // Relaciones
+  documents       Document[]
+  
+  // Timestamps
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  @@index([clientId])
+  @@index([partnerId])
+  @@index([status])
+  @@index([serviceType])
+  @@map("budgets")
+}
+
+// ============================================
+// CONSULTATIONS (Consultas Partner-Auditor)
+// ============================================
+
+enum ConsultationStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_PARTNER
+  WAITING_AUDITOR
+  RESOLVED
+  CLOSED
+}
+
+model Consultation {
+  id              String              @id @default(cuid())
+  partnerId       String
+  partner         Partner             @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  
+  // Información de la consulta
+  subject         String
+  status          ConsultationStatus  @default(OPEN)
+  priority        Int                 @default(1) // 1-5
+  
+  // Relaciones
+  messages        ConsultationMessage[]
+  documents       Document[]
+  
+  // Fechas importantes
+  resolvedAt      DateTime?
+  closedAt        DateTime?
+  
+  // Timestamps
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  
+  @@index([partnerId])
+  @@index([status])
+  @@map("consultations")
+}
+
+model ConsultationMessage {
+  id              String       @id @default(cuid())
+  consultationId  String
+  consultation    Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  
+  // Autor del mensaje
+  senderId        String       // User ID
+  senderRole      UserRole     // Para identificar rápidamente si es partner o auditor
+  
+  // Contenido
+  message         String       @db.Text
+  attachments     String[]     // URLs de archivos adjuntos
+  
+  // Timestamps
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  @@index([consultationId])
+  @@index([senderId])
+  @@map("consultation_messages")
+}
+
+// ============================================
+// MEETINGS (Reuniones)
+// ============================================
+
+enum MeetingStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+}
+
+model Meeting {
+  id              String        @id @default(cuid())
+  partnerId       String
+  partner         Partner       @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  auditorId       String?
+  auditor         Auditor?      @relation(fields: [auditorId], references: [id], onDelete: SetNull)
+  
+  // Información de la reunión
+  title           String
+  description     String?       @db.Text
+  scheduledAt     DateTime
+  duration        Int           @default(30) // Minutos
+  location        String?       // Presencial o link de videollamada
+  
+  // Integración Calendly
+  calendlyEventUrl String?
+  calendlyEventId  String?
+  
+  // Estado
+  status          MeetingStatus @default(SCHEDULED)
+  notes           String?       @db.Text
+  
+  // Timestamps
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  completedAt     DateTime?
+  
+  @@index([partnerId])
+  @@index([auditorId])
+  @@index([scheduledAt])
+  @@index([status])
+  @@map("meetings")
+}
+
+// ============================================
+// INVOICES (Facturas)
+// ============================================
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model Invoice {
+  id              String        @id @default(cuid())
+  partnerId       String
+  partner         Partner       @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  
+  // Información de la factura
+  invoiceNumber   String        @unique
+  amount          Decimal       @db.Decimal(10, 2)
+  concept         String
+  description     String?       @db.Text
+  
+  // Archivos
+  pdfUrl          String?
+  
+  // Estado y fechas
+  status          InvoiceStatus @default(DRAFT)
+  issuedAt        DateTime?
+  dueAt           DateTime?
+  paidAt          DateTime?
+  
+  // Timestamps
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  @@index([partnerId])
+  @@index([invoiceNumber])
+  @@index([status])
+  @@map("invoices")
+}
+
+// ============================================
+// NEWS (Noticias y Comunicados)
+// ============================================
+
+enum NewsStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model News {
+  id              String      @id @default(cuid())
+  authorId        String
+  author          Auditor     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Contenido
+  title           String
+  slug            String      @unique
+  content         String      @db.Text
+  excerpt         String?
+  coverImage      String?
+  
+  // Categoría y tags
+  category        String?
+  tags            String[]
+  
+  // Estado
+  status          NewsStatus  @default(DRAFT)
+  featured        Boolean     @default(false)
+  
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+  
+  // Fechas
+  publishedAt     DateTime?
+  
+  // Timestamps
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([authorId])
+  @@index([slug])
+  @@index([status])
+  @@index([publishedAt])
+  @@map("news")
+}
+
+// ============================================
+// DOCUMENTS (Documentos y Archivos)
+// ============================================
+
+enum DocumentType {
+  CONTRACT
+  INVOICE
+  BUDGET
+  CONSULTATION
+  CLIENT
+  OTHER
+}
+
+model Document {
+  id              String       @id @default(cuid())
+  uploadedBy      String       // User ID
+  
+  // Información del archivo
+  fileName        String
+  fileUrl         String
+  fileType        String       // MIME type
+  fileSize        Int          // Bytes
+  
+  // Clasificación
+  documentType    DocumentType
+  
+  // Relaciones polimórficas (opcional, puede estar relacionado con varias entidades)
+  partnerId       String?
+  partner         Partner?     @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  clientId        String?
+  client          Client?      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  budgetId        String?
+  budget          Budget?      @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  consultationId  String?
+  consultation    Consultation? @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  
+  // Metadata
+  description     String?
+  tags            String[]
+  
+  // Timestamps
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  @@index([uploadedBy])
+  @@index([documentType])
+  @@index([partnerId])
+  @@index([clientId])
+  @@index([budgetId])
+  @@index([consultationId])
+  @@map("documents")
+}
+
+// ============================================
+// AUDIT LOG (Registro de auditoría)
+// ============================================
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  APPROVE
+  REJECT
+  SEND
+  DOWNLOAD
+}
+
+model AuditLog {
+  id              String      @id @default(cuid())
+  userId          String
+  userRole        UserRole
+  
+  // Acción realizada
+  action          AuditAction
+  entity          String      // Nombre de la entidad (User, Budget, etc.)
+  entityId        String?     // ID de la entidad afectada
+  
+  // Detalles
+  description     String?
+  metadata        Json?       // Datos adicionales en formato JSON
+  ipAddress       String?
+  userAgent       String?
+  
+  // Timestamp
+  createdAt       DateTime    @default(now())
+  
+  @@index([userId])
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

@@ -10,8 +10,10 @@ Bienvenido a la documentación del proyecto MindAudit Spain SLP. Este índice te
 
 1. Lee el [README.md](../README.md) para entender el proyecto
 2. Revisa el [Resumen Ejecutivo](EXECUTIVE_SUMMARY.md) para ver el estado actual
-3. Consulta el [Plan de Implementación](IMPLEMENTATION_PLAN.md) para saber qué sigue
-4. Explora la [Arquitectura](.agent/workflows/architecture.md) para entender la estructura
+3. **NUEVO** → Configura la base de datos con [Guía de Supabase](SUPABASE_SETUP.md)
+4. Consulta el [Estado de Integración](DATABASE_INTEGRATION_STATUS.md) para ver el progreso
+5. Consulta el [Plan de Implementación](IMPLEMENTATION_PLAN.md) para saber qué sigue
+6. Explora la [Arquitectura](../.agent/workflows/architecture.md) para entender la estructura
 
 ### Para Stakeholders
 
