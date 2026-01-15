@@ -52,7 +52,7 @@ export function PartnersContent() {
                 {/* Simulated Image - Replace with real path if available */}
                 <div className="absolute inset-0 bg-slate-200 animate-pulse">
                    <Image 
-                    src="/partners-hero.webp" 
+                    src="/partner-ship.webp" 
                     alt="Partnership" 
                     fill 
                     className="object-cover"

@@ -164,7 +164,7 @@ export function AboutContent() {
               <div className="flex-1 relative">
                  <div className="relative rounded-3xl overflow-hidden aspect-4/3 shadow-2xl">
                     <Image 
-                        src="/office_culture_desk_1768237176900.png" 
+                        src="/nosotros-image.webp" 
                         alt="Cultura de empresa" 
                         fill 
                         className="object-cover opacity-80"
