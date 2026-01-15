@@ -1,63 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, Eye, EyeOff, ArrowRight, ShieldCheck, Loader2, AlertCircle } from "lucide-react";
+import { Mail, Eye, EyeOff, ArrowRight, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
-import { loginSchema, type LoginInput } from "@/validators/auth.validator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [authError, setAuthError] = useState<string | null>(null);
-
-  // Mensajes de error/éxito desde query params (ej: registro exitoso)
-  const registered = searchParams.get("registered");
-  const callbackUrl = searchParams.get("callbackUrl") || "/partner/dashboard";
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
-  });
-
-  const onSubmit = async (data: LoginInput) => {
-    try {
-      setIsLoading(true);
-      setAuthError(null);
-
-      const result = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setAuthError("Email o contraseña incorrectos");
-        return;
-      }
-
-      if (result?.ok) {
-        router.push(callbackUrl);
-        router.refresh();
-      }
-    } catch (err) {
-      console.error("Error en login:", err);
-      setAuthError("Ocurrió un error inesperado. Inténtalo de nuevo.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [showPassword, setShowPassword] = React.useState(false);
 
   return (
     <div className="flex min-h-screen w-full bg-white">
@@ -105,24 +55,8 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Feedback Messages */}
-          {registered && (
-            <Alert className="border-green-500 bg-green-50 text-green-900">
-              <AlertDescription>
-                Registro exitoso. Por favor, inicia sesión con tus credenciales.
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {authError && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{authError}</AlertDescription>
-            </Alert>
-          )}
-
           {/* Form */}
-          <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
+          <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
             {/* Email Field */}
             <div className="space-y-2.5">
               <label
@@ -136,19 +70,10 @@ export default function LoginPage() {
                   id="email"
                   type="email"
                   placeholder="correo@ejemplo.com"
-                  className={`w-full h-14 px-5 rounded-xl border bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all pr-12 text-[15px] font-medium ${
-                    errors.email
-                      ? "border-red-500 focus:ring-red-200"
-                      : "border-slate-200 focus:ring-[#0f4c81]/20 focus:border-[#0f4c81] group-hover:border-slate-300"
-                  }`}
-                  {...register("email")}
-                  disabled={isLoading}
+                  className="w-full h-14 px-5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0f4c81]/20 focus:border-[#0f4c81] transition-all group-hover:border-slate-300 pr-12 text-[15px] font-medium"
                 />
                 <Mail className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-[#0f4c81] transition-colors" />
               </div>
-              {errors.email && (
-                <p className="text-sm text-red-500 font-medium">{errors.email.message}</p>
-              )}
             </div>
 
             {/* Password Field */}
@@ -172,13 +97,7 @@ export default function LoginPage() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  className={`w-full h-14 px-5 rounded-xl border bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all pr-12 text-[15px] font-medium ${
-                    errors.password
-                      ? "border-red-500 focus:ring-red-200"
-                      : "border-slate-200 focus:ring-[#0f4c81]/20 focus:border-[#0f4c81] group-hover:border-slate-300"
-                  }`}
-                  {...register("password")}
-                  disabled={isLoading}
+                  className="w-full h-14 px-5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0f4c81]/20 focus:border-[#0f4c81] transition-all group-hover:border-slate-300 pr-12 text-[15px] font-medium"
                 />
                 <button
                   type="button"
@@ -192,9 +111,6 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-sm text-red-500 font-medium">{errors.password.message}</p>
-              )}
             </div>
 
             {/* Remember Me */}
@@ -213,22 +129,9 @@ export default function LoginPage() {
             </div>
 
             {/* Submit Button */}
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full h-14 bg-[#0a3a6b] hover:bg-[#082e56] text-white rounded-xl text-md font-bold shadow-lg shadow-blue-900/10 flex items-center justify-center gap-2 group transition-all"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Iniciando...
-                </>
-              ) : (
-                <>
-                  Iniciar Sesión
-                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </>
-              )}
+            <Button className="w-full h-14 bg-[#0a3a6b] hover:bg-[#082e56] text-white rounded-xl text-md font-bold shadow-lg shadow-blue-900/10 flex items-center justify-center gap-2 group transition-all">
+              Iniciar Sesión
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
           </form>
 

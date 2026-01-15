@@ -17,8 +17,8 @@ interface Step1Props {
 }
 
 export function Step1AccountDetails({ formData, touched, errors, onChange, onNext }: Step1Props) {
-  const isStepValid = !errors.nombreCompleto && !errors.email && !errors.empresa && !errors.cif && !errors.roac && 
-                      formData.nombreCompleto && formData.email && formData.empresa && formData.cif && formData.roac && formData.terms;
+  const isStepValid = !errors.nombreCompleto && !errors.email && !errors.password && !errors.confirmPassword && !errors.empresa && !errors.cif && !errors.roac && 
+                      formData.nombreCompleto && formData.email && formData.password && formData.confirmPassword && formData.empresa && formData.cif && formData.roac && formData.terms;
 
   return (
     <Card className="border-none shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white">
@@ -51,6 +51,28 @@ export function Step1AccountDetails({ formData, touched, errors, onChange, onNex
               onChange={onChange}
               touched={touched.email}
               error={errors.email}
+            />
+
+            <FormInput
+              label="Contraseña"
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={onChange}
+              touched={touched.password}
+              error={errors.password}
+            />
+
+             <FormInput
+              label="Confirmar Contraseña"
+              type="password"
+              name="confirmPassword"
+              placeholder="••••••••"
+              value={formData.confirmPassword}
+              onChange={onChange}
+              touched={touched.confirmPassword}
+              error={errors.confirmPassword}
             />
 
             <FormInput
@@ -105,7 +127,7 @@ export function Step1AccountDetails({ formData, touched, errors, onChange, onNex
             disabled={!isStepValid}
             className="w-full h-14 bg-[#0a3a6b] hover:bg-[#082e56] text-white rounded-xl text-md font-extrabold shadow-lg flex items-center justify-center gap-2 group transition-all mt-4 disabled:opacity-50 disabled:grayscale"
           >
-            Crear Cuenta
+            Siguiente Paso
             <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Button>
         </form>

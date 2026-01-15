@@ -2,6 +2,8 @@ export interface RegisterFormData {
   // Paso 1
   nombreCompleto: string;
   email: string;
+  password?: string;
+  confirmPassword?: string;
   empresa: string;
   cif: string;
   roac: string;
