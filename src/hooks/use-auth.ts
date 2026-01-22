@@ -1,34 +1,32 @@
-'use client'
-
 import { useSession } from 'next-auth/react'
-import { UserRole, UserStatus } from '@prisma/client'
+import { UserRole } from '@prisma/client'
 
+/**
+ * Hook personalizado para acceder a la sesión y roles del usuario
+ */
 export function useAuth() {
   const { data: session, status } = useSession()
-  const user = session?.user
-
-  const isAuthenticated = status === 'authenticated'
-  const isLoading = status === 'loading'
-
-  const isPartner = user?.role === UserRole.PARTNER
-  const isAuditor = user?.role === UserRole.AUDITOR
-  const isAdmin = user?.role === UserRole.ADMIN
-
-  const isActive = user?.status === UserStatus.ACTIVE
-  const isPending = user?.status === UserStatus.PENDING_VERIFICATION
 
   return {
+    user: session?.user,
     session,
-    user,
-    isAuthenticated,
-    isLoading,
-    role: user?.role,
-    // Role checks
-    isPartner,
-    isAuditor,
-    isAdmin,
-    // Status checks
-    isActive,
-    isPending,
+    status,
+    isLoading: status === 'loading',
+    isAuthenticated: status === 'authenticated',
+    isUnauthenticated: status === 'unauthenticated',
+    
+    // Helpers de rol
+    isAdmin: session?.user?.role === UserRole.ADMIN,
+    isColaborador: session?.user?.role === UserRole.COLABORADOR,
+    isEmpresa: session?.user?.role === UserRole.EMPRESA,
+    
+    // IDs útiles
+    userId: session?.user?.id,
+    colaboradorId: session?.user?.colaboradorId,
+    empresaId: session?.user?.empresaId,
+    
+    // Verificaciones de permisos
+    hasRole: (role: UserRole) => session?.user?.role === role,
+    hasAnyRole: (roles: UserRole[]) => roles.includes(session?.user?.role as UserRole),
   }
 }

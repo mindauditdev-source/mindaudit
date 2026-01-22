@@ -1,4 +1,6 @@
 export interface RegisterFormData {
+  // Configuración
+  role: 'COLABORADOR' | 'EMPRESA' | null;
   // Paso 1
   nombreCompleto: string;
   email: string;
@@ -14,6 +16,10 @@ export interface RegisterFormData {
   codigoPostal: string;
   telefono: string;
   web: string;
+  // Paso 2 (Empresa fields)
+  employees: string;
+  revenue: string;
+  fiscalYear: string;
   // Paso 3
   certificado: File | null;
   especialidades: string[];

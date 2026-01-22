@@ -1,53 +1,35 @@
 import { hash, compare } from 'bcryptjs'
 import { prisma } from '@/lib/db/prisma'
-import { UserRole, UserStatus, PartnerStatus } from '@prisma/client'
-import type { RegisterInput, LoginInput } from '@/validators/auth.validator'
+import {
+  RegisterColaboradorInput,
+  RegisterEmpresaInput,
+  LoginInput,
+  ChangePasswordInput,
+} from '@/validators/auth.validator'
+import { UserRole, UserStatus, ColaboradorStatus, EmpresaStatus, EmpresaOrigen } from '@prisma/client'
 
 // ============================================
-// TYPES
+// TIPOS DE RESPUESTA
 // ============================================
 
-export interface AuthUser {
-  id: string
-  email: string
-  name: string
-  role: UserRole
-  status: UserStatus
-  image: string | null
-  emailVerified: Date | null
-  partner?: {
-    id: string
-    companyName: string
-    cif: string
-    status: PartnerStatus
-  } | null
-  auditor?: {
-    id: string
-    specialization: string | null
-  } | null
-}
-
-export interface RegisterResult {
+interface AuthResult {
   success: boolean
-  user?: AuthUser
-  error?: string
-}
-
-export interface LoginResult {
-  success: boolean
-  user?: AuthUser
+  user?: any
   error?: string
 }
 
 // ============================================
-// REGISTER SERVICE
+// REGISTRO DE COLABORADOR
 // ============================================
 
-export async function registerPartner(
-  input: RegisterInput
-): Promise<RegisterResult> {
+/**
+ * Registra un nuevo Colaborador (Gestoría/Asesoría)
+ */
+export async function registerColaborador(
+  input: RegisterColaboradorInput
+): Promise<AuthResult> {
   try {
-    // 1. Verificar si el email ya existe
+    // Verificar si el email ya existe
     const existingUser = await prisma.user.findUnique({
       where: { email: input.email },
     })
@@ -55,64 +37,62 @@ export async function registerPartner(
     if (existingUser) {
       return {
         success: false,
-        error: 'Este email ya está registrado',
+        error: 'El email ya está registrado',
       }
     }
 
-    // 2. Verificar si el CIF ya existe
-    const existingPartner = await prisma.partner.findUnique({
+    // Verificar si el CIF ya existe
+    const existingCIF = await prisma.colaborador.findUnique({
       where: { cif: input.cif },
     })
 
-    if (existingPartner) {
+    if (existingCIF) {
       return {
         success: false,
-        error: 'Este CIF ya está registrado',
+        error: 'El CIF ya está registrado',
       }
     }
 
-    // 3. Hash de la contraseña
+    // Hash de la contraseña
     const hashedPassword = await hash(input.password, 10)
 
-    // 4. Crear usuario y partner en una transacción
+    // Crear usuario y colaborador en una transacción
     const user = await prisma.user.create({
       data: {
         email: input.email,
         name: input.name,
-        hashedPassword,
-        role: UserRole.PARTNER,
+        role: UserRole.COLABORADOR,
         status: UserStatus.PENDING_VERIFICATION,
-        partner: {
+        hashedPassword,
+        colaborador: {
           create: {
             companyName: input.companyName,
             cif: input.cif,
             phone: input.phone,
-            address: input.address || null,
-            city: input.city || null,
-            province: input.province || null,
-            postalCode: input.postalCode || null,
-            website: input.website || null,
-            status: PartnerStatus.PENDING_APPROVAL,
+            address: input.address,
+            city: input.city,
+            province: input.province,
+            postalCode: input.postalCode,
+            website: input.website,
+            status: ColaboradorStatus.PENDING_APPROVAL,
+            commissionRate: 0, // El admin lo configurará después
           },
         },
       },
       include: {
-        partner: true,
+        colaborador: true,
       },
     })
 
-    // 5. TODO: Enviar email de verificación
-    // await sendVerificationEmail(user.email, user.id)
-
-    // 6. Crear log de auditoría
+    // Log de auditoría
     await prisma.auditLog.create({
       data: {
         userId: user.id,
-        userRole: user.role,
+        userRole: UserRole.COLABORADOR,
         action: 'CREATE',
         entity: 'User',
         entityId: user.id,
-        description: 'Usuario registrado como Partner',
+        description: `Nuevo colaborador registrado: ${input.companyName}`,
       },
     })
 
@@ -123,51 +103,151 @@ export async function registerPartner(
         email: user.email,
         name: user.name,
         role: user.role,
-        status: user.status,
-        image: user.image,
-        emailVerified: user.emailVerified,
-        partner: user.partner
-          ? {
-              id: user.partner.id,
-              companyName: user.partner.companyName,
-              cif: user.partner.cif,
-              status: user.partner.status,
-            }
-          : null,
       },
     }
   } catch (error) {
-    console.error('Error en registerPartner:', error)
+    console.error('Error en registerColaborador:', error)
     return {
       success: false,
-      error: 'Error al registrar el usuario. Por favor, intenta de nuevo.',
+      error: 'Error al registrar el colaborador. Por favor, intenta de nuevo.',
     }
   }
 }
 
 // ============================================
-// LOGIN SERVICE
+// REGISTRO DE EMPRESA
 // ============================================
 
-export async function loginUser(input: LoginInput): Promise<LoginResult> {
+/**
+ * Registra una nueva Empresa (cliente directo)
+ */
+export async function registerEmpresa(
+  input: RegisterEmpresaInput
+): Promise<AuthResult> {
   try {
-    // 1. Buscar usuario por email
-    const user = await prisma.user.findUnique({
+    // Verificar si el email ya existe
+    const existingUser = await prisma.user.findUnique({
       where: { email: input.email },
+    })
+
+    if (existingUser) {
+      return {
+        success: false,
+        error: 'El email ya está registrado',
+      }
+    }
+
+    // Verificar si el CIF ya existe
+    const existingCIF = await prisma.empresa.findUnique({
+      where: { cif: input.cif },
+    })
+
+    if (existingCIF) {
+      return {
+        success: false,
+        error: 'El CIF ya está registrado',
+      }
+    }
+
+    // Hash de la contraseña
+    const hashedPassword = await hash(input.password, 10)
+
+    // Crear usuario y empresa en una transacción
+    const user = await prisma.user.create({
+      data: {
+        email: input.email,
+        name: input.name,
+        role: UserRole.EMPRESA,
+        status: UserStatus.PENDING_VERIFICATION,
+        hashedPassword,
+        empresa: {
+          create: {
+            origen: EmpresaOrigen.DIRECTA,
+            companyName: input.companyName,
+            cif: input.cif,
+            contactName: input.name,
+            contactEmail: input.email,
+            contactPhone: input.contactPhone,
+            address: input.address,
+            city: input.city,
+            province: input.province,
+            postalCode: input.postalCode,
+            website: input.website,
+            employees: input.employees,
+            revenue: input.revenue,
+            fiscalYear: input.fiscalYear,
+            status: EmpresaStatus.PROSPECT,
+          },
+        },
+      },
       include: {
-        partner: true,
-        auditor: true,
+        empresa: true,
       },
     })
 
-    if (!user || !user.hashedPassword) {
+    // Log de auditoría
+    await prisma.auditLog.create({
+      data: {
+        userId: user.id,
+        userRole: UserRole.EMPRESA,
+        action: 'CREATE',
+        entity: 'User',
+        entityId: user.id,
+        description: `Nueva empresa registrada directamente: ${input.companyName}`,
+      },
+    })
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+    }
+  } catch (error) {
+    console.error('Error en registerEmpresa:', error)
+    return {
+      success: false,
+      error: 'Error al registrar la empresa. Por favor, intenta de nuevo.',
+    }
+  }
+}
+
+// ============================================
+// LOGIN
+// ============================================
+
+/**
+ * Autentica un usuario (cualquier rol)
+ */
+export async function loginUser(input: LoginInput): Promise<AuthResult> {
+  try {
+    // Buscar usuario por email
+    const user = await prisma.user.findUnique({
+      where: { email: input.email },
+      include: {
+        colaborador: true,
+        empresa: true,
+      },
+    })
+
+    if (!user) {
       return {
         success: false,
         error: 'Credenciales inválidas',
       }
     }
 
-    // 2. Verificar contraseña
+    // Verificar contraseña
+    if (!user.hashedPassword) {
+      return {
+        success: false,
+        error: 'Esta cuenta usa autenticación sin contraseña',
+      }
+    }
+
     const isPasswordValid = await compare(input.password, user.hashedPassword)
 
     if (!isPasswordValid) {
@@ -177,7 +257,7 @@ export async function loginUser(input: LoginInput): Promise<LoginResult> {
       }
     }
 
-    // 3. Verificar estado del usuario
+    // Verificar estado del usuario
     if (user.status === UserStatus.SUSPENDED) {
       return {
         success: false,
@@ -192,23 +272,13 @@ export async function loginUser(input: LoginInput): Promise<LoginResult> {
       }
     }
 
-    // 4. Verificar estado del partner (si aplica)
-    if (user.role === UserRole.PARTNER && user.partner) {
-      if (user.partner.status === PartnerStatus.SUSPENDED) {
-        return {
-          success: false,
-          error: 'Tu cuenta de partner ha sido suspendida. Contacta con soporte.',
-        }
-      }
-    }
-
-    // 5. Actualizar último login
+    // Actualizar último login
     await prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
     })
 
-    // 6. Crear log de auditoría
+    // Log de auditoría
     await prisma.auditLog.create({
       data: {
         userId: user.id,
@@ -216,7 +286,7 @@ export async function loginUser(input: LoginInput): Promise<LoginResult> {
         action: 'LOGIN',
         entity: 'User',
         entityId: user.id,
-        description: 'Usuario inició sesión',
+        description: `Usuario ${user.email} inició sesión`,
       },
     })
 
@@ -228,22 +298,8 @@ export async function loginUser(input: LoginInput): Promise<LoginResult> {
         name: user.name,
         role: user.role,
         status: user.status,
-        image: user.image,
-        emailVerified: user.emailVerified,
-        partner: user.partner
-          ? {
-              id: user.partner.id,
-              companyName: user.partner.companyName,
-              cif: user.partner.cif,
-              status: user.partner.status,
-            }
-          : null,
-        auditor: user.auditor
-          ? {
-              id: user.auditor.id,
-              specialization: user.auditor.specialization,
-            }
-          : null,
+        colaborador: user.colaborador,
+        empresa: user.empresa,
       },
     }
   } catch (error) {
@@ -256,46 +312,23 @@ export async function loginUser(input: LoginInput): Promise<LoginResult> {
 }
 
 // ============================================
-// GET USER BY ID
+// OBTENER USUARIO POR ID
 // ============================================
 
-export async function getUserById(userId: string): Promise<AuthUser | null> {
+/**
+ * Obtiene un usuario por su ID con sus relaciones
+ */
+export async function getUserById(userId: string) {
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        partner: true,
-        auditor: true,
+        colaborador: true,
+        empresa: true,
       },
     })
 
-    if (!user) {
-      return null
-    }
-
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      status: user.status,
-      image: user.image,
-      emailVerified: user.emailVerified,
-      partner: user.partner
-        ? {
-            id: user.partner.id,
-            companyName: user.partner.companyName,
-            cif: user.partner.cif,
-            status: user.partner.status,
-          }
-        : null,
-      auditor: user.auditor
-        ? {
-            id: user.auditor.id,
-            specialization: user.auditor.specialization,
-          }
-        : null,
-    }
+    return user
   } catch (error) {
     console.error('Error en getUserById:', error)
     return null
@@ -303,96 +336,17 @@ export async function getUserById(userId: string): Promise<AuthUser | null> {
 }
 
 // ============================================
-// GET USER BY EMAIL
+// CAMBIAR CONTRASEÑA
 // ============================================
 
-export async function getUserByEmail(email: string): Promise<AuthUser | null> {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { email },
-      include: {
-        partner: true,
-        auditor: true,
-      },
-    })
-
-    if (!user) {
-      return null
-    }
-
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      status: user.status,
-      image: user.image,
-      emailVerified: user.emailVerified,
-      partner: user.partner
-        ? {
-            id: user.partner.id,
-            companyName: user.partner.companyName,
-            cif: user.partner.cif,
-            status: user.partner.status,
-          }
-        : null,
-      auditor: user.auditor
-        ? {
-            id: user.auditor.id,
-            specialization: user.auditor.specialization,
-          }
-        : null,
-    }
-  } catch (error) {
-    console.error('Error en getUserByEmail:', error)
-    return null
-  }
-}
-
-// ============================================
-// VERIFY EMAIL
-// ============================================
-
-export async function verifyUserEmail(userId: string): Promise<boolean> {
-  try {
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        emailVerified: new Date(),
-        status: UserStatus.ACTIVE,
-      },
-    })
-
-    // Crear log de auditoría
-    await prisma.auditLog.create({
-      data: {
-        userId,
-        userRole: UserRole.PARTNER, // Asumimos que es partner, ajustar si es necesario
-        action: 'UPDATE',
-        entity: 'User',
-        entityId: userId,
-        description: 'Email verificado',
-      },
-    })
-
-    return true
-  } catch (error) {
-    console.error('Error en verifyUserEmail:', error)
-    return false
-  }
-}
-
-// ============================================
-// CHANGE PASSWORD
-// ============================================
-
-export async function changeUserPassword(
+/**
+ * Cambia la contraseña de un usuario
+ */
+export async function changePassword(
   userId: string,
-  currentPassword: string,
-  newPassword: string
-): Promise<{ success: boolean; error?: string }> {
+  input: ChangePasswordInput
+): Promise<AuthResult> {
   try {
-    // 1. Obtener usuario
     const user = await prisma.user.findUnique({
       where: { id: userId },
     })
@@ -404,8 +358,8 @@ export async function changeUserPassword(
       }
     }
 
-    // 2. Verificar contraseña actual
-    const isPasswordValid = await compare(currentPassword, user.hashedPassword)
+    // Verificar contraseña actual
+    const isPasswordValid = await compare(input.currentPassword, user.hashedPassword)
 
     if (!isPasswordValid) {
       return {
@@ -414,33 +368,76 @@ export async function changeUserPassword(
       }
     }
 
-    // 3. Hash de la nueva contraseña
-    const hashedPassword = await hash(newPassword, 10)
+    // Hash de la nueva contraseña
+    const hashedPassword = await hash(input.newPassword, 10)
 
-    // 4. Actualizar contraseña
+    // Actualizar contraseña
     await prisma.user.update({
       where: { id: userId },
       data: { hashedPassword },
     })
 
-    // 5. Crear log de auditoría
+    // Log de auditoría
     await prisma.auditLog.create({
       data: {
-        userId,
+        userId: user.id,
         userRole: user.role,
         action: 'UPDATE',
         entity: 'User',
-        entityId: userId,
-        description: 'Contraseña cambiada',
+        entityId: user.id,
+        description: 'Contraseña actualizada',
       },
     })
 
-    return { success: true }
+    return {
+      success: true,
+    }
   } catch (error) {
-    console.error('Error en changeUserPassword:', error)
+    console.error('Error en changePassword:', error)
     return {
       success: false,
       error: 'Error al cambiar la contraseña. Por favor, intenta de nuevo.',
+    }
+  }
+}
+
+// ============================================
+// VERIFICAR EMAIL
+// ============================================
+
+/**
+ * Marca el email de un usuario como verificado
+ */
+export async function verifyEmail(userId: string): Promise<AuthResult> {
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        emailVerified: new Date(),
+        status: UserStatus.ACTIVE,
+      },
+    })
+
+    // Log de auditoría
+    await prisma.auditLog.create({
+      data: {
+        userId,
+        userRole: UserRole.COLABORADOR, // Asumimos, pero podría ser cualquiera
+        action: 'UPDATE',
+        entity: 'User',
+        entityId: userId,
+        description: 'Email verificado',
+      },
+    })
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    console.error('Error en verifyEmail:', error)
+    return {
+      success: false,
+      error: 'Error al verificar el email',
     }
   }
 }

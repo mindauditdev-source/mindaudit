@@ -2,87 +2,107 @@ import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
 import { UserRole } from '@prisma/client'
 
-// Rutas públicas que no requieren autenticación
-const publicRoutes = [
-  '/',
-  '/login',
-  '/register',
-  '/magic-link',
-  '/verify-email',
-  '/forgot-password',
-  '/reset-password',
-  '/servicios',
-  '/contacto',
-  '/about',
-  '/legal/terminos',
-  '/legal/privacidad',
-]
-
-// Rutas que son solo para usuarios no autenticados (como login/register)
-const authRoutes = [
-  '/login',
-  '/register',
-  '/magic-link',
-  '/forgot-password',
-  '/reset-password',
-]
-
 export default withAuth(
   function middleware(req) {
-    const { token } = req.nextauth
-    const isAuth = !!token
-    const isAuthRoute = authRoutes.some((route) =>
-      req.nextUrl.pathname.startsWith(route)
-    )
+    const token = req.nextauth.token
+    const path = req.nextUrl.pathname
 
-    // Si el usuario está autenticado e intenta acceder a rutas de auth (login, etc),
-    // redirigir al dashboard correspondiente
-    if (isAuth && isAuthRoute) {
-      if (token.role === 'PARTNER') {
-        return NextResponse.redirect(new URL('/partner/dashboard', req.url))
-      } else if (token.role === 'AUDITOR') {
-        return NextResponse.redirect(new URL('/auditor/dashboard', req.url))
-      } else if (token.role === 'ADMIN') {
-        return NextResponse.redirect(new URL('/admin/dashboard', req.url))
+    // Rutas públicas que no requieren autenticación
+    const publicPaths = [
+      '/',
+      '/login',
+      '/register',
+      '/servicios',
+      '/sobre-nosotros',
+      '/partners',
+      '/presupuesto',
+      '/contacto',
+      '/trabaja-con-nosotros',
+      '/legal',
+    ]
+
+    // Permitir acceso a rutas públicas
+    if (publicPaths.some((publicPath) => path.startsWith(publicPath))) {
+      return NextResponse.next()
+    }
+
+    // Si no está autenticado, redirigir a login
+    if (!token) {
+      const url = new URL('/login', req.url)
+      url.searchParams.set('callbackUrl', req.nextUrl.pathname)
+      return NextResponse.redirect(url)
+    }
+
+    // Protección basada en roles
+    const role = token.role as UserRole
+
+    // Rutas de Admin
+    if (path.startsWith('/admin')) {
+      if (role !== UserRole.ADMIN) {
+        return NextResponse.redirect(new URL('/dashboard', req.url))
       }
     }
 
-    // Validación de roles para rutas protegidas
-    if (
-      req.nextUrl.pathname.startsWith('/partner') &&
-      token?.role !== 'PARTNER' &&
-      token?.role !== 'ADMIN'
-    ) {
-      return NextResponse.redirect(new URL('/login', req.url)) // O página de no autorizado
+    // Rutas de Colaborador
+    if (path.startsWith('/colaborador')) {
+      if (role !== UserRole.COLABORADOR) {
+        return NextResponse.redirect(new URL('/dashboard', req.url))
+      }
     }
 
-    if (
-      req.nextUrl.pathname.startsWith('/auditor') &&
-      token?.role !== 'AUDITOR' &&
-      token?.role !== 'ADMIN'
-    ) {
-      return NextResponse.redirect(new URL('/login', req.url))
+    // Rutas de Empresa
+    if (path.startsWith('/empresa')) {
+      if (role !== UserRole.EMPRESA) {
+        return NextResponse.redirect(new URL('/dashboard', req.url))
+      }
     }
 
-    if (req.nextUrl.pathname.startsWith('/admin') && token?.role !== 'ADMIN') {
-      return NextResponse.redirect(new URL('/login', req.url))
+    // Dashboard general - redirigir según rol
+    if (path === '/dashboard') {
+      switch (role) {
+        case UserRole.ADMIN:
+          return NextResponse.redirect(new URL('/admin/dashboard', req.url))
+        case UserRole.COLABORADOR:
+          return NextResponse.redirect(new URL('/colaborador/dashboard', req.url))
+        case UserRole.EMPRESA:
+          return NextResponse.redirect(new URL('/empresa/dashboard', req.url))
+        default:
+          return NextResponse.redirect(new URL('/login', req.url))
+      }
     }
 
     return NextResponse.next()
   },
   {
     callbacks: {
-      authorized: ({ req, token }) => {
-        const isPublicRoute = publicRoutes.some((route) =>
-          req.nextUrl.pathname.startsWith(route)
-        )
-        
-        // Si es ruta pública, permitir siempre
-        if (isPublicRoute) return true
+      authorized: ({ token, req }) => {
+        const path = req.nextUrl.pathname
 
-        // Si no es pública, requerir token
+        // Rutas públicas
+        const publicPaths = [
+          '/',
+          '/login',
+          '/register',
+          '/servicios',
+          '/sobre-nosotros',
+          '/partners',
+          '/presupuesto',
+          '/contacto',
+          '/trabaja-con-nosotros',
+          '/legal',
+        ]
+
+        // Permitir acceso a rutas públicas sin token
+        if (publicPaths.some((publicPath) => path.startsWith(publicPath))) {
+          return true
+        }
+
+        // Rutas protegidas requieren token
         return !!token
       },
+    },
+    pages: {
+      signIn: '/login',
     },
   }
 )
@@ -91,12 +111,12 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
+     * - api/auth (NextAuth API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - images (public images)
+     * - public files (images, etc.)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|images).*)',
+    '/((?!api/auth|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

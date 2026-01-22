@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Shield, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormInput } from "@/components/ui/form-input";
@@ -17,16 +17,22 @@ interface Step1Props {
 }
 
 export function Step1AccountDetails({ formData, touched, errors, onChange, onNext }: Step1Props) {
-  const isStepValid = !errors.nombreCompleto && !errors.email && !errors.password && !errors.confirmPassword && !errors.empresa && !errors.cif && !errors.roac && 
-                      formData.nombreCompleto && formData.email && formData.password && formData.confirmPassword && formData.empresa && formData.cif && formData.roac && formData.terms;
+  const isColaborador = formData.role === 'COLABORADOR';
+
+  const isStepValid = !errors.nombreCompleto && !errors.email && !errors.password && !errors.confirmPassword && !errors.empresa && !errors.cif && 
+                      formData.nombreCompleto && formData.email && formData.password && formData.confirmPassword && formData.empresa && formData.cif && formData.terms;
 
   return (
     <Card className="border-none shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white">
       <CardContent className="p-10 lg:p-14 space-y-10">
         <div className="space-y-2">
-          <h1 className="text-3xl font-extrabold text-slate-900">Registro de Partner</h1>
+          <h1 className="text-3xl font-extrabold text-slate-900">
+            {isColaborador ? "Registro de Colaborador" : "Registro de Empresa"}
+          </h1>
           <p className="text-slate-500 font-medium">
-            Únase a la red líder de servicios profesionales de auditoría en España.
+            {isColaborador 
+              ? "Únase como colaborador y gestione auditorías para sus clientes."
+              : "Regístrese para solicitar y gestionar auditorías para su empresa."}
           </p>
         </div>
 
@@ -76,9 +82,9 @@ export function Step1AccountDetails({ formData, touched, errors, onChange, onNex
             />
 
             <FormInput
-              label="Nombre de la Empresa"
+              label={isColaborador ? "Nombre del Despacho / Gestoría" : "Razón Social"}
               name="empresa"
-              placeholder="MindAudit SLP"
+              placeholder={isColaborador ? "Asesores SL" : "Empresa SA"}
               value={formData.empresa}
               onChange={onChange}
               touched={touched.empresa}
@@ -95,18 +101,6 @@ export function Step1AccountDetails({ formData, touched, errors, onChange, onNex
               error={errors.cif}
             />
           </div>
-
-          <FormInput
-            label="Número de Registro ROAC"
-            name="roac"
-            placeholder="Introduzca su ID oficial de auditor"
-            icon={Shield}
-            value={formData.roac}
-            onChange={onChange}
-            touched={touched.roac}
-            error={errors.roac}
-            helperText="Requerido para la validación de servicios de auditoría oficial."
-          />
 
           <div className="pt-6 border-t border-slate-100 flex items-center gap-4">
             <input
