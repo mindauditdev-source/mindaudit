@@ -4,6 +4,7 @@ import { ServicesLandingSection } from '@/components/landing/ServicesLandingSect
 import { WhyChooseUs } from '@/components/landing/WhyChooseUs';
 import { TrustedBy } from '@/components/landing/TrustedBy';
 import { CTASection } from '@/components/landing/CTASection';
+import { CareersCTA } from '@/components/landing/CareersCTA';
 
 export default function LandingPage() {
   return (
@@ -13,6 +14,7 @@ export default function LandingPage() {
       <ServicesLandingSection />
       <WhyChooseUs />
       <TrustedBy />
+      <CareersCTA />
       <CTASection />
     </>
   );

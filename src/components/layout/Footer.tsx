@@ -19,6 +19,18 @@ export function Footer() {
               Servicios profesionales de auditoría y consultoría para empresas 
               que buscan excelencia y transparencia.
             </p>
+            <ul className="space-y-2 pt-2">
+              <li>
+                <Link href="/sobre-nosotros" className="text-slate-500 hover:text-[#0f4c81] text-xs font-semibold uppercase tracking-wider transition-colors">
+                  Sobre Nosotros
+                </Link>
+              </li>
+              <li>
+                <Link href="/trabaja-con-nosotros" className="text-slate-500 hover:text-[#0f4c81] text-xs font-semibold uppercase tracking-wider transition-colors">
+                  Trabaja con nosotros
+                </Link>
+              </li>
+            </ul>
           </div>
 
           {/* Column 2: Servicios */}
