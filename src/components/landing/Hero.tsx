@@ -17,7 +17,7 @@ export function Hero() {
       <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none">
         {/* Background Image */}
         <Image
-          src="/bg-hero-mindaudit-3.webp"
+          src="/hero-bg-section.webp"
           alt="Background"
           fill
           priority
