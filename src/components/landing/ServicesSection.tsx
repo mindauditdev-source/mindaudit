@@ -1,56 +1,27 @@
 import Link from 'next/link';
-import { 
-  Building2, 
-  CheckCircle2, 
-  ShieldCheck,
-  FileText,
-  Search,
-  Scale,
-  Settings,
-  Zap,
-  Briefcase,
-  Layers,
-  FileSearch,
-  Globe
-} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { auditServices } from '@/config/services';
+import * as LucideIcons from 'lucide-react';
+import { LucideIcon, ShieldCheck } from 'lucide-react';
 
 export function ServicesSection() {
   const serviceCategories = [
     {
       title: "Auditoría de Cuentas",
-      items: [
-        { name: "Auditoría de Cuentas Anuales individuales y grupos", icon: Building2 },
-        { name: "Auditoría de Cuentas de empresas del sector Público", icon: Globe },
-        { name: "Revisiones Limitadas", icon: Search },
-        { name: "Auditoría de procedimientos acordados", icon: Settings },
-      ]
+      items: auditServices.filter(s => s.category === 'financial')
     },
     {
       title: "Auditorías Especializadas",
-      items: [
-        { name: "Auditoría Ecoembes", icon: CheckCircle2 },
-        { name: "Auditoría Biocarburantes", icon: Zap },
-        { name: "Auditoría SICBIOS", icon: ShieldCheck },
-        { name: "Auditoría CORES", icon: Layers },
-      ]
+      items: auditServices.filter(s => s.category === 'special')
     },
     {
-        title: "Informes Especiales y Mercantiles",
-        items: [
-          { name: "Informes Especiales de aumento de Capital Social", icon: FileText },
-          { name: "Informes por Reducción de Capital Social", icon: Scale },
-          { name: "Informes Complementarios del Banco de España", icon: LandmarkIcon },
-        ]
+      title: "Informes Especiales y Mercantiles",
+      items: auditServices.filter(s => s.category === 'grants')
     },
     {
       title: "Consultoría y Transacciones",
-      items: [
-        { name: "Due Diligence", icon: FileSearch },
-        { name: "Revisión Contable", icon: Briefcase },
-        { name: "Verificación de Estados Financieros", icon: ShieldCheck },
-      ]
+      items: auditServices.filter(s => s.category === 'other')
     }
   ];
 
@@ -85,18 +56,27 @@ export function ServicesSection() {
                   {category.title}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {category.items.map((item, i) => (
-                    <Card key={i} className="border-slate-100 hover:border-blue-200 hover:shadow-md transition-all group cursor-default">
-                      <CardContent className="p-6">
-                        <div className="h-10 w-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-colors mb-4">
-                           {item.icon && <item.icon className="h-5 w-5" />}
-                        </div>
-                        <p className="text-sm font-bold text-slate-700 leading-snug">
-                          {item.name}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  ))}
+                  {category.items.map((item, i) => {
+                    const IconComponent = (LucideIcons[item.icon as keyof typeof LucideIcons] as LucideIcon) || ShieldCheck;
+                    
+                    return (
+                      <Link key={i} href={`/servicios/${item.slug}`}>
+                        <Card className="border-slate-100 hover:border-blue-200 hover:shadow-lg transition-all group h-full">
+                          <CardContent className="p-6">
+                            <div className="h-10 w-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-colors mb-4">
+                              <IconComponent className="h-5 w-5" />
+                            </div>
+                            <p className="text-sm font-bold text-slate-700 leading-snug group-hover:text-blue-600 transition-colors">
+                              {item.name}
+                            </p>
+                            <p className="text-xs text-slate-400 mt-2 line-clamp-2">
+                              {item.shortDescription}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -123,28 +103,4 @@ export function ServicesSection() {
       </section>
     </div>
   );
-}
-
-function LandmarkIcon(props: React.SVGProps<SVGSVGElement>) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <line x1="3" y1="22" x2="21" y2="22" />
-            <line x1="6" y1="18" x2="6" y2="11" />
-            <line x1="10" y1="18" x2="10" y2="11" />
-            <line x1="14" y1="18" x2="14" y2="11" />
-            <line x1="18" y1="18" x2="18" y2="11" />
-            <polygon points="12 2 20 7 4 7" />
-        </svg>
-    )
 }

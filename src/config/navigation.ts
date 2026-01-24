@@ -273,10 +273,10 @@ export const footerNavigation = {
     { name: 'Blog & Insights', href: '/blog' }, // Por definir
   ],
   services: [
-    { name: 'Auditoría Financiera', href: '/servicios#financiera' },
-    { name: 'Auditoría de Subvenciones', href: '/servicios#subvenciones' },
-    { name: 'Auditoría Ecoembes', href: '/servicios#ecoembes' },
-    { name: 'Due Diligence', href: '/servicios#due-diligence' },
+    { name: 'Auditoría Financiera', href: '/servicios/auditoria-cuentas-anuales' },
+    { name: 'Auditoría de Subvenciones', href: '/servicios/auditoria-subvenciones' },
+    { name: 'Auditoría Ecoembes', href: '/servicios/auditoria-ecoembes' },
+    { name: 'Due Diligence', href: '/servicios/due-diligence' },
   ],
   legal: [
     { name: 'Aviso Legal', href: publicRoutes.legal.notice },
