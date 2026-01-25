@@ -162,4 +162,45 @@ export class PartnerApiService {
     const response = await this.fetch(`/empresas/${id}`);
     return response.data.empresa;
   }
+
+  static async createAuditoria(data: {
+    empresaId: string;
+    tipoServicio: string;
+    fiscalYear: number;
+    description?: string;
+    urgente?: boolean;
+  }) {
+    return this.fetch("/auditorias", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async getAuditorias(filters?: { companyId?: string; status?: string }): Promise<{
+    auditorias: Array<{
+      id: string;
+      tipoServicio: string;
+      fiscalYear: number;
+      status: string;
+      createdAt: string;
+      empresa: {
+        id: string;
+        companyName: string;
+        cif: string;
+      };
+    }>;
+    total: number;
+  }> {
+    let query = "";
+    if (filters) {
+      const params = new URLSearchParams();
+      if (filters.status) params.append("status", filters.status);
+      // Note: companyId might filter locally or need backend support if backend GET /api/auditorias supports it
+      // The current backend GET /api/auditorias only supports status param (checked in step 425)
+      // Partner sees ALL their audits by default. Client-side filtering for company in URL probably better for now unless we update backend.
+      query = `?${params.toString()}`;
+    }
+    const response = await this.fetch(`/auditorias${query}`);
+    return response.data;
+  }
 }

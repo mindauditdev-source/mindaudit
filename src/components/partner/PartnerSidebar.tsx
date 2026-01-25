@@ -27,6 +27,11 @@ const sidebarItems = [
     icon: Building2,
   },
   {
+    title: "Mis Auditorías",
+    href: "/partner/auditorias",
+    icon: FileText,
+  },
+  {
     title: "Comisiones",
     href: "/partner/facturas", // Using facturas for now based on folder structure
     icon: PieChart,

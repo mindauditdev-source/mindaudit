@@ -17,7 +17,8 @@ import {
   Users, 
   ArrowLeft,
   Plus,
-  Calendar
+  Calendar,
+  FileText
 } from "lucide-react";
 import { PartnerApiService, PartnerCompany } from "@/services/partner-api.service";
 import { formatCurrency } from "@/lib/utils";
@@ -273,12 +274,26 @@ export default function CompanyDetailsPage() {
                     </div>
                  ) : (
                     <div className="text-center py-6">
-                       <p className="text-sm text-slate-500">No hay auditorías registradas.</p>
-                       <Link href={`/partner/auditorias/nueva?empresaId=${clienteId}`}>
-                          <Button variant="link" size="sm" className="mt-2 text-blue-600">
-                             Crear primera auditoría
-                          </Button>
-                       </Link>
+                       {company.status === 'IN_AUDIT' ? (
+                          <div className="mb-4">
+                             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 mb-3">
+                                <FileText className="h-6 w-6 text-amber-600" />
+                             </div>
+                             <h3 className="text-sm font-semibold text-slate-900">Auditoría Inicial en Curso</h3>
+                             <p className="text-xs text-slate-500 mt-1 max-w-[200px] mx-auto">
+                                Esta empresa está siendo auditada por primera vez.
+                             </p>
+                          </div>
+                       ) : (
+                          <>
+                             <p className="text-sm text-slate-500">No hay auditorías registradas.</p>
+                             <Link href={`/partner/auditorias/nueva?empresaId=${clienteId}`}>
+                                <Button variant="link" size="sm" className="mt-2 text-blue-600">
+                                   Crear primera auditoría
+                                </Button>
+                             </Link>
+                          </>
+                       )}
                     </div>
                  )}
               </CardContent>
