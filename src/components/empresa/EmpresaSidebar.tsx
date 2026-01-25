@@ -25,11 +25,6 @@ const sidebarItems = [
     icon: FileText,
   },
   {
-    title: "Documentos",
-    href: "/empresa/documentos",
-    icon: Building2,
-  },
-  {
     title: "Perfil",
     href: "/empresa/perfil",
     icon: Users,
