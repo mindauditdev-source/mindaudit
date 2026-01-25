@@ -6,49 +6,58 @@ import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
+  Users,
   Building2,
   FileText,
+  PieChart,
+  Settings,
   LogOut,
-  Users
+  ShieldCheck,
+  ClipboardList
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const sidebarItems = [
   {
-    title: "Dashboard",
-    href: "/empresa/dashboard",
+    title: "Panel General",
+    href: "/admin/dashboard",
     icon: LayoutDashboard,
   },
   {
-    title: "Mis Auditorías",
-    href: "/empresa/auditorias",
-    icon: FileText,
-  },
-  {
-    title: "Perfil",
-    href: "/empresa/perfil",
+    title: "Colaboradores",
+    href: "/admin/colaboradores",
     icon: Users,
   },
   {
-    title: "Documentos",
-    href: "/empresa/documentos",
-    icon: FileText,
+    title: "Empresas",
+    href: "/admin/empresas",
+    icon: Building2,
   },
   {
-    title: "Facturas",
-    href: "/empresa/facturas",
-    icon: FileText, // Could use Receipt or FileText
+    title: "Auditorías",
+    href: "/admin/auditorias",
+    icon: ClipboardList,
+  },
+  {
+    title: "Comisiones",
+    href: "/admin/comisiones",
+    icon: PieChart,
+  },
+  {
+    title: "Configuración",
+    href: "/admin/config",
+    icon: Settings,
   },
 ];
 
-export function EmpresaSidebar() {
+export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full w-64 flex-col bg-[#1a2e35] text-white transition-all duration-300">
-      <div className="flex h-16 items-center px-6 border-b border-[#2a4e55]">
-        <Building2 className="h-6 w-6 mr-2 text-emerald-400" />
-        <span className="text-xl font-bold tracking-tight">Portal Cliente</span>
+    <div className="flex h-full w-64 flex-col bg-slate-900 text-white transition-all duration-300">
+      <div className="flex h-16 items-center px-6 border-b border-slate-800">
+        <ShieldCheck className="h-6 w-6 mr-2 text-indigo-400" />
+        <span className="text-xl font-bold tracking-tight">Admin Portal</span>
       </div>
       
       <div className="flex-1 overflow-y-auto py-6">
@@ -62,14 +71,14 @@ export function EmpresaSidebar() {
                 className={cn(
                   "group flex items-center rounded-lg px-3 py-3 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-[#2a4e55] text-white shadow-md"
-                    : "text-slate-300 hover:bg-[#2a4e55]/50 hover:text-white"
+                    ? "bg-indigo-600 text-white shadow-md"
+                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
                 )}
               >
                 <item.icon
                   className={cn(
                     "mr-3 h-5 w-5 flex-shrink-0 transition-colors",
-                    isActive ? "text-emerald-400" : "text-slate-400 group-hover:text-emerald-400"
+                    isActive ? "text-white" : "text-slate-500 group-hover:text-white"
                   )}
                   aria-hidden="true"
                 />
@@ -80,10 +89,10 @@ export function EmpresaSidebar() {
         </nav>
       </div>
 
-      <div className="border-t border-[#2a4e55] p-4">
+      <div className="border-t border-slate-800 p-4">
         <Button
           variant="ghost"
-          className="w-full justify-start text-slate-300 hover:bg-[#2a4e55] hover:text-white"
+          className="w-full justify-start text-slate-400 hover:bg-slate-800 hover:text-white"
           onClick={() => signOut({ callbackUrl: '/login' })}
         >
           <LogOut className="mr-3 h-5 w-5" />

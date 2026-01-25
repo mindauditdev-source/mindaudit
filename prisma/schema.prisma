@@ -165,6 +165,7 @@ model Empresa {
   // Relaciones
   auditorias      Auditoria[]
   documentos      Documento[]
+  solicitudes     SolicitudDocumento[]
   
   // Timestamps
   createdAt       DateTime       @default(now())
@@ -242,6 +243,7 @@ model Auditoria {
   // Relaciones
   comisiones        Comision[]
   documentos        Documento[]
+  solicitudes       SolicitudDocumento[]
   
   // Timestamps
   createdAt         DateTime         @default(now())
@@ -354,6 +356,9 @@ model Documento {
   auditoriaId     String?
   auditoria       Auditoria?     @relation(fields: [auditoriaId], references: [id], onDelete: Cascade)
   
+  // Relación con solicitud
+  solicitud       SolicitudDocumento? @relation("DocumentoSolicitud")
+  
   // Metadata
   description     String?
   tags            String[]
@@ -367,6 +372,39 @@ model Documento {
   @@index([empresaId])
   @@index([auditoriaId])
   @@map("documentos")
+}
+
+enum SolicitudStatus {
+  PENDIENTE
+  ENTREGADO
+  RECHAZADO
+  APROBADO
+}
+
+model SolicitudDocumento {
+  id              String           @id @default(cuid())
+  title           String
+  description     String?          @db.Text
+  status          SolicitudStatus  @default(PENDIENTE)
+  
+  // Relaciones
+  empresaId       String
+  empresa         Empresa          @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  auditoriaId     String?
+  auditoria       Auditoria?       @relation(fields: [auditoriaId], references: [id], onDelete: Cascade)
+  
+  // Documento subido (una vez completada)
+  documentoId     String?          @unique
+  documento       Documento?       @relation("DocumentoSolicitud", fields: [documentoId], references: [id], onDelete: SetNull)
+  
+  // Timestamps
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([empresaId])
+  @@index([auditoriaId])
+  @@index([status])
+  @@map("solicitudes_documentos")
 }
 
 // ============================================

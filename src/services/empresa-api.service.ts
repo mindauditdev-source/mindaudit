@@ -93,4 +93,30 @@ export class EmpresaApiService {
       body: JSON.stringify(data),
     });
   }
+
+  static async getDocumentos(): Promise<{ documentos: any[] }> {
+    const response = await this.fetch("/documentos");
+    return response.data;
+  }
+
+  static async getSolicitudesDocumento(params?: { auditoriaId?: string }): Promise<{ solicitudes: any[] }> {
+    let query = "";
+    if (params?.auditoriaId) query = `?auditoriaId=${params.auditoriaId}`;
+    const response = await this.fetch(`/documentos/solicitudes${query}`);
+    return response.data;
+  }
+
+  static async saveDocument(data: {
+    name: string;
+    url: string;
+    size?: number;
+    type?: string;
+    auditoriaId?: string;
+    solicitudId?: string;
+  }) {
+    return this.fetch("/documentos", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
 }

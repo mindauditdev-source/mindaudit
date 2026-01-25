@@ -50,9 +50,40 @@ export async function POST(request: NextRequest) {
       colaboradorId = colaborador.id
     }
 
-    // Crear empresa
+    // Verify if User exists with contactEmail
+    let empresaUser = await prisma.user.findUnique({
+      where: { email: validatedData.contactEmail },
+    })
+
+    // If no user, create one with role EMPRESA
+    if (!empresaUser) {
+      // NOTE: In a real prod environment, we should send an invite email.
+      // For now, we set a default password or generated one.
+      const bcrypt = await import('bcryptjs');
+      // Default temp password logic (e.g. "Empresa2024!")
+      const hashedPassword = await bcrypt.hash("MindAudit123!", 10);
+      
+      empresaUser = await prisma.user.create({
+        data: {
+          email: validatedData.contactEmail,
+          name: validatedData.contactName,
+          hashedPassword: hashedPassword,
+          role: UserRole.EMPRESA,
+        },
+      })
+    } else {
+      // If user exists, ensure they are EMPRESA role (optional check, or just link)
+      // We might want to skip linking if they are ADMIN or COLABORADOR to avoid multi-role complexity in MVP
+      if (empresaUser.role !== UserRole.EMPRESA) {
+         // Failing if email is taken by non-empresa might be safer
+         return errorResponse('El email de contacto ya está registrado como otro tipo de usuario', 409)
+      }
+    }
+
+    // Crear empresa linked to User
     const empresa = await prisma.empresa.create({
       data: {
+        userId: empresaUser.id, // Linked to the new or existing user
         origen: colaboradorId ? EmpresaOrigen.COLABORADOR : EmpresaOrigen.DIRECTA,
         colaboradorId,
         companyName: validatedData.companyName,

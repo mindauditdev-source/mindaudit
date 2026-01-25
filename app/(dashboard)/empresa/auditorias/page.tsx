@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FileText, Plus, Search, Calendar } from "lucide-react";
+import { FileText, Plus, Search, Calendar, AlertCircle } from "lucide-react";
 import { EmpresaApiService, EmpresaAuditoria } from "@/services/empresa-api.service";
 import { AuditoriaStatus } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
@@ -13,15 +13,20 @@ import { Badge } from "@/components/ui/badge";
 export default function EmpresaAuditoriasPage() {
   const [loading, setLoading] = useState(true);
   const [auditorias, setAuditorias] = useState<EmpresaAuditoria[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const data = await EmpresaApiService.getAuditorias();
-        setAuditorias(data.auditorias);
+        const [auditData, requestData] = await Promise.all([
+          EmpresaApiService.getAuditorias(),
+          EmpresaApiService.getSolicitudesDocumento()
+        ]);
+        setAuditorias(auditData.auditorias || []);
+        setPendingRequests(requestData.solicitudes?.filter((s: any) => s.status === 'PENDIENTE') || []);
       } catch (error) {
-        console.error("Error loading auditorias:", error);
+        console.error("Error loading auditorias data:", error);
       } finally {
         setLoading(false);
       }
@@ -83,11 +88,23 @@ export default function EmpresaAuditoriasPage() {
                            <div className="flex items-center gap-2">
                               <h4 className="font-semibold text-slate-900">{a.tipoServicio.replace(/_/g, " ")}</h4>
                               <StatusBadge status={a.status} />
+                              {pendingRequests.some(r => r.auditoriaId === a.id) && (
+                                 <Badge className="bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-100 animate-pulse">
+                                    Documentos Reclamados
+                                 </Badge>
+                              )}
                            </div>
-                           <p className="text-sm text-slate-500 mt-1 flex items-center gap-2">
-                              <Calendar className="h-3.5 w-3.5" />
-                              Ejercicio {a.fiscalYear} • ID: {a.id.substring(0, 8)}
-                           </p>
+                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-1">
+                              <p className="text-sm text-slate-500 flex items-center gap-2">
+                                 <Calendar className="h-3.5 w-3.5" />
+                                 Ejercicio {a.fiscalYear} • ID: {a.id.substring(0, 8)}
+                              </p>
+                              {pendingRequests.some(r => r.auditoriaId === a.id) && (
+                                 <Link href="/empresa/documentos" className="text-xs font-bold text-amber-600 underline flex items-center gap-1">
+                                    Subir documentación requerida
+                                 </Link>
+                              )}
+                           </div>
                         </div>
                      </div>
                      <Link href={`/empresa/auditorias/${a.id}`}>
