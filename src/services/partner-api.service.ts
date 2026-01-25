@@ -110,4 +110,56 @@ export class PartnerApiService {
     const response = await this.fetch("/colaboradores/me/comisiones");
     return response.data;
   }
+
+  static async createCompany(data: {
+    companyName: string;
+    cif: string;
+    contactName: string;
+    contactEmail: string;
+    contactPhone?: string;
+    revenue?: number;
+    fiscalYear?: number;
+    employees?: number;
+  }): Promise<PartnerCompany> {
+    const response = await this.fetch("/empresas", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    return response.data.empresa;
+  }
+
+  static async getCompanyDetails(id: string): Promise<PartnerCompany> {
+    // Assuming backend endpoint support /api/empresas/:id or similar.
+    // Since we don't have a direct "get single company by ID" for partner in the strict list earlier,
+    // we can reuse the generic admin/colaborador logic if available or filter from getEmpresas if needed.
+    // Ideally, we should have GET /api/empresas/:id implemented.
+    // Based on previous tasks, we might NOT have this specific endpoint for Partner role exposed directly under /empresas/:id if RBAC restricts it.
+    // However, looking at api structure:
+    // GET /api/empresas -> Admin only
+    // GET /api/colaboradores/me/empresas -> List all
+    // We should probably implement a GET /api/empresas/:id that checks if the company belongs to the caller (Colaborador).
+    // Let's assume we will implement/use GET /api/empresas/[id] and it handles permission check.
+    
+    /* 
+       WAIT: The previous implementation of GET /api/empresas/me is for the company itself.
+       We need an endpoint for the PARTNER to view a specific company details.
+       
+       Let's check if we implemented GET /api/empresas/[id]. 
+       We implemented:
+       - GET /api/empresas (Admin list)
+       - GET /api/empresas/me (Company profile)
+       
+       We MISSING: GET /api/empresas/:id generic with ownership check.
+       
+       Let's implement it first in the backend task or verify if we can fetch it.
+       For now, let's filter from getEmpresas() as a temporary solution OR implement the endpoint.
+       Implementing the endpoint is better.
+    */
+    
+    // Changing strategy: I'll try to fetch all and find one, but that's inefficient.
+    // Better: I will implement GET /api/empresas/[id] in the next steps.
+    // For now I'll add the method call assuming the endpoint will exist.
+    const response = await this.fetch(`/empresas/${id}`);
+    return response.data.empresa;
+  }
 }
