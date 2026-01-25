@@ -71,6 +71,16 @@ export async function GET(request: NextRequest) {
       }),
     ])
 
+    // Calcular ingresos totales (presupuestos de auditorías aprobadas/en proceso/completadas)
+    const ingresosTotales = await prisma.auditoria.aggregate({
+      where: {
+        status: {
+          in: ['APROBADA', 'EN_PROCESO', 'COMPLETADA'],
+        },
+      },
+      _sum: { presupuesto: true },
+    })
+
     // Calcular ingresos del mes actual
     const now = new Date()
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -90,6 +100,7 @@ export async function GET(request: NextRequest) {
         totalEmpresas,
         totalAuditorias,
         auditoriasActivas,
+        ingresosTotales: ingresosTotales._sum.presupuesto?.toNumber() || 0,
         empresasPorOrigen: empresasPorOrigen.reduce(
           (acc, item) => {
             acc[item.origen] = item._count
@@ -106,6 +117,7 @@ export async function GET(request: NextRequest) {
             total: comisionesPagadas._sum.montoComision?.toNumber() || 0,
             count: comisionesPagadas._count,
           },
+          totalHistorico: (comisionesPendientes._sum.montoComision?.toNumber() || 0) + (comisionesPagadas._sum.montoComision?.toNumber() || 0)
         },
         ingresosMes: ingresosMes._sum.presupuesto?.toNumber() || 0,
         auditoriasPorEstado: auditoriasPorEstado.reduce(

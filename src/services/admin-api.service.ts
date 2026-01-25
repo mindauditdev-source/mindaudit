@@ -46,7 +46,21 @@ export class AdminApiService {
 
   static async getStats(): Promise<AdminStats> {
     const response = await this.fetch("/admin/stats");
-    return response.data;
+    const s = response.data.stats;
+    
+    // Sum pending actions: requested and under revision
+    const pendingCount = (s.auditoriasPorEstado?.['SOLICITADA'] || 0) + 
+                         (s.auditoriasPorEstado?.['EN_REVISION'] || 0);
+
+    return {
+      totalRevenue: s.ingresosTotales || s.ingresosMes || 0,
+      totalAudits: s.totalAuditorias || 0,
+      activeColaboradores: s.totalColaboradores || 0,
+      totalEmpresas: s.totalEmpresas || 0,
+      pendingAudits: pendingCount,
+      commissionPaid: s.comisiones?.pagadas?.total || 0,
+      revenueByMonth: [], // Future development
+    };
   }
 
   static async getColaboradores(): Promise<{ colaboradores: AdminColaborador[] }> {
