@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { Bell, Search, User } from "lucide-react";
+import { Search, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { NotificationPopover } from "@/components/shared/NotificationPopover";
 
 export function AuditorNavbar() {
   const { data: session } = useSession();
@@ -30,10 +31,7 @@ export function AuditorNavbar() {
       </div>
 
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="text-slate-500 relative hover:bg-slate-50 rounded-full">
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-blue-600 border-2 border-white"></span>
-        </Button>
+        <NotificationPopover />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

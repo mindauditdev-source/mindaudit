@@ -1,7 +1,6 @@
 import { useAuth } from "@/hooks/use-auth";
-import { Bell } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { NotificationPopover } from "@/components/shared/NotificationPopover";
 
 export function EmpresaHeader() {
   const { user } = useAuth();
@@ -18,10 +17,7 @@ export function EmpresaHeader() {
       </div>
       
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-emerald-600">
-          <Bell className="h-5 w-5" />
-          <span className="sr-only">Notificaciones</span>
-        </Button>
+        <NotificationPopover />
         
         <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
           <div className="hidden text-right md:block">

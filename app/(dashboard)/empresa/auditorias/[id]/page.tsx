@@ -46,18 +46,27 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
 
   // Payment Failure State
   const [isPaymentFailedOpen, setIsPaymentFailedOpen] = useState(false);
+  const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
 
   // Success/Failure handling
   useEffect(() => {
     const paymentStatus = searchParams.get("payment");
     if (paymentStatus === "success" || searchParams.get("success") === "simulate") {
-       alert("🎉 ¡Pago completado con éxito! Su expediente ha comenzado.");
-       // Clean URL
-       router.replace(`/empresa/auditorias/${id}`);
+       setIsPaymentProcessing(true);
+       // Poll for status update? Or just show processing UI.
+       // We can reload data periodically if processing
     } else if (paymentStatus === "failed") {
        setIsPaymentFailedOpen(true);
     }
   }, [searchParams, id, router]);
+
+
+  // Stop processing if status changes to EN_PROCESO
+  useEffect(() => {
+    if (audit?.status === 'EN_PROCESO' || audit?.status === 'APROBADA') {
+      setIsPaymentProcessing(false);
+    }
+  }, [audit?.status]);
   
   // Decision Modal State
   const [isDecisionOpen, setIsDecisionOpen] = useState(false);
@@ -88,6 +97,17 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Poll for status change if processing
+  useEffect(() => {
+    if (!isPaymentProcessing) return;
+    
+    const interval = setInterval(() => {
+      loadData();
+    }, 3000); // Check every 3s
+    
+    return () => clearInterval(interval);
+  }, [isPaymentProcessing, loadData]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, solicitud: any) => {
     const file = e.target.files?.[0];
@@ -455,20 +475,37 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
                             Rechazar Oferta <XCircle className="ml-2 h-4 w-4" />
                          </Button>
                       </div>
-                    ) : (audit.status === 'PENDIENTE_DE_PAGO' || searchParams.get('payment') === 'failed') ? (
+                  ) : (audit.status === 'PENDIENTE_DE_PAGO' || searchParams.get('payment') === 'failed' || isPaymentProcessing) ? (
                         <div className="space-y-4">
-                           <div className="p-4 bg-amber-500/10 rounded-2xl border border-amber-500/20 text-center">
-                              <AlertCircle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
-                              <p className="text-sm font-black text-amber-500 uppercase tracking-widest mb-1">Pago Pendiente</p>
-                              <p className="text-sm font-medium text-slate-300">El pago no se ha completado. Inténtalo de nuevo para iniciar.</p>
-                           </div>
-                           <Button 
-                              onClick={handleRetryPayment}
-                              disabled={submitting}
-                              className="w-full h-14 rounded-2xl bg-[#6366f1] hover:bg-[#4f46e5] text-white font-black text-lg shadow-xl shadow-indigo-900/20 animate-pulse"
-                           >
-                              {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : "Completar Pago Ahora"}
-                           </Button>
+                           {isPaymentProcessing ? (
+                              <div className="p-6 bg-blue-500/10 rounded-2xl border border-blue-500/20 text-center animate-pulse">
+                                 <Loader2 className="h-8 w-8 text-blue-500 mx-auto mb-3 animate-spin" />
+                                 <p className="text-sm font-black text-blue-500 uppercase tracking-widest mb-1">Verificando Pago</p>
+                                 <p className="text-sm font-medium text-slate-300">Estamos confirmando la transacción. Por favor espera...</p>
+                              </div>
+                           ) : searchParams.get('payment') === 'failed' ? (
+                              <div className="p-4 bg-red-500/10 rounded-2xl border border-red-500/20 text-center">
+                                 <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-3" />
+                                 <p className="text-sm font-black text-red-500 uppercase tracking-widest mb-1">Pago No Completado</p>
+                                 <p className="text-sm font-medium text-slate-300">Hubo un problema con la transacción. Inténtalo de nuevo.</p>
+                              </div>
+                           ) : (
+                              <div className="p-4 bg-indigo-500/10 rounded-2xl border border-indigo-500/20 text-center">
+                                 <Clock className="h-8 w-8 text-indigo-400 mx-auto mb-3" />
+                                 <p className="text-sm font-black text-indigo-400 uppercase tracking-widest mb-1">En Espera de Pago</p>
+                                 <p className="text-sm font-medium text-slate-300">Para iniciar el expediente, es necesario abonar el servicio.</p>
+                              </div>
+                           )}
+
+                           {!isPaymentProcessing && (
+                              <Button 
+                                 onClick={handleRetryPayment}
+                                 disabled={submitting}
+                                 className="w-full h-14 rounded-2xl bg-[#6366f1] hover:bg-[#4f46e5] text-white font-black text-lg shadow-xl shadow-indigo-900/20"
+                              >
+                                 {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : "Completar Pago Ahora"}
+                              </Button>
+                           )}
                         </div>
                    ) : audit.status === 'APROBADA' || audit.status === 'EN_PROCESO' ? (
                       <div className="p-6 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 text-center">
