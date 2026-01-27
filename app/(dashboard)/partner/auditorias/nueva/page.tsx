@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -28,7 +28,7 @@ const createAuditSchema = z.object({
 
 type CreateAuditFormValues = z.infer<typeof createAuditSchema>;
 
-export default function CreateAuditPage() {
+function CreateAuditForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const empresaIdParam = searchParams.get("empresaId");
@@ -240,5 +240,17 @@ export default function CreateAuditPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function CreateAuditPage() {
+  return (
+    <Suspense fallback={
+       <div className="flex h-screen items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-[#0a3a6b]" />
+       </div>
+    }>
+       <CreateAuditForm />
+    </Suspense>
   );
 }

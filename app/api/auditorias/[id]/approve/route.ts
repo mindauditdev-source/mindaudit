@@ -108,14 +108,15 @@ export async function PATCH(
           id: updatedAuditoria.id,
           status: updatedAuditoria.status,
           fechaAprobacion: updatedAuditoria.fechaAprobacion,
-          presupuesto: updatedAuditoria.presupuesto.toNumber(),
+          presupuesto: updatedAuditoria.presupuesto?.toNumber() ?? 0,
         },
         comision: comisionInfo,
       },
       `Auditoría aprobada exitosamente${comisionInfo ? '. Comisión generada automáticamente.' : ''}`
     )
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error en PATCH /api/auditorias/[id]/approve:', error)
-    return serverErrorResponse(error.message)
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return serverErrorResponse(message)
   }
 }

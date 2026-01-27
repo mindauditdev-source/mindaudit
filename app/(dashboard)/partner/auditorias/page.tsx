@@ -1,12 +1,13 @@
 "use client";
 
+import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Search, FileText } from "lucide-react";
+import { Plus, Search, FileText, Loader2 } from "lucide-react";
 import { PartnerApiService } from "@/services/partner-api.service";
 
 // Reuse types or import from service
@@ -28,7 +29,7 @@ interface AuditListItem {
   };
 }
 
-export default function PartnerAuditsPage() {
+function PartnerAuditsContent() {
   const [loading, setLoading] = useState(true);
   const [auditorias, setAuditorias] = useState<AuditListItem[]>([]);
   const searchParams = useSearchParams();
@@ -44,7 +45,7 @@ export default function PartnerAuditsPage() {
         
         let filtered = data.auditorias;
         if (companyIdParam) {
-           filtered = filtered.filter(a => a.empresa.id === companyIdParam);
+           filtered = filtered.filter((a: AuditListItem) => a.empresa.id === companyIdParam);
         }
         
         setAuditorias(filtered);
@@ -178,4 +179,16 @@ function StatusBadge({ status }: { status: string }) {
       {status}
     </span>
   );
+}
+
+export default function PartnerAuditsPage() {
+   return (
+      <Suspense fallback={
+         <div className="flex h-screen items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-[#0a3a6b]" />
+         </div>
+      }>
+         <PartnerAuditsContent />
+      </Suspense>
+   );
 }

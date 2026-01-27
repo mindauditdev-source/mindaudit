@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,7 +13,7 @@ import { signIn } from "next-auth/react";
 import { loginSchema, type LoginInput } from "@/validators/auth.validator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
@@ -260,5 +261,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-screen items-center justify-center bg-white">
+        <Loader2 className="h-8 w-8 animate-spin text-[#0a3a6b]" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
