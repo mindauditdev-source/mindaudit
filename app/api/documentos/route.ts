@@ -19,8 +19,8 @@ const createDocumentSchema = z.object({
   type: z.string().optional(),
   size: z.number().optional(),
   empresaId: z.string().optional(), 
-  auditoriaId: z.string().optional(),
-  solicitudId: z.string().optional(),
+  auditoriaId: z.string().nullable().optional(),
+  solicitudId: z.string().nullable().optional(),
 });
 
 /**

@@ -11,16 +11,18 @@ import { AuditoriaStatus, UserRole } from '@prisma/client'
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     // Autenticar usuario
     const user = await getAuthenticatedUser()
     requireEmpresaOrAdmin(user)
 
     // Obtener auditoría
     const auditoria = await prisma.auditoria.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         empresa: true,
       },
@@ -51,7 +53,7 @@ export async function PATCH(
 
     // Actualizar auditoría a RECHAZADA
     const updatedAuditoria = await prisma.auditoria.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         status: AuditoriaStatus.RECHAZADA,
         ...(motivo && { presupuestoNotas: motivo }),
@@ -65,8 +67,8 @@ export async function PATCH(
         userRole: user.role,
         action: 'REJECT',
         entity: 'Auditoria',
-        entityId: params.id,
-        description: `Auditoría rechazada: ${params.id}${motivo ? ` - Motivo: ${motivo}` : ''}`,
+        entityId: id,
+        description: `Auditoría rechazada: ${id}${motivo ? ` - Motivo: ${motivo}` : ''}`,
       },
     })
 

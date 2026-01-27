@@ -36,6 +36,7 @@ export interface EmpresaAuditoria {
   empresaId: string;
   colaboradorId: string | null;
   tipoServicio: string;
+  description: string | null;
   fiscalYear: number;
   status: AuditoriaStatus;
   urgente: boolean;
@@ -104,6 +105,29 @@ export class EmpresaApiService {
     if (params?.auditoriaId) query = `?auditoriaId=${params.auditoriaId}`;
     const response = await this.fetch(`/documentos/solicitudes${query}`);
     return response.data;
+  }
+
+  static async getAuditoriaById(id: string): Promise<EmpresaAuditoria> {
+    const response = await this.fetch(`/auditorias/${id}`);
+    return response.data.auditoria;
+  }
+
+  static async submitDecision(id: string, data: {
+    decision: 'ACCEPT' | 'REJECT' | 'MEETING';
+    feedback?: string;
+  }) {
+    return this.fetch(`/auditorias/${id}/decision`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async createCheckoutSession(auditoriaId: string): Promise<{ url: string }> {
+    const response = await this.fetch("/payments/checkout", {
+      method: "POST",
+      body: JSON.stringify({ auditoriaId }),
+    });
+    return response;
   }
 
   static async saveDocument(data: {

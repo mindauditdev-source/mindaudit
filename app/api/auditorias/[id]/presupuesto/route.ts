@@ -19,16 +19,18 @@ const presupuestoSchema = z.object({
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     // Autenticar y verificar que sea admin
     const user = await getAuthenticatedUser()
     requireAdmin(user)
 
     // Obtener auditoría
     const auditoria = await prisma.auditoria.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         empresa: true,
         colaborador: true,
@@ -60,7 +62,7 @@ export async function POST(
 
     // Actualizar auditoría
     const updatedAuditoria = await prisma.auditoria.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         presupuesto: validatedData.presupuesto,
         presupuestoNotas: validatedData.presupuestoNotas,
@@ -81,8 +83,8 @@ export async function POST(
         userRole: user.role,
         action: 'SEND',
         entity: 'Auditoria',
-        entityId: params.id,
-        description: `Presupuesto enviado: €${validatedData.presupuesto} para auditoría ${params.id}`,
+        entityId: id,
+        description: `Presupuesto enviado: €${validatedData.presupuesto} para auditoría ${id}`,
       },
     })
 

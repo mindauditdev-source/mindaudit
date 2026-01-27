@@ -1,4 +1,4 @@
-import { ColaboradorStatus, AuditoriaStatus, ComisionStatus } from "@prisma/client";
+import { ColaboradorStatus } from "@prisma/client";
 
 export interface AdminStats {
   totalRevenue: number;
@@ -26,29 +26,27 @@ export interface AdminColaborador {
   }
 }
 
-export class AdminApiService {
-  private static async fetch(endpoint: string, options: RequestInit = {}) {
-    const res = await fetch(`/api${endpoint}`, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
-    });
+async function apiFetch(endpoint: string, options: RequestInit = {}) {
+  const res = await fetch(`/api${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 
-    if (!res.ok) {
-      const error = await res.json().catch(() => ({}));
-      throw new Error(error.message || "Error en la petición de administración");
-    }
-
-    return res.json();
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || "Error en la petición de administración");
   }
 
-  static async getStats(): Promise<AdminStats> {
-    const response = await this.fetch("/admin/stats");
+  return res.json();
+}
+
+export const AdminApiService = {
+  getStats: async (): Promise<AdminStats> => {
+    const response = await apiFetch("/admin/stats");
     const s = response.data.stats;
-    
-    // Sum pending actions: requested and under revision
     const pendingCount = (s.auditoriasPorEstado?.['SOLICITADA'] || 0) + 
                          (s.auditoriasPorEstado?.['EN_REVISION'] || 0);
 
@@ -59,67 +57,79 @@ export class AdminApiService {
       totalEmpresas: s.totalEmpresas || 0,
       pendingAudits: pendingCount,
       commissionPaid: s.comisiones?.pagadas?.total || 0,
-      revenueByMonth: [], // Future development
+      revenueByMonth: [],
     };
-  }
+  },
 
-  static async getColaboradores(): Promise<{ colaboradores: AdminColaborador[] }> {
-    const response = await this.fetch("/admin/colaboradores");
+  getColaboradores: async (): Promise<{ colaboradores: AdminColaborador[] }> => {
+    const response = await apiFetch("/admin/colaboradores");
     return response.data;
-  }
+  },
 
-  static async approveColaborador(id: string) {
-    return this.fetch(`/admin/colaboradores/${id}/approve`, {
+  approveColaborador: async (id: string) => {
+    return apiFetch(`/admin/colaboradores/${id}/approve`, {
       method: "PATCH",
     });
-  }
+  },
 
-  static async updateCommissionRate(id: string, rate: number) {
-    return this.fetch(`/admin/colaboradores/${id}/commission-rate`, {
+  updateCommissionRate: async (id: string, rate: number) => {
+    return apiFetch(`/admin/colaboradores/${id}/commission-rate`, {
       method: "PATCH",
       body: JSON.stringify({ commissionRate: rate }),
     });
-  }
+  },
 
-  static async getComisiones(): Promise<{ comisiones: any[] }> {
-    const response = await this.fetch("/admin/comisiones");
+  getComisiones: async (colaboradorId?: string): Promise<{ comisiones: any[] }> => {
+    const query = colaboradorId ? `?colaboradorId=${colaboradorId}` : "";
+    const response = await apiFetch(`/admin/comisiones${query}`);
     return response.data;
-  }
+  },
   
-  static async payComision(id: string) {
-    return this.fetch(`/admin/comisiones/${id}/pay`, {
+  payComision: async (id: string) => {
+    return apiFetch(`/admin/comisiones/${id}/pay`, {
        method: "PATCH",
     });
-  }
+  },
 
-  static async getAuditorias(): Promise<{ auditorias: any[] }> {
-    // Current GET /api/auditorias returns all if admin
-    const response = await this.fetch("/auditorias");
+  getAuditorias: async (): Promise<{ auditorias: any[] }> => {
+    const response = await apiFetch("/auditorias");
     return response.data;
-  }
+  },
 
-  static async submitBudget(id: string, data: { presupuesto: number; notas?: string }) {
-    return this.fetch(`/auditorias/${id}/presupuesto`, {
+  submitBudget: async (id: string, data: { presupuesto: number; notas?: string }) => {
+    return apiFetch(`/auditorias/${id}/presupuesto`, {
       method: "POST",
       body: JSON.stringify(data),
     });
-  }
+  },
 
-  static async completeAudit(id: string) {
-     return this.fetch(`/auditorias/${id}/complete`, {
+  completeAudit: async (id: string) => {
+     return apiFetch(`/auditorias/${id}/complete`, {
         method: "PATCH",
      });
-  }
+  },
 
-  static async requestDocument(data: {
+  requestDocument: async (data: {
     title: string;
     description?: string;
     empresaId: string;
     auditoriaId?: string;
-  }) {
-    return this.fetch("/documentos/solicitudes", {
+  }) => {
+    return apiFetch("/documentos/solicitudes", {
       method: "POST",
       body: JSON.stringify(data),
     });
+  },
+
+  getSolicitudesByEmpresa: async (empresaId: string) => {
+    const response = await apiFetch(`/documentos/solicitudes?empresaId=${empresaId}`);
+    return response.data;
+  },
+
+  updateSolicitudStatus: async (id: string, data: { status: string; feedback?: string }) => {
+    return apiFetch(`/documentos/solicitudes/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
   }
-}
+};

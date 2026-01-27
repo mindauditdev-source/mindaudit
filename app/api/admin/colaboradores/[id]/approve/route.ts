@@ -11,16 +11,17 @@ import { ColaboradorStatus, UserStatus } from '@prisma/client'
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     // Autenticar y verificar que sea admin
     const user = await getAuthenticatedUser()
     requireAdmin(user)
 
     // Obtener colaborador
     const colaborador = await prisma.colaborador.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         user: true,
       },
@@ -43,7 +44,7 @@ export async function PATCH(
     const updatedColaborador = await prisma.$transaction(async (tx) => {
       // 1. Actualizar colaborador
       const updated = await tx.colaborador.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           status: ColaboradorStatus.ACTIVE,
           ...(commissionRate !== undefined && { commissionRate }),
@@ -71,7 +72,7 @@ export async function PATCH(
         userRole: user.role,
         action: 'APPROVE',
         entity: 'Colaborador',
-        entityId: params.id,
+        entityId: id,
         description: `Colaborador aprobado: ${colaborador.companyName}`,
       },
     })

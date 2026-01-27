@@ -29,7 +29,7 @@ const sidebarItems = [
     icon: Users,
   },
   {
-    title: "Clientes",
+    title: "Clientes y Auditorías",
     href: "/auditor/clientes",
     icon: Building2,
   },

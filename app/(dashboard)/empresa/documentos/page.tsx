@@ -6,8 +6,8 @@ import { EmpresaApiService } from "@/services/empresa-api.service";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, FileText, Upload, Clock, CheckCircle2, CloudUpload, Info } from "lucide-react";
-import { formatBytes } from "@/lib/utils";
+import { Loader2, FileText, Upload, Clock, CheckCircle2, CloudUpload, Info, AlertCircle } from "lucide-react";
+import { cn, formatBytes } from "@/lib/utils";
 
 export default function EmpresaDocumentsPage() {
   const [solicitudes, setSolicitudes] = useState<any[]>([]);
@@ -80,7 +80,7 @@ export default function EmpresaDocumentsPage() {
     );
   }
 
-  const pendingRequests = solicitudes.filter(s => s.status === 'PENDIENTE');
+  const pendingRequests = solicitudes.filter(s => s.status === 'PENDIENTE' || s.status === 'RECHAZADO');
 
   return (
     <div className="space-y-8">
@@ -145,7 +145,13 @@ export default function EmpresaDocumentsPage() {
                              </div>
                              <h4 className="text-lg font-bold text-slate-900">{req.title}</h4>
                              {req.description && (
-                                <p className="text-sm text-slate-500">{req.description}</p>
+                                <p className="text-sm text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100 whitespace-pre-wrap">{req.description}</p>
+                             )}
+                             {req.status === 'RECHAZADO' && (
+                                <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-100">
+                                   <AlertCircle className="h-4 w-4 shrink-0" />
+                                   <p className="text-xs font-bold uppercase tracking-tight">Acción Requerida: Documento Rechazado</p>
+                                </div>
                              )}
                           </div>
 
@@ -159,7 +165,10 @@ export default function EmpresaDocumentsPage() {
                              />
                              <Button 
                                 asChild
-                                className="bg-[#1a2e35] hover:bg-[#132328]"
+                                className={cn(
+                                   "shadow-md transition-all self-end",
+                                   req.status === 'RECHAZADO' ? "bg-red-600 hover:bg-black" : "bg-[#1a2e35] hover:bg-[#132328]"
+                                )}
                                 disabled={uploadingId === req.id}
                              >
                                 <label htmlFor={`file-${req.id}`} className="cursor-pointer">
@@ -168,7 +177,7 @@ export default function EmpresaDocumentsPage() {
                                    ) : (
                                       <CloudUpload className="h-4 w-4 mr-2" />
                                    )}
-                                   Subir Documento
+                                   {req.status === 'RECHAZADO' ? "Corregir y Subir" : "Subir Documento"}
                                 </label>
                              </Button>
                           </div>

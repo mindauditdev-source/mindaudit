@@ -10,15 +10,17 @@ import { prisma } from '@/lib/db/prisma'
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     // Autenticar usuario
     const user = await getAuthenticatedUser()
 
     // Obtener auditoría
     const auditoria = await prisma.auditoria.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         empresa: {
           include: {

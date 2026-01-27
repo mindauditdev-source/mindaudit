@@ -19,16 +19,17 @@ const commissionRateSchema = z.object({
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     // Autenticar y verificar que sea admin
     const user = await getAuthenticatedUser()
     requireAdmin(user)
 
     // Obtener colaborador
     const colaborador = await prisma.colaborador.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!colaborador) {
@@ -41,7 +42,7 @@ export async function PATCH(
 
     // Actualizar tasa de comisión
     const updatedColaborador = await prisma.colaborador.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         commissionRate: validatedData.commissionRate,
       },
@@ -54,7 +55,7 @@ export async function PATCH(
         userRole: user.role,
         action: 'UPDATE',
         entity: 'Colaborador',
-        entityId: params.id,
+        entityId: id,
         description: `Tasa de comisión actualizada a ${validatedData.commissionRate}% para ${colaborador.companyName}`,
       },
     })

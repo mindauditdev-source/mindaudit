@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
         title: validatedData.title,
         description: validatedData.description,
         empresaId: validatedData.empresaId,
-        auditoriaId: validatedData.auditoriaId,
+        auditoriaId: (validatedData.auditoriaId === 'GENERAL' || !validatedData.auditoriaId) ? null : validatedData.auditoriaId,
         status: SolicitudStatus.PENDIENTE,
       },
     });

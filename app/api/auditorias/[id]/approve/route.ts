@@ -13,16 +13,18 @@ import { CommissionService } from '@/services/commission.service'
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     // Autenticar usuario
     const user = await getAuthenticatedUser()
     requireEmpresaOrAdmin(user)
 
     // Obtener auditoría
     const auditoria = await prisma.auditoria.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         empresa: true,
         colaborador: true,
@@ -55,7 +57,7 @@ export async function PATCH(
 
     // Actualizar auditoría a APROBADA
     const updatedAuditoria = await prisma.auditoria.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         status: AuditoriaStatus.APROBADA,
         fechaAprobacion: new Date(),
@@ -70,7 +72,7 @@ export async function PATCH(
     let comisionInfo = null
     if (auditoria.colaboradorId) {
       try {
-        const result = await CommissionService.generateCommission(params.id)
+        const result = await CommissionService.generateCommission(id)
         if (result && result.comision) {
           comisionInfo = {
             id: result.comision.id,
@@ -93,8 +95,8 @@ export async function PATCH(
         userRole: user.role,
         action: 'APPROVE',
         entity: 'Auditoria',
-        entityId: params.id,
-        description: `Auditoría aprobada: ${params.id}${comisionInfo ? ` - Comisión generada: €${comisionInfo.montoComision}` : ''}`,
+        entityId: id,
+        description: `Auditoría aprobada: ${id}${comisionInfo ? ` - Comisión generada: €${comisionInfo.montoComision}` : ''}`,
       },
     })
 

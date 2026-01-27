@@ -17,9 +17,10 @@ const payCommissionSchema = z.object({
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Autenticar y verificar que sea admin
     const user = await getAuthenticatedUser()
     requireAdmin(user)
@@ -30,7 +31,7 @@ export async function PATCH(
 
     // Marcar comisión como pagada
     const comision = await CommissionService.markAsPaid(
-      params.id,
+      id,
       validatedData.referenciaPago,
       validatedData.notas
     )

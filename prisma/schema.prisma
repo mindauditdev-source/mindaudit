@@ -187,6 +187,7 @@ enum AuditoriaStatus {
   SOLICITADA      // Recién solicitada
   EN_REVISION     // MindAudit revisando
   PRESUPUESTADA   // Presupuesto enviado
+  REUNION_SOLICITADA // Cliente solicita reunión para discutir presupuesto
   APROBADA        // Cliente aprobó presupuesto
   EN_PROCESO      // Auditoría en ejecución
   COMPLETADA      // Auditoría finalizada
@@ -396,6 +397,8 @@ model SolicitudDocumento {
   // Documento subido (una vez completada)
   documentoId     String?          @unique
   documento       Documento?       @relation("DocumentoSolicitud", fields: [documentoId], references: [id], onDelete: SetNull)
+  
+  feedback        String?          @db.Text
   
   // Timestamps
   createdAt       DateTime         @default(now())
