@@ -115,6 +115,25 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    // 📧 Enviar notificación por email al admin
+    try {
+      const emailService = (await import('@/lib/email/email-service')).EmailService;
+      await emailService.notifyNewAudit({
+        id: auditoria.id,
+        tipoServicio: auditoria.tipoServicio,
+        fiscalYear: auditoria.fiscalYear,
+        urgente: auditoria.urgente,
+        presupuesto: auditoria.presupuesto?.toNumber(),
+      }, {
+        companyName: empresa.companyName,
+        contactName: empresa.contactName,
+        contactEmail: empresa.contactEmail,
+        cif: empresa.cif,
+      });
+    } catch (emailError) {
+      console.error('Error enviando email de notificación:', emailError);
+    }
+
     return createdResponse(
       {
         auditoria: {
@@ -133,7 +152,7 @@ export async function POST(request: NextRequest) {
       },
       'Auditoría solicitada exitosamente'
     )
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error en POST /api/auditorias:', error)
 
     // Errores de validación de Zod
@@ -147,7 +166,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return serverErrorResponse(error.message)
+    const message = error instanceof Error ? error.message : 'Error desconocido';
+    return serverErrorResponse(message)
   }
 }
 
@@ -161,7 +181,7 @@ export async function GET(request: NextRequest) {
     const user = await getAuthenticatedUser()
 
     // Construir filtros según el rol
-    const where: any = {}
+    const where: import('@prisma/client').Prisma.AuditoriaWhereInput = {}
 
     if (user.role === UserRole.COLABORADOR) {
       // Colaborador: solo sus auditorías
@@ -186,7 +206,7 @@ export async function GET(request: NextRequest) {
 
     // Obtener parámetros de búsqueda
     const { searchParams } = new URL(request.url)
-    const status = searchParams.get('status')
+    const status = searchParams.get('status') as AuditoriaStatus | null
     if (status) where.status = status
 
     // Obtener auditorías
@@ -234,8 +254,9 @@ export async function GET(request: NextRequest) {
       })),
       total: auditorias.length,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error en GET /api/auditorias:', error)
-    return serverErrorResponse(error.message)
+    const message = error instanceof Error ? error.message : 'Error desconocido';
+    return serverErrorResponse(message)
   }
 }

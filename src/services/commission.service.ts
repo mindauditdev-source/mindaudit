@@ -90,7 +90,7 @@ export class CommissionService {
    * Genera una comisión automáticamente cuando se aprueba una auditoría
    */
   static async generateCommission(auditoriaId: string): Promise<{
-    comision: any
+    comision: import('@prisma/client').Comision | null
     message: string
   } | null> {
     // Verificar que la auditoría existe y está aprobada
@@ -209,7 +209,10 @@ export class CommissionService {
     comisionId: string,
     referenciaPago: string,
     notas?: string
-  ): Promise<any> {
+  ): Promise<import('@prisma/client').Comision & { 
+    colaborador: import('@prisma/client').Colaborador & { user: import('@prisma/client').User },
+    auditoria: import('@prisma/client').Auditoria & { empresa: import('@prisma/client').Empresa }
+  }> {
     // Obtener comisión
     const comision = await prisma.comision.findUnique({
       where: { id: comisionId },
@@ -239,7 +242,9 @@ export class CommissionService {
           notas,
         },
         include: {
-          colaborador: true,
+          colaborador: {
+            include: { user: true }
+          },
           auditoria: {
             include: {
               empresa: true,
@@ -390,7 +395,7 @@ export class CommissionService {
   /**
    * Cancela una comisión (si la auditoría es cancelada)
    */
-  static async cancelCommission(comisionId: string): Promise<any> {
+  static async cancelCommission(comisionId: string): Promise<import('@prisma/client').Comision> {
     const comision = await prisma.comision.findUnique({
       where: { id: comisionId },
     })

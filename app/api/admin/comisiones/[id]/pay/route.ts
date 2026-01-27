@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { getAuthenticatedUser } from '@/middleware/api-auth'
 import { requireAdmin } from '@/middleware/api-rbac'
-import { successResponse, errorResponse, serverErrorResponse, validationErrorResponse } from '@/lib/api-response'
+import { successResponse, serverErrorResponse, validationErrorResponse } from '@/lib/api-response'
 import { CommissionService } from '@/services/commission.service'
 import { z } from 'zod'
 
@@ -36,7 +36,29 @@ export async function PATCH(
       validatedData.notas
     )
 
-    // TODO: Enviar notificación por email al colaborador
+    // 📧 Enviar notificación por email al colaborador
+    try {
+      const emailService = (await import('@/lib/email/email-service')).EmailService;
+      await emailService.notifyCommissionPaid(
+        {
+          montoComision: comision.montoComision.toNumber(),
+          referenciaPago: comision.referenciaPago || 'N/A',
+          auditoria: {
+            empresa: {
+              companyName: comision.auditoria.empresa.companyName,
+            },
+          },
+        },
+        {
+          user: {
+            name: comision.colaborador.user.name,
+            email: comision.colaborador.user.email,
+          },
+        }
+      );
+    } catch (emailError) {
+      console.error('Error enviando email de comisión:', emailError);
+    }
 
     return successResponse(
       {
@@ -53,7 +75,7 @@ export async function PATCH(
       },
       'Comisión marcada como pagada exitosamente'
     )
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error en PATCH /api/admin/comisiones/[id]/pay:', error)
 
     if (error instanceof z.ZodError) {
@@ -66,6 +88,7 @@ export async function PATCH(
       )
     }
 
-    return serverErrorResponse(error.message)
+    const message = error instanceof Error ? error.message : 'Error desconocido';
+    return serverErrorResponse(message)
   }
 }

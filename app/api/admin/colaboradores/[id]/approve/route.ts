@@ -77,7 +77,19 @@ export async function PATCH(
       },
     })
 
-    // TODO: Enviar email de bienvenida
+    // 📧 Enviar email de bienvenida
+    try {
+      const emailService = (await import('@/lib/email/email-service')).EmailService;
+      await emailService.notifyPartnerApproved({
+        commissionRate: updatedColaborador.commissionRate.toNumber(),
+        user: {
+          name: updatedColaborador.user.name || 'Colaborador',
+          email: updatedColaborador.user.email,
+        },
+      });
+    } catch (emailError) {
+      console.error('Error enviando email de bienvenida:', emailError);
+    }
 
     return successResponse(
       {
@@ -90,8 +102,9 @@ export async function PATCH(
       },
       'Colaborador aprobado exitosamente'
     )
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error en PATCH /api/admin/colaboradores/[id]/approve:', error)
-    return serverErrorResponse(error.message)
+    const message = error instanceof Error ? error.message : 'Error desconocido';
+    return serverErrorResponse(message)
   }
 }

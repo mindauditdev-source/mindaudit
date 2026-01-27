@@ -28,12 +28,14 @@ export async function POST(
     const user = await getAuthenticatedUser()
     requireAdmin(user)
 
-    // Obtener auditoría
+    // Obtener auditoría con info para email
     const auditoria = await prisma.auditoria.findUnique({
       where: { id },
       include: {
         empresa: true,
-        colaborador: true,
+        colaborador: {
+          include: { user: { select: { email: true } } }
+        },
       },
     })
 
@@ -44,10 +46,11 @@ export async function POST(
     // Verificar que esté en estado correcto
     if (
       auditoria.status !== AuditoriaStatus.SOLICITADA &&
-      auditoria.status !== AuditoriaStatus.EN_REVISION
+      auditoria.status !== AuditoriaStatus.EN_REVISION &&
+      auditoria.status !== AuditoriaStatus.PRESUPUESTADA // Allow resending/updating budget
     ) {
       return errorResponse(
-        'La auditoría debe estar en estado SOLICITADA o EN_REVISION para enviar presupuesto',
+        'La auditoría debe estar en un estado que permita enviar presupuesto',
         400
       )
     }
@@ -70,10 +73,6 @@ export async function POST(
         status: AuditoriaStatus.PRESUPUESTADA,
         fechaPresupuesto: new Date(),
       },
-      include: {
-        empresa: true,
-        colaborador: true,
-      },
     })
 
     // Log de auditoría
@@ -88,14 +87,35 @@ export async function POST(
       },
     })
 
-    // TODO: Enviar notificación por email a empresa y colaborador
+    // 📧 Enviar notificación por email
+    try {
+      const emailService = (await import('@/lib/email/email-service')).EmailService;
+      await emailService.notifyBudgetReady(
+        {
+          id: updatedAuditoria.id,
+          tipoServicio: auditoria.tipoServicio,
+          fiscalYear: auditoria.fiscalYear,
+          urgente: auditoria.urgente,
+          presupuesto: validatedData.presupuesto,
+        },
+        {
+          companyName: auditoria.empresa.companyName,
+          contactName: auditoria.empresa.contactName,
+          contactEmail: auditoria.empresa.contactEmail,
+          cif: auditoria.empresa.cif,
+        },
+        auditoria.colaborador?.user.email
+      );
+    } catch (emailError) {
+      console.error('Error enviando email de presupuesto:', emailError);
+    }
 
     return successResponse(
       {
         auditoria: {
           id: updatedAuditoria.id,
           status: updatedAuditoria.status,
-          presupuesto: updatedAuditoria.presupuesto.toNumber(),
+          presupuesto: updatedAuditoria.presupuesto?.toNumber(),
           presupuestoNotas: updatedAuditoria.presupuestoNotas,
           presupuestoValidoHasta: updatedAuditoria.presupuestoValidoHasta,
           fechaPresupuesto: updatedAuditoria.fechaPresupuesto,
@@ -103,8 +123,12 @@ export async function POST(
       },
       'Presupuesto enviado exitosamente'
     )
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error en POST /api/auditorias/[id]/presupuesto:', error)
-    return serverErrorResponse(error.message)
+    if (error instanceof z.ZodError) {
+       return errorResponse('Datos de presupuesto inválidos', 400);
+    }
+    const message = error instanceof Error ? error.message : 'Error desconocido';
+    return serverErrorResponse(message)
   }
 }

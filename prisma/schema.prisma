@@ -1,8 +1,3 @@
-// ============================================
-// MINDAUDIT SPAIN - SCHEMA DE BASE DE DATOS
-// Sistema Multi-Tenant con Roles y Comisiones
-// ============================================
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,14 +8,234 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ============================================
-// ENUMS GLOBALES
-// ============================================
+model User {
+  id             String       @id @default(cuid())
+  email          String       @unique
+  name           String
+  role           UserRole     @default(COLABORADOR)
+  status         UserStatus   @default(PENDING_VERIFICATION)
+  hashedPassword String?
+  emailVerified  DateTime?
+  image          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  lastLoginAt    DateTime?
+  colaborador    Colaborador?
+  empresa        Empresa?
+
+  @@index([email])
+  @@index([role])
+  @@index([status])
+  @@map("users")
+}
+
+model Colaborador {
+  id                 String            @id @default(cuid())
+  userId             String            @unique
+  companyName        String
+  cif                String            @unique
+  phone              String
+  address            String?
+  city               String?
+  province           String?
+  postalCode         String?
+  website            String?
+  status             ColaboradorStatus @default(PENDING_APPROVAL)
+  commissionRate     Decimal           @default(0) @db.Decimal(5, 2)
+  totalCommissions   Decimal           @default(0) @db.Decimal(12, 2)
+  pendingCommissions Decimal           @default(0) @db.Decimal(12, 2)
+  contractUrl        String?
+  contractSignedAt   DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  auditorias         Auditoria[]
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comisiones         Comision[]
+  empresas           Empresa[]
+
+  @@index([userId])
+  @@index([cif])
+  @@index([status])
+  @@map("colaboradores")
+}
+
+model Empresa {
+  id            String               @id @default(cuid())
+  userId        String?              @unique
+  colaboradorId String?
+  origen        EmpresaOrigen
+  companyName   String
+  cif           String               @unique
+  contactName   String
+  contactEmail  String
+  contactPhone  String?
+  address       String?
+  city          String?
+  province      String?
+  postalCode    String?
+  website       String?
+  employees     Int?
+  revenue       Decimal?             @db.Decimal(15, 2)
+  fiscalYear    Int?
+  status        EmpresaStatus        @default(PROSPECT)
+  notes         String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  auditorias    Auditoria[]
+  documentos    Documento[]
+  colaborador   Colaborador?         @relation(fields: [colaboradorId], references: [id])
+  user          User?                @relation(fields: [userId], references: [id])
+  solicitudes   SolicitudDocumento[]
+
+  @@index([userId])
+  @@index([colaboradorId])
+  @@index([cif])
+  @@index([origen])
+  @@index([status])
+  @@map("empresas")
+}
+
+model Auditoria {
+  id                     String               @id @default(cuid())
+  empresaId              String
+  colaboradorId          String?
+  tipoServicio           TipoServicio
+  fiscalYear             Int
+  description            String?
+  urgente                Boolean              @default(false)
+  status                 AuditoriaStatus      @default(SOLICITADA)
+  presupuesto            Decimal?             @db.Decimal(12, 2)
+  presupuestoNotas       String?
+  presupuestoValidoHasta DateTime?
+  comisionRate           Decimal?             @db.Decimal(5, 2)
+  comisionAmount         Decimal?             @db.Decimal(12, 2)
+  comisionPagada         Boolean              @default(false)
+  fechaSolicitud         DateTime             @default(now())
+  fechaPresupuesto       DateTime?
+  fechaAprobacion        DateTime?
+  fechaInicio            DateTime?
+  fechaFinalizacion      DateTime?
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  colaborador            Colaborador?         @relation(fields: [colaboradorId], references: [id])
+  empresa                Empresa              @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  comisiones             Comision[]
+  documentos             Documento[]
+  solicitudes            SolicitudDocumento[]
+
+  @@index([empresaId])
+  @@index([colaboradorId])
+  @@index([status])
+  @@index([tipoServicio])
+  @@index([fechaSolicitud])
+  @@map("auditorias")
+}
+
+model Comision {
+  id             String         @id @default(cuid())
+  colaboradorId  String
+  auditoriaId    String
+  montoBase      Decimal        @db.Decimal(12, 2)
+  porcentaje     Decimal        @db.Decimal(5, 2)
+  montoComision  Decimal        @db.Decimal(12, 2)
+  status         ComisionStatus @default(PENDIENTE)
+  fechaPago      DateTime?
+  referenciaPago String?
+  notas          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  auditoria      Auditoria      @relation(fields: [auditoriaId], references: [id], onDelete: Cascade)
+  colaborador    Colaborador    @relation(fields: [colaboradorId], references: [id], onDelete: Cascade)
+
+  @@index([colaboradorId])
+  @@index([auditoriaId])
+  @@index([status])
+  @@index([fechaPago])
+  @@map("comisiones")
+}
+
+model ConfiguracionSistema {
+  id                     String   @id @default(cuid())
+  comisionDefaultRate    Decimal  @default(10) @db.Decimal(5, 2)
+  diasValidezPresupuesto Int      @default(30)
+  emailNotificaciones    String   @default("info@mindaudit.es")
+  metadata               Json?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@map("configuracion_sistema")
+}
+
+model Documento {
+  id            String              @id @default(cuid())
+  uploadedBy    String
+  fileName      String
+  fileUrl       String
+  fileType      String
+  fileSize      Int
+  tipoDocumento TipoDocumento
+  empresaId     String?
+  auditoriaId   String?
+  description   String?
+  tags          String[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  auditoria     Auditoria?          @relation(fields: [auditoriaId], references: [id], onDelete: Cascade)
+  empresa       Empresa?            @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  solicitud     SolicitudDocumento? @relation("DocumentoSolicitud")
+
+  @@index([uploadedBy])
+  @@index([tipoDocumento])
+  @@index([empresaId])
+  @@index([auditoriaId])
+  @@map("documentos")
+}
+
+model SolicitudDocumento {
+  id          String          @id @default(cuid())
+  title       String
+  description String?
+  status      SolicitudStatus @default(PENDIENTE)
+  empresaId   String
+  auditoriaId String?
+  documentoId String?         @unique
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  feedback    String?
+  auditoria   Auditoria?      @relation(fields: [auditoriaId], references: [id], onDelete: Cascade)
+  documento   Documento?      @relation("DocumentoSolicitud", fields: [documentoId], references: [id])
+  empresa     Empresa         @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  @@index([empresaId])
+  @@index([auditoriaId])
+  @@index([status])
+  @@map("solicitudes_documentos")
+}
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  userId      String
+  userRole    UserRole
+  action      AuditAction
+  entity      String
+  entityId    String?
+  description String?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime    @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
 
 enum UserRole {
-  ADMIN        // Administrador del sistema
-  COLABORADOR  // Colaborador/Asesor que trae empresas
-  EMPRESA      // Empresa que necesita auditoría
+  ADMIN
+  COLABORADOR
+  EMPRESA
 }
 
 enum UserStatus {
@@ -30,39 +245,6 @@ enum UserStatus {
   PENDING_VERIFICATION
 }
 
-// ============================================
-// USUARIOS (Tabla principal de autenticación)
-// ============================================
-
-model User {
-  id              String     @id @default(cuid())
-  email           String     @unique
-  name            String
-  role            UserRole   @default(COLABORADOR)
-  status          UserStatus @default(PENDING_VERIFICATION)
-  hashedPassword  String?
-  emailVerified   DateTime?
-  image           String?
-  
-  // Relaciones polimórficas según el rol
-  colaborador     Colaborador?
-  empresa         Empresa?
-  
-  // Timestamps
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-  lastLoginAt     DateTime?
-  
-  @@index([email])
-  @@index([role])
-  @@index([status])
-  @@map("users")
-}
-
-// ============================================
-// COLABORADORES (Asesores/Gestorías)
-// ============================================
-
 enum ColaboradorStatus {
   ACTIVE
   INACTIVE
@@ -70,264 +252,47 @@ enum ColaboradorStatus {
   PENDING_APPROVAL
 }
 
-model Colaborador {
-  id                String            @id @default(cuid())
-  userId            String            @unique
-  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Información profesional
-  companyName       String            // Nombre de su gestoría/despacho
-  cif               String            @unique
-  phone             String
-  address           String?
-  city              String?
-  province          String?
-  postalCode        String?
-  website           String?
-  
-  // Estado
-  status            ColaboradorStatus @default(PENDING_APPROVAL)
-  
-  // Comisiones
-  commissionRate    Decimal           @default(0) @db.Decimal(5, 2) // % configurado por admin
-  totalCommissions  Decimal           @default(0) @db.Decimal(12, 2) // Total acumulado
-  pendingCommissions Decimal          @default(0) @db.Decimal(12, 2) // Pendiente de pago
-  
-  // Documentos
-  contractUrl       String?
-  contractSignedAt  DateTime?
-  
-  // Relaciones
-  empresas          Empresa[]         // Empresas que ha traído
-  auditorias        Auditoria[]       // Auditorías solicitadas
-  comisiones        Comision[]        // Historial de comisiones
-  
-  // Timestamps
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  
-  @@index([userId])
-  @@index([cif])
-  @@index([status])
-  @@map("colaboradores")
-}
-
-// ============================================
-// EMPRESAS (Clientes que necesitan auditoría)
-// ============================================
-
 enum EmpresaStatus {
   ACTIVE
   INACTIVE
-  PROSPECT      // Registrada pero sin auditoría solicitada
-  IN_AUDIT      // Auditoría en proceso
-  AUDITED       // Ya auditada
+  PROSPECT
+  IN_AUDIT
+  AUDITED
 }
 
 enum EmpresaOrigen {
-  COLABORADOR   // Traída por un colaborador
-  DIRECTA       // Registro directo en la plataforma
+  COLABORADOR
+  DIRECTA
 }
-
-model Empresa {
-  id              String         @id @default(cuid())
-  userId          String?        @unique // Null si fue creada por colaborador
-  user            User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
-  // Relación con colaborador (si aplica)
-  colaboradorId   String?
-  colaborador     Colaborador?   @relation(fields: [colaboradorId], references: [id], onDelete: SetNull)
-  
-  // Origen de la empresa
-  origen          EmpresaOrigen
-  
-  // Información de la empresa
-  companyName     String
-  cif             String         @unique
-  contactName     String         // Persona de contacto
-  contactEmail    String
-  contactPhone    String?
-  address         String?
-  city            String?
-  province        String?
-  postalCode      String?
-  website         String?
-  
-  // Información fiscal
-  employees       Int?
-  revenue         Decimal?       @db.Decimal(15, 2) // Facturación anual
-  fiscalYear      Int?           // Año fiscal actual
-  
-  // Estado
-  status          EmpresaStatus  @default(PROSPECT)
-  notes           String?        @db.Text
-  
-  // Relaciones
-  auditorias      Auditoria[]
-  documentos      Documento[]
-  solicitudes     SolicitudDocumento[]
-  
-  // Timestamps
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  
-  @@index([userId])
-  @@index([colaboradorId])
-  @@index([cif])
-  @@index([origen])
-  @@index([status])
-  @@map("empresas")
-}
-
-// ============================================
-// AUDITORÍAS (Servicios de auditoría)
-// ============================================
 
 enum AuditoriaStatus {
-  SOLICITADA      // Recién solicitada
-  EN_REVISION     // MindAudit revisando
-  PRESUPUESTADA   // Presupuesto enviado
-  REUNION_SOLICITADA // Cliente solicita reunión para discutir presupuesto
-  APROBADA        // Cliente aprobó presupuesto
-  EN_PROCESO      // Auditoría en ejecución
-  COMPLETADA      // Auditoría finalizada
-  CANCELADA       // Cancelada
-  RECHAZADA       // Presupuesto rechazado
+  SOLICITADA
+  EN_REVISION
+  PRESUPUESTADA
+  REUNION_SOLICITADA
+  APROBADA
+  EN_PROCESO
+  COMPLETADA
+  CANCELADA
+  RECHAZADA
 }
 
 enum TipoServicio {
-  AUDITORIA_CUENTAS           // Auditoría de cuentas anuales (obligatoria)
-  AUDITORIA_CONSOLIDADA       // Auditoría de cuentas consolidadas
-  AUDITORIA_VOLUNTARIA        // Auditoría voluntaria
-  AUDITORIA_SUBVENCIONES      // Auditoría de subvenciones
-  REVISION_LIMITADA           // Revisión limitada
-  DUE_DILIGENCE              // Due diligence
-  AUDITORIA_FORENSE          // Auditoría forense
-  OTROS                      // Otros servicios
+  AUDITORIA_CUENTAS
+  AUDITORIA_CONSOLIDADA
+  AUDITORIA_VOLUNTARIA
+  AUDITORIA_SUBVENCIONES
+  REVISION_LIMITADA
+  DUE_DILIGENCE
+  AUDITORIA_FORENSE
+  OTROS
 }
-
-model Auditoria {
-  id                String           @id @default(cuid())
-  empresaId         String
-  empresa           Empresa          @relation(fields: [empresaId], references: [id], onDelete: Cascade)
-  
-  // Colaborador que solicitó (si aplica)
-  colaboradorId     String?
-  colaborador       Colaborador?     @relation(fields: [colaboradorId], references: [id], onDelete: SetNull)
-  
-  // Información del servicio
-  tipoServicio      TipoServicio
-  fiscalYear        Int              // Año fiscal a auditar
-  description       String?          @db.Text
-  urgente           Boolean          @default(false)
-  
-  // Estado
-  status            AuditoriaStatus  @default(SOLICITADA)
-  
-  // Presupuesto
-  presupuesto       Decimal?         @db.Decimal(12, 2)
-  presupuestoNotas  String?          @db.Text
-  presupuestoValidoHasta DateTime?
-  
-  // Comisión (si hay colaborador)
-  comisionRate      Decimal?         @db.Decimal(5, 2) // % de comisión
-  comisionAmount    Decimal?         @db.Decimal(12, 2) // Monto de comisión
-  comisionPagada    Boolean          @default(false)
-  
-  // Fechas importantes
-  fechaSolicitud    DateTime         @default(now())
-  fechaPresupuesto  DateTime?
-  fechaAprobacion   DateTime?
-  fechaInicio       DateTime?
-  fechaFinalizacion DateTime?
-  
-  // Relaciones
-  comisiones        Comision[]
-  documentos        Documento[]
-  solicitudes       SolicitudDocumento[]
-  
-  // Timestamps
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
-  
-  @@index([empresaId])
-  @@index([colaboradorId])
-  @@index([status])
-  @@index([tipoServicio])
-  @@index([fechaSolicitud])
-  @@map("auditorias")
-}
-
-// ============================================
-// COMISIONES (Historial de pagos a colaboradores)
-// ============================================
 
 enum ComisionStatus {
-  PENDIENTE       // Generada pero no pagada
-  PAGADA          // Ya pagada
-  CANCELADA       // Cancelada (ej: auditoría cancelada)
+  PENDIENTE
+  PAGADA
+  CANCELADA
 }
-
-model Comision {
-  id              String         @id @default(cuid())
-  colaboradorId   String
-  colaborador     Colaborador    @relation(fields: [colaboradorId], references: [id], onDelete: Cascade)
-  auditoriaId     String
-  auditoria       Auditoria      @relation(fields: [auditoriaId], references: [id], onDelete: Cascade)
-  
-  // Montos
-  montoBase       Decimal        @db.Decimal(12, 2) // Precio de la auditoría
-  porcentaje      Decimal        @db.Decimal(5, 2)  // % de comisión aplicado
-  montoComision   Decimal        @db.Decimal(12, 2) // Monto a pagar
-  
-  // Estado
-  status          ComisionStatus @default(PENDIENTE)
-  
-  // Pago
-  fechaPago       DateTime?
-  referenciaPago  String?        // Número de transferencia, etc.
-  notas           String?        @db.Text
-  
-  // Timestamps
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  
-  @@index([colaboradorId])
-  @@index([auditoriaId])
-  @@index([status])
-  @@index([fechaPago])
-  @@map("comisiones")
-}
-
-// ============================================
-// CONFIGURACIÓN DEL SISTEMA
-// ============================================
-
-model ConfiguracionSistema {
-  id                      String   @id @default(cuid())
-  
-  // Comisiones por defecto
-  comisionDefaultRate     Decimal  @default(10) @db.Decimal(5, 2) // % por defecto
-  
-  // Configuración de auditorías
-  diasValidezPresupuesto  Int      @default(30) // Días de validez del presupuesto
-  
-  // Notificaciones
-  emailNotificaciones     String   @default("info@mindaudit.es")
-  
-  // Metadata
-  metadata                Json?
-  
-  // Timestamps
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
-  
-  @@map("configuracion_sistema")
-}
-
-// ============================================
-// DOCUMENTOS
-// ============================================
 
 enum TipoDocumento {
   CONTRATO
@@ -338,81 +303,12 @@ enum TipoDocumento {
   OTRO
 }
 
-model Documento {
-  id              String         @id @default(cuid())
-  uploadedBy      String         // User ID
-  
-  // Información del archivo
-  fileName        String
-  fileUrl         String
-  fileType        String         // MIME type
-  fileSize        Int            // Bytes
-  
-  // Clasificación
-  tipoDocumento   TipoDocumento
-  
-  // Relaciones
-  empresaId       String?
-  empresa         Empresa?       @relation(fields: [empresaId], references: [id], onDelete: Cascade)
-  auditoriaId     String?
-  auditoria       Auditoria?     @relation(fields: [auditoriaId], references: [id], onDelete: Cascade)
-  
-  // Relación con solicitud
-  solicitud       SolicitudDocumento? @relation("DocumentoSolicitud")
-  
-  // Metadata
-  description     String?
-  tags            String[]
-  
-  // Timestamps
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  
-  @@index([uploadedBy])
-  @@index([tipoDocumento])
-  @@index([empresaId])
-  @@index([auditoriaId])
-  @@map("documentos")
-}
-
 enum SolicitudStatus {
   PENDIENTE
   ENTREGADO
   RECHAZADO
   APROBADO
 }
-
-model SolicitudDocumento {
-  id              String           @id @default(cuid())
-  title           String
-  description     String?          @db.Text
-  status          SolicitudStatus  @default(PENDIENTE)
-  
-  // Relaciones
-  empresaId       String
-  empresa         Empresa          @relation(fields: [empresaId], references: [id], onDelete: Cascade)
-  auditoriaId     String?
-  auditoria       Auditoria?       @relation(fields: [auditoriaId], references: [id], onDelete: Cascade)
-  
-  // Documento subido (una vez completada)
-  documentoId     String?          @unique
-  documento       Documento?       @relation("DocumentoSolicitud", fields: [documentoId], references: [id], onDelete: SetNull)
-  
-  feedback        String?          @db.Text
-  
-  // Timestamps
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-
-  @@index([empresaId])
-  @@index([auditoriaId])
-  @@index([status])
-  @@map("solicitudes_documentos")
-}
-
-// ============================================
-// AUDIT LOG (Registro de auditoría del sistema)
-// ============================================
 
 enum AuditAction {
   CREATE
@@ -425,30 +321,4 @@ enum AuditAction {
   SEND
   DOWNLOAD
   PAYMENT
-}
-
-model AuditLog {
-  id              String      @id @default(cuid())
-  userId          String
-  userRole        UserRole
-  
-  // Acción realizada
-  action          AuditAction
-  entity          String      // Nombre de la entidad
-  entityId        String?     // ID de la entidad afectada
-  
-  // Detalles
-  description     String?
-  metadata        Json?
-  ipAddress       String?
-  userAgent       String?
-  
-  // Timestamp
-  createdAt       DateTime    @default(now())
-  
-  @@index([userId])
-  @@index([action])
-  @@index([entity])
-  @@index([createdAt])
-  @@map("audit_logs")
 }

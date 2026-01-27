@@ -2,7 +2,6 @@ import { NextRequest } from "next/server";
 import { getAuthenticatedUser } from "@/middleware/api-auth";
 import {
   successResponse,
-  errorResponse,
   serverErrorResponse,
   forbiddenResponse,
   notFoundResponse,
@@ -95,8 +94,100 @@ export async function GET(
         }
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`Error en GET /api/empresas/${params.id}:`, error);
-    return serverErrorResponse(error.message);
+    const message = error instanceof Error ? error.message : "Error desconocido";
+    return serverErrorResponse(message);
+  }
+}
+
+/**
+ * PATCH /api/empresas/[id]
+ * Actualiza una empresa específica
+ */
+export async function PATCH(
+  request: NextRequest,
+  props: { params: Promise<{ id: string }> }
+) {
+  const params = await props.params;
+  try {
+    const user = await getAuthenticatedUser();
+    const empresaId = params.id;
+
+    // Obtener la empresa actual para verificar propiedad
+    const currentEmpresa = await prisma.empresa.findUnique({
+      where: { id: empresaId },
+    });
+
+    if (!currentEmpresa) {
+      return notFoundResponse("Empresa no encontrada");
+    }
+
+    // Verificar permisos
+    if (user.role === UserRole.COLABORADOR) {
+      const colaborador = await prisma.colaborador.findUnique({
+        where: { userId: user.id },
+      });
+      if (!colaborador || currentEmpresa.colaboradorId !== colaborador.id) {
+        return forbiddenResponse("No tienes permiso para editar esta empresa");
+      }
+    } else if (user.role === UserRole.EMPRESA) {
+      if (currentEmpresa.userId !== user.id) {
+        return forbiddenResponse("No tienes permiso para editar esta empresa");
+      }
+    } else if (user.role !== UserRole.ADMIN) {
+      return forbiddenResponse("Acceso denegado");
+    }
+
+    const body = await request.json();
+    
+    // Validar campos permitidos (evitar que cambien el CIF o el ColaboradorId a menos que sea Admin)
+    const { 
+      companyName, contactName, contactPhone, address, city, 
+      province, postalCode, website, employees, revenue, notes, status 
+    } = body;
+
+    const data: import('@prisma/client').Prisma.EmpresaUpdateInput = {
+      ...(companyName && { companyName }),
+      ...(contactName && { contactName }),
+      ...(contactPhone && { contactPhone }),
+      ...(address !== undefined && { address }),
+      ...(city !== undefined && { city }),
+      ...(province !== undefined && { province }),
+      ...(postalCode !== undefined && { postalCode }),
+      ...(website !== undefined && { website }),
+      ...(employees !== undefined && { employees }),
+      ...(revenue !== undefined && { revenue }),
+      ...(notes !== undefined && { notes }),
+    };
+
+    // Solo el Admin puede cambiar el status o el CIF
+    if (user.role === UserRole.ADMIN) {
+      if (status) data.status = status;
+      if (body.cif) data.cif = body.cif;
+    }
+
+    const updatedEmpresa = await prisma.empresa.update({
+      where: { id: empresaId },
+      data,
+    });
+
+    // Log de auditoría
+    await prisma.auditLog.create({
+      data: {
+        userId: user.id,
+        userRole: user.role,
+        action: 'UPDATE',
+        entity: 'Empresa',
+        entityId: empresaId,
+        description: `Empresa actualizada: ${updatedEmpresa.companyName}`,
+      },
+    });
+
+    return successResponse({ empresa: updatedEmpresa }, "Empresa actualizada correctamente");
+  } catch (error: unknown) {
+    console.error(`Error en PATCH /api/empresas/${params.id}:`, error);
+    const message = error instanceof Error ? error.message : "Error desconocido";
+    return serverErrorResponse(message);
   }
 }
