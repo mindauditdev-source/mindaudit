@@ -9,7 +9,6 @@ import {
   serverErrorResponse
 } from "@/lib/api-response";
 import { prisma } from "@/lib/db/prisma";
-import { CommissionService } from "@/services/commission.service";
 import { AuditoriaStatus } from "@prisma/client";
 
 export async function PATCH(
@@ -40,9 +39,8 @@ export async function PATCH(
     let nextStatus: AuditoriaStatus = auditoria.status;
 
     if (decision === 'ACCEPT') {
-       // In a real flow, this would return a Stripe link
-       // For now, we move it to APROBADA to simulate the 'post-payment' state or 'intent'
-       nextStatus = "APROBADA";
+       // Cliente acepta el presupuesto, ahora debe proceder al pago
+       nextStatus = "PENDIENTE_DE_PAGO";
     } else if (decision === 'REJECT') {
        nextStatus = "RECHAZADA";
     } else if (decision === 'MEETING') {
@@ -57,16 +55,8 @@ export async function PATCH(
       }
     });
 
-    // Generar comisión si se aprueba
-    if (nextStatus === "APROBADA") {
-       try {
-         await CommissionService.generateCommission(id);
-       } catch (commError) {
-         console.error("Error generating commission:", commError);
-         // No bloqueamos la respuesta principal si falla la comisión, 
-         // pero lo logueamos para revisión manual si es necesario.
-       }
-    }
+
+    // NOTA: La comisión se generará en el webhook una vez confirmado el pago
 
     // Audit Log
     await prisma.auditLog.create({

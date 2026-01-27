@@ -8,7 +8,6 @@ import {
   LayoutDashboard,
   Users,
   Building2,
-  FileText,
   PieChart,
   Settings,
   LogOut,
@@ -29,13 +28,13 @@ const sidebarItems = [
     icon: Users,
   },
   {
-    title: "Clientes y Auditorías",
+    title: "Directorio de Clientes",
     href: "/auditor/clientes",
     icon: Building2,
   },
   {
-    title: "Presupuestos",
-    href: "/auditor/presupuestos",
+    title: "Gestión de Auditorías",
+    href: "/auditor/auditorias",
     icon: ClipboardList,
   },
   {

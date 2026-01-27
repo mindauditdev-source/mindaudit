@@ -47,8 +47,10 @@ export const AdminApiService = {
   getStats: async (): Promise<AdminStats> => {
     const response = await apiFetch("/admin/stats");
     const s = response.data.stats;
-    const pendingCount = (s.auditoriasPorEstado?.['SOLICITADA'] || 0) + 
-                         (s.auditoriasPorEstado?.['EN_REVISION'] || 0);
+    const allStatuses = Object.keys(s.auditoriasPorEstado || {});
+    const pendingCount = allStatuses
+      .filter(status => status !== 'COMPLETADA' && status !== 'CANCELADA')
+      .reduce((acc, status) => acc + (s.auditoriasPorEstado[status] || 0), 0);
 
     return {
       totalRevenue: s.ingresosTotales || s.ingresosMes || 0,
@@ -96,6 +98,11 @@ export const AdminApiService = {
     return response.data;
   },
 
+  getAuditoriaById: async (id: string): Promise<{ auditoria: any }> => {
+    const response = await apiFetch(`/auditorias/${id}`);
+    return response.data;
+  },
+
   submitBudget: async (id: string, data: { presupuesto: number; notas?: string }) => {
     return apiFetch(`/auditorias/${id}/presupuesto`, {
       method: "POST",
@@ -107,6 +114,12 @@ export const AdminApiService = {
      return apiFetch(`/auditorias/${id}/complete`, {
         method: "PATCH",
      });
+  },
+
+  cancelAudit: async (id: string) => {
+    return apiFetch(`/auditorias/${id}/cancel`, {
+      method: "PATCH",
+    });
   },
 
   requestDocument: async (data: {
@@ -130,6 +143,28 @@ export const AdminApiService = {
     return apiFetch(`/documentos/solicitudes/${id}`, {
       method: "PATCH",
       body: JSON.stringify(data),
+    });
+  },
+
+  saveDocument: async (data: {
+    name: string;
+    url: string;
+    size?: number;
+    type?: string;
+    empresaId?: string;
+    auditoriaId?: string;
+    solicitudId?: string;
+  }) => {
+    return apiFetch("/documentos", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  cancelSolicitudDocumento: async (id: string, razon?: string) => {
+    return apiFetch(`/documentos/solicitudes/${id}/cancel`, {
+      method: "PATCH",
+      body: JSON.stringify({ razon }),
     });
   }
 };

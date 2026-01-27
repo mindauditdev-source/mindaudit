@@ -267,10 +267,11 @@ enum EmpresaOrigen {
 
 enum AuditoriaStatus {
   SOLICITADA
-  EN_REVISION
+  EN_REVISION         // Deprecated - use SOLICITADA
   PRESUPUESTADA
   REUNION_SOLICITADA
-  APROBADA
+  APROBADA            // Deprecated - use PENDIENTE_DE_PAGO
+  PENDIENTE_DE_PAGO
   EN_PROCESO
   COMPLETADA
   CANCELADA
@@ -308,6 +309,7 @@ enum SolicitudStatus {
   ENTREGADO
   RECHAZADO
   APROBADO
+  CANCELADA
 }
 
 enum AuditAction {

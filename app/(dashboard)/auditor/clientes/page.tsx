@@ -37,12 +37,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -53,7 +47,6 @@ import {
 
 export default function AuditorClientesPage() {
   const [empresas, setEmpresas] = useState<any[]>([]);
-  const [auditorias, setAuditorias] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Sidepanel state
@@ -84,12 +77,8 @@ export default function AuditorClientesPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [resEmp, resAud] = await Promise.all([
-        fetch("/api/empresas").then(r => r.json()),
-        AdminApiService.getAuditorias()
-      ]);
+      const resEmp = await fetch("/api/empresas").then(r => r.json());
       setEmpresas(resEmp.data.empresas || []);
-      setAuditorias(resAud.auditorias || []);
     } catch (error) {
       console.error("Error loading data:", error);
     } finally {
@@ -161,95 +150,50 @@ export default function AuditorClientesPage() {
   };
 
   const hasPendingAudits = (empresa: any) => {
-     return empresa.auditorias?.some((a: any) => a.status === 'SOLICITADA' || a.status === 'EN_REVISION');
+     return empresa.auditorias?.some((a: any) => a.status !== 'COMPLETADA' && a.status !== 'CANCELADA');
   };
-
-  const pendingAuditsCount = auditorias.filter(a => a.status === 'SOLICITADA' || a.status === 'EN_REVISION').length;
 
   return (
     <div className="space-y-8 pb-20">
       <div className="flex flex-col gap-1">
-        <h1 className="text-4xl font-black tracking-tight text-slate-900">Clientes y <span className="text-blue-600">Auditorías</span></h1>
-        <p className="text-slate-500 font-medium">Panel unificado para el seguimiento de cartera y expedientes en revisión.</p>
+        <h1 className="text-4xl font-black tracking-tight text-slate-900">Directorio de <span className="text-blue-600">Clientes</span></h1>
+        <p className="text-slate-500 font-medium">Gestión y seguimiento de empresas registradas en la plataforma.</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
          <Card className="border-none shadow-sm bg-blue-600 text-white rounded-2xl">
             <CardContent className="p-6">
-               <p className="text-blue-100 font-bold text-xs uppercase tracking-widest">En Espera de Acción</p>
-               <h3 className="text-3xl font-black mt-1">{pendingAuditsCount} Auditorías</h3>
-               <p className="text-blue-200 text-xs mt-2 font-medium">Expedientes pendientes de presupuesto o revisión.</p>
-            </CardContent>
-         </Card>
-         <Card className="border-none shadow-sm bg-white rounded-2xl">
-            <CardContent className="p-6">
-               <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">Cartera Activa</p>
-               <h3 className="text-3xl font-black text-slate-900 mt-1">{empresas.length} Clientes</h3>
-               <p className="text-slate-400 text-xs mt-2 font-medium">Empresas registradas en la plataforma.</p>
+               <p className="text-blue-100 font-bold text-xs uppercase tracking-widest">Cartera Activa</p>
+               <h3 className="text-3xl font-black mt-1">{empresas.length} Clientes</h3>
+               <p className="text-blue-200 text-xs mt-2 font-medium">Empresas registradas y verificadas.</p>
             </CardContent>
          </Card>
       </div>
 
-      <Tabs defaultValue="clientes" className="w-full">
-         <TabsList className="bg-slate-100 p-1 rounded-xl h-12 mb-6">
-            <TabsTrigger value="clientes" className="rounded-lg font-bold px-8 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all h-full">Directorio de Clientes</TabsTrigger>
-            <TabsTrigger value="auditorias" className="rounded-lg font-bold px-8 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all h-full flex items-center gap-2">
-               Asesorías Pendientes
-               {pendingAuditsCount > 0 && <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] text-white">{pendingAuditsCount}</span>}
-            </TabsTrigger>
-         </TabsList>
-
-         <TabsContent value="clientes">
-            <Card className="border-none shadow-sm overflow-hidden rounded-[24px] bg-white">
-               <CardHeader className="bg-white border-b border-slate-100 px-8 py-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                     <CardTitle className="text-xl font-black">Empresas en Cartera</CardTitle>
-                     <div className="relative group">
-                        <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                        <input 
-                           type="text" 
-                           placeholder="Filtrar por nombre o CIF..." 
-                           className="h-11 w-full sm:w-72 rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-medium border-none shadow-inner" 
-                        />
-                     </div>
-                  </div>
-               </CardHeader>
-               <CardContent className="p-0">
-                  {loading ? (
-                     <div className="p-8 space-y-4">
-                        {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full rounded-2xl" />)}
-                     </div>
-                  ) : (
-                     <ClientTable loading={loading} empresas={empresas} hasPendingAudits={hasPendingAudits} handleOpenDetail={handleOpenDetail} />
-                  )}
-               </CardContent>
-            </Card>
-         </TabsContent>
-
-         <TabsContent value="auditorias">
-            <Card className="border-none shadow-sm overflow-hidden rounded-[24px] bg-white">
-               <CardHeader className="bg-white border-b border-slate-100 px-8 py-6">
-                  <CardTitle className="text-xl font-black">Expedientes Prioritarios</CardTitle>
-                  <p className="text-sm text-slate-500 font-medium">Visualización consolidada de solicitudes que requieren tu intervención técnica.</p>
-               </CardHeader>
-               <CardContent className="p-0">
-                  {loading ? (
-                     <div className="p-8 space-y-4">
-                        {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full rounded-2xl" />)}
-                     </div>
-                  ) : auditorias.length === 0 ? (
-                     <div className="p-24 text-center">
-                        <ClipboardList className="h-20 w-20 mx-auto mb-6 text-slate-100" />
-                        <p className="text-slate-400 font-bold text-xl uppercase tracking-tighter">Sin solicitudes pendientes</p>
-                        <p className="text-slate-400 text-sm mt-1">Todas las asesorías están al día o en proceso presupuestario.</p>
-                     </div>
-                  ) : (
-                     <AuditoriaTable auditorias={auditorias.filter(a => a.status === 'SOLICITADA' || a.status === 'EN_REVISION')} />
-                  )}
-               </CardContent>
-            </Card>
-         </TabsContent>
-      </Tabs>
+      <Card className="border-none shadow-sm overflow-hidden rounded-[24px] bg-white">
+         <CardHeader className="bg-white border-b border-slate-100 px-8 py-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+               <CardTitle className="text-xl font-black">Empresas en Cartera</CardTitle>
+               <div className="relative group">
+                  <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                  <input 
+                     type="text" 
+                     placeholder="Filtrar por nombre o CIF..." 
+                     className="h-11 w-full sm:w-72 rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-medium border-none shadow-inner" 
+                  />
+               </div>
+            </div>
+         </CardHeader>
+         <CardContent className="p-0">
+            {loading ? (
+               <div className="p-8 space-y-4">
+                  {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full rounded-2xl" />)}
+               </div>
+            ) : (
+               <ClientTable loading={loading} empresas={empresas} hasPendingAudits={hasPendingAudits} handleOpenDetail={handleOpenDetail} />
+            )}
+         </CardContent>
+      </Card>
 
       {/* Client Detail Sidepanel (Sheet) */}
       <Sheet open={isPanelOpen} onOpenChange={setIsPanelOpen}>
@@ -435,7 +379,7 @@ export default function AuditorClientesPage() {
 
                   <div className="p-8 border-t border-slate-100 bg-white">
                      <Button className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-black text-white font-black text-base shadow-xl shadow-blue-500/10" asChild>
-                        <a href={`/auditor/presupuestos`}>Ir a Presupuestar</a>
+                        <a href={`/auditor/auditorias`}>Ir a Gestión de Auditorías</a>
                      </Button>
                   </div>
                </>
@@ -629,50 +573,3 @@ function ClientTable({ empresas, hasPendingAudits, handleOpenDetail }: any) {
    );
 }
 
-function AuditoriaTable({ auditorias }: any) {
-   return (
-      <div className="overflow-x-auto">
-         <table className="w-full text-sm text-left">
-            <thead className="bg-slate-50/50 text-slate-400 font-black uppercase text-[10px] tracking-[0.15em] border-b border-slate-100">
-               <tr>
-                  <th className="px-8 py-5">Concepto / Expediente</th>
-                  <th className="px-8 py-5">Cliente Asociado</th>
-                  <th className="px-8 py-5">Estado Actual</th>
-                  <th className="px-8 py-5 text-right whitespace-nowrap">Propuesta</th>
-               </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-               {auditorias.map((a: any) => (
-                  <tr key={a.id} className="hover:bg-amber-50/30 transition-all group">
-                     <td className="px-8 py-6">
-                        <div className="flex flex-col">
-                           <span className="font-black text-slate-900 text-[16px] leading-tight mb-1">{a.tipoServicio?.replace(/_/g, " ")}</span>
-                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">EJERCICIO {a.fiscalYear}</span>
-                        </div>
-                     </td>
-                     <td className="px-8 py-6">
-                        <div className="flex flex-col">
-                           <span className="font-bold text-slate-700">{a.empresa?.companyName}</span>
-                           <span className="text-xs text-slate-400 font-medium">{a.empresa?.cif}</span>
-                        </div>
-                     </td>
-                     <td className="px-8 py-6">
-                        <Badge className={cn(
-                           "border-none font-black text-[9px] uppercase px-2 py-0.5 rounded-md",
-                           a.status === 'REUNION_SOLICITADA' ? "bg-orange-100 text-orange-700 animate-pulse" : "bg-amber-50 text-amber-700"
-                        )}>
-                           {a.status}
-                        </Badge>
-                     </td>
-                     <td className="px-8 py-6 text-right">
-                        <Button className="h-10 rounded-xl font-bold bg-[#0f172a] hover:bg-black text-white px-4 shadow-lg shadow-slate-900/10" asChild>
-                           <a href={`/auditor/presupuestos`}>Emitir Presupuesto</a>
-                        </Button>
-                     </td>
-                  </tr>
-               ))}
-            </tbody>
-         </table>
-      </div>
-   );
-}

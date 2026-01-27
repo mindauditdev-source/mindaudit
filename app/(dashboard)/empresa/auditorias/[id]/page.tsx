@@ -44,12 +44,18 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
   const [submitting, setSubmitting] = useState(false);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
 
-  // Success handling
+  // Payment Failure State
+  const [isPaymentFailedOpen, setIsPaymentFailedOpen] = useState(false);
+
+  // Success/Failure handling
   useEffect(() => {
-    if (searchParams.get("success") === "simulate") {
-       alert("🎉 ¡Simulación de Pago con Stripe completada con éxito! Su expediente ha sido aprobado.");
+    const paymentStatus = searchParams.get("payment");
+    if (paymentStatus === "success" || searchParams.get("success") === "simulate") {
+       alert("🎉 ¡Pago completado con éxito! Su expediente ha comenzado.");
        // Clean URL
        router.replace(`/empresa/auditorias/${id}`);
+    } else if (paymentStatus === "failed") {
+       setIsPaymentFailedOpen(true);
     }
   }, [searchParams, id, router]);
   
@@ -144,13 +150,8 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
       loadData();
       
       if (decisionType === 'ACCEPT') {
-         try {
-            const { url } = await EmpresaApiService.createCheckoutSession(id);
-            alert("¡Presupuesto aceptado! Redirigiendo a pasarela de pago...");
-            window.location.href = url; // In a mock env, this might just refresh or go to a success state
-         } catch {
-            alert("Error al iniciar la pasarela de pago.");
-         }
+         // Si acepta, iniciamos el flujo de pago
+         handleRetryPayment();
       } else if (decisionType === 'MEETING') {
          alert("Solicitud de reunión enviada. Nos pondremos en contacto pronto.");
       } else {
@@ -158,6 +159,19 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
       }
     } catch {
       alert("Error al procesar la decisión");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleRetryPayment = async () => {
+    try {
+      setSubmitting(true);
+      const { url } = await EmpresaApiService.createCheckoutSession(id);
+      window.location.href = url;
+    } catch (err) {
+      console.error(err);
+      alert("Error al iniciar pasarela de pago");
     } finally {
       setSubmitting(false);
     }
@@ -441,6 +455,21 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
                             Rechazar Oferta <XCircle className="ml-2 h-4 w-4" />
                          </Button>
                       </div>
+                    ) : (audit.status === 'PENDIENTE_DE_PAGO' || searchParams.get('payment') === 'failed') ? (
+                        <div className="space-y-4">
+                           <div className="p-4 bg-amber-500/10 rounded-2xl border border-amber-500/20 text-center">
+                              <AlertCircle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
+                              <p className="text-sm font-black text-amber-500 uppercase tracking-widest mb-1">Pago Pendiente</p>
+                              <p className="text-sm font-medium text-slate-300">El pago no se ha completado. Inténtalo de nuevo para iniciar.</p>
+                           </div>
+                           <Button 
+                              onClick={handleRetryPayment}
+                              disabled={submitting}
+                              className="w-full h-14 rounded-2xl bg-[#6366f1] hover:bg-[#4f46e5] text-white font-black text-lg shadow-xl shadow-indigo-900/20 animate-pulse"
+                           >
+                              {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : "Completar Pago Ahora"}
+                           </Button>
+                        </div>
                    ) : audit.status === 'APROBADA' || audit.status === 'EN_PROCESO' ? (
                       <div className="p-6 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 text-center">
                          <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto mb-3" />
@@ -539,6 +568,27 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
                   </Button>
                </DialogFooter>
             </div>
+         </DialogContent>
+      </Dialog>
+
+      {/* Payment Failure Dialog */}
+      <Dialog open={isPaymentFailedOpen} onOpenChange={setIsPaymentFailedOpen}>
+         <DialogContent className="sm:max-w-[425px] rounded-[32px] border-none shadow-2xl">
+            <DialogHeader className="space-y-3">
+               <div className="h-14 w-14 bg-red-50 rounded-2xl flex items-center justify-center mb-2">
+                  <AlertCircle className="h-7 w-7 text-red-600" />
+               </div>
+               <DialogTitle className="text-2xl font-black text-slate-900 tracking-tighter">ERROR EN EL PAGO</DialogTitle>
+               <DialogDescription className="font-medium text-slate-500">
+                  No se ha podido completar la transacción. Por favor, verifica tus datos bancarios o intenta con otra tarjeta.
+               </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="pt-6 flex gap-2">
+               <Button variant="ghost" onClick={() => setIsPaymentFailedOpen(false)} className="rounded-xl font-bold">Cancelar</Button>
+               <Button onClick={() => { setIsPaymentFailedOpen(false); handleRetryPayment(); }} className="bg-slate-900 text-white font-black rounded-xl flex-1 shadow-lg">
+                  Reintentar Pago
+               </Button>
+            </DialogFooter>
          </DialogContent>
       </Dialog>
     </div>

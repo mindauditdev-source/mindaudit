@@ -39,7 +39,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-export default function AuditorPresupuestosPage() {
+export default function AuditorAuditoriasPage() {
   const [auditorias, setAuditorias] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedAudit, setSelectedAudit] = useState<any>(null);
@@ -124,8 +124,8 @@ export default function AuditorPresupuestosPage() {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Centro de Presupuestos</h1>
-          <p className="text-slate-500 mt-1">Gestión integral de expedientes, presupuestos y control de avance comercial.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Gestión de Auditorías</h1>
+          <p className="text-slate-500 mt-1">Administración técnica, presupuestaria y seguimiento de todos los expedientes activos.</p>
         </div>
       </div>
 
@@ -209,15 +209,19 @@ export default function AuditorPresupuestosPage() {
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end" className="w-60 rounded-xl shadow-xl border-slate-200">
                                      <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-3">Gestión de Oferta</DropdownMenuLabel>
-                                     <DropdownMenuItem onClick={() => handleOpenBudget(a)} className="py-2.5 rounded-lg font-medium mx-1">
-                                        <Euro className="mr-2 h-4 w-4 text-emerald-500" /> Emitir Presupuesto
-                                     </DropdownMenuItem>
+                                     {(a.status === 'SOLICITADA' || a.status === 'EN_REVISION' || a.status === 'REUNION_SOLICITADA') && (
+                                        <DropdownMenuItem onClick={() => handleOpenBudget(a)} className="py-2.5 rounded-lg font-medium mx-1">
+                                           <Euro className="mr-2 h-4 w-4 text-emerald-500" /> Emitir Presupuesto
+                                        </DropdownMenuItem>
+                                     )}
                                      <DropdownMenuItem onClick={() => handleOpenDocRequest(a)} className="py-2.5 rounded-lg font-medium mx-1">
                                         <FileText className="mr-2 h-4 w-4 text-blue-500" /> Requerir Documentación
                                      </DropdownMenuItem>
                                      <DropdownMenuSeparator className="bg-slate-50" />
-                                     <DropdownMenuItem className="py-2.5 rounded-lg font-medium mx-1 focus:bg-slate-50">
-                                        <ExternalLink className="mr-2 h-4 w-4 text-slate-400" /> Ver Detalles Completos
+                                     <DropdownMenuItem className="py-2.5 rounded-lg font-medium mx-1 focus:bg-slate-50" asChild>
+                                        <a href={`/auditor/auditorias/${a.id}`}>
+                                           <ExternalLink className="mr-2 h-4 w-4 text-slate-400" /> Ver Detalles Completos
+                                        </a>
                                      </DropdownMenuItem>
                                   </DropdownMenuContent>
                                </DropdownMenu>

@@ -180,4 +180,50 @@ export class EmailService {
       `,
     });
   }
+
+  /**
+   * Notificación de Auditoría Iniciada (EN_PROCESO) - Enviado tras el pago
+   */
+  static async notifyAuditStarted(audit: AuditInfo, empresa: EmpresaInfo, invoiceUrl: string) {
+    return this.sendEmail({
+      to: empresa.contactEmail,
+      subject: `🚀 Auditoría Iniciada: ${audit.tipoServicio}`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2 style="color: #0c3a6b;">¡Tu auditoría ha comenzado!</h2>
+          <p>Hola ${empresa.contactName},</p>
+          <p>Hemos confirmado tu pago para la auditoría de <strong>${audit.tipoServicio}</strong> (${audit.fiscalYear}).</p>
+          <p>Tu expediente ya está en estado <strong>En Proceso</strong>. Nuestro equipo de auditores comenzará la revisión técnica de inmediato.</p>
+          <p>Puedes descargar tu factura pulsando el siguiente botón:</p>
+          <div style="margin: 20px 0;">
+            <a href="${invoiceUrl}" style="background: #10b981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Descargar Factura</a>
+          </div>
+          <p>Recuerda que puedes subir documentos adicionales o consultar el estado de las solicitudes desde tu dashboard.</p>
+          <a href="${process.env.NEXTAUTH_URL}/empresa/auditorias/${audit.id}" style="background: #0c3a6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Ver Detalles en Dashboard</a>
+          <p>Gracias por elegir MindAudit Spain.</p>
+        </div>
+      `,
+    });
+  }
+
+  /**
+   * Notificación de Auditoría Finalizada
+   */
+  static async notifyAuditCompleted(audit: AuditInfo, empresa: EmpresaInfo) {
+    return this.sendEmail({
+      to: empresa.contactEmail,
+      subject: `🏁 Auditoría Finalizada: ${audit.tipoServicio}`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2 style="color: #0c3a6b;">Auditoría Completada</h2>
+          <p>Hola ${empresa.contactName},</p>
+          <p>Nos complace informarte que la auditoría de <strong>${audit.tipoServicio}</strong> para el año ${audit.fiscalYear} ha finalizado correctamente.</p>
+          <p>Ya puedes acceder a tu dashboard para descargar el informe final y la documentación asociada.</p>
+          <a href="${process.env.NEXTAUTH_URL}/empresa/auditorias/${audit.id}" style="background: #0c3a6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Ver Informe Final</a>
+          <br/><br/>
+          <p>Ha sido un placer trabajar contigo.</p>
+        </div>
+      `,
+    });
+  }
 }

@@ -127,8 +127,8 @@ export default function AuditorDashboardPage() {
                          <Clock className="h-6 w-6 text-amber-500" />
                       </div>
                       <div>
-                         <p className="text-sm font-black text-slate-800 uppercase tracking-widest text-[10px]">Pendientes</p>
-                         <h4 className="text-lg font-bold text-slate-700">Auditorías por Presupuestar</h4>
+                         <p className="text-sm font-black text-slate-800 uppercase tracking-widest text-[10px]">En Espera de Acción</p>
+                         <h4 className="text-lg font-bold text-slate-700">Auditorías Activas</h4>
                       </div>
                    </div>
                    <div className="text-right relative z-10">
@@ -169,13 +169,13 @@ export default function AuditorDashboardPage() {
                         </div>
                      </div>
                      <div className="space-y-2">
-                        <p className="font-black text-2xl text-slate-900">Prioridad Comercial</p>
+                        <p className="font-black text-2xl text-slate-900">En Espera de Acción</p>
                         <p className="text-sm text-slate-500 max-w-[280px] font-medium leading-relaxed">
-                           Se han detectado <span className="text-amber-600 font-black">{stats.pendingAudits} solicitudes</span> que requieren una oferta económica inmediata para continuar el flujo.
+                           Se han detectado <span className="text-amber-600 font-black">{stats.pendingAudits} expedientes</span> que requieren atención o seguimiento para completar el ciclo.
                         </p>
                      </div>
                      <Button className="w-full bg-[#1a2e35] hover:bg-black text-white font-bold h-12 rounded-xl shadow-xl shadow-slate-200" asChild>
-                        <a href="/auditor/presupuestos">Ir a Centro de Presupuestos</a>
+                        <a href="/auditor/auditorias">Ir a Gestión de Auditorías</a>
                      </Button>
                   </div>
                ) : (

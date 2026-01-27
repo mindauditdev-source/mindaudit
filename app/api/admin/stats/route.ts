@@ -35,11 +35,11 @@ export async function GET(request: NextRequest) {
       // Total auditorías
       prisma.auditoria.count(),
 
-      // Auditorías activas (en proceso)
+      // Auditorías activas (no completadas ni canceladas)
       prisma.auditoria.count({
         where: {
           status: {
-            in: ['SOLICITADA', 'EN_REVISION', 'PRESUPUESTADA', 'APROBADA', 'EN_PROCESO'],
+            notIn: ['COMPLETADA', 'CANCELADA'],
           },
         },
       }),
