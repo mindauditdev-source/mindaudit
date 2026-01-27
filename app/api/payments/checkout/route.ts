@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/middleware/api-auth";
 import { prisma } from "@/lib/db/prisma";
+import { stripe } from "@/lib/stripe";
 import { 
   errorResponse, 
   unauthorizedResponse, 
@@ -35,11 +36,34 @@ export async function POST(req: NextRequest) {
       return errorResponse("Presupuesto no disponible para pago", 400);
     }
 
-    // FOR NOW: Return a mock checkout URL
-    // In a production environment, here we would call stripe.checkout.sessions.create
+    // Create Stripe Checkout Session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: `Auditoría ${auditoria.fiscalYear} - ${auditoria.tipoServicio.replace(/_/g, " ")}`,
+              description: `Servicio de auditoría para la empresa ${auditoria.empresa.companyName}`,
+            },
+            unit_amount: Math.round(Number(auditoria.presupuesto) * 100), // Convert to cents
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/empresa/auditorias/${auditoria.id}?payment=success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/empresa/auditorias/${auditoria.id}?payment=failed`,
+      metadata: {
+        auditoriaId: auditoria.id,
+      },
+      customer_email: user.email, 
+    });
+
     return NextResponse.json({
-      message: "Checkout session created (Mock)",
-      url: `/empresa/auditorias/${auditoria.id}?success=simulate`, 
+      message: "Checkout session created",
+      url: session.url,
     });
 
   } catch (error: unknown) {
