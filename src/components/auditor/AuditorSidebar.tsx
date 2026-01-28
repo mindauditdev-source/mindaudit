@@ -38,14 +38,9 @@ const sidebarItems = [
     icon: ClipboardList,
   },
   {
-    title: "Métricas",
-    href: "/auditor/metricas",
+    title: "Finanzas",
+    href: "/auditor/finanzas",
     icon: PieChart,
-  },
-  {
-    title: "Configuración",
-    href: "/auditor/configuracion",
-    icon: Settings,
   },
 ];
 

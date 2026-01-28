@@ -161,11 +161,51 @@ export async function GET(_req: NextRequest) {
           date: doc.updatedAt
         });
       });
+
+      // 4. Pagos Recibidos (Nuevo - Auditoría en Proceso)
+      const paidAudits = await prisma.auditoria.findMany({
+        where: {
+          ...auditWhere,
+          status: 'EN_PROCESO',
+          fechaInicio: {
+             // Notificar solo si se inició en los últimos 7 días, por ejemplo
+             gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          }
+        },
+        include: { empresa: { select: { companyName: true } } },
+        orderBy: { updatedAt: 'desc' }
+      });
+
+      paidAudits.forEach(audit => {
+        notifications.push({
+          id: `paid-${audit.id}`,
+          type: 'PAYMENT_CONFIRMED',
+          title: 'Pago Recibido',
+          message: `${audit.empresa.companyName} ha pagado. El expediente está en marcha.`,
+          link: `/auditor/auditorias/${audit.id}`,
+          severity: 'HIGH',
+          date: audit.updatedAt
+        });
+      });
+
+
     }
 
+    // 4. Filtrar notificaciones leídas
+    const readNotifications = await prisma.notificationRead.findMany({
+      where: {
+        userId: user.id,
+        notificationId: { in: notifications.map(n => n.id) }
+      },
+      select: { notificationId: true }
+    });
+
+    const readIds = new Set(readNotifications.map(nr => nr.notificationId));
+    const unreadNotifications = notifications.filter(n => !readIds.has(n.id));
+
     return successResponse({
-      count: notifications.length,
-      items: notifications
+      count: unreadNotifications.length,
+      items: unreadNotifications
     });
 
   } catch (error) {

@@ -324,3 +324,14 @@ enum AuditAction {
   DOWNLOAD
   PAYMENT
 }
+
+model NotificationRead {
+  id             String   @id @default(cuid())
+  userId         String
+  notificationId String
+  readAt         DateTime @default(now())
+
+  @@unique([userId, notificationId])
+  @@index([userId])
+  @@map("notification_reads")
+}

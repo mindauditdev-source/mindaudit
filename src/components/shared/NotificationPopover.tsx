@@ -69,6 +69,17 @@ export function NotificationPopover() {
     }
   };
 
+  const markAsRead = async (id: string, link: string) => {
+    try {
+       await fetch(`/api/notifications/${id}/read`, { method: 'POST' });
+       setNotifications(prev => prev.filter(n => n.id !== id));
+       setOpen(false);
+       // window.location.href = link; // Optional: force navigation if Link doesn't handle it well
+    } catch (err) {
+       console.error("Error marking as read", err);
+    }
+  };
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
@@ -106,7 +117,10 @@ export function NotificationPopover() {
                 <Link 
                   key={item.id} 
                   href={item.link} 
-                  onClick={() => setOpen(false)}
+                  onClick={(e) => {
+                     // e.preventDefault(); // If we want to wait for async
+                     markAsRead(item.id, item.link);
+                  }}
                   className={cn(
                     "flex gap-4 p-4 transition-colors border-b border-slate-100 last:border-0",
                     getSeverityColor(item.severity)
