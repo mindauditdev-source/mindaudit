@@ -284,6 +284,25 @@ async function main() {
     },
   })
 
+  // Auditoría 5: LISTA PARA PAGAR (TEST CASE)
+  // Esta auditoría aparecerá como "Pendiente" y el usuario podrá simular el pago
+  const auditoria5 = await prisma.auditoria.create({
+    data: {
+      empresaId: empresaDirectaUser.empresa!.id, // Misma empresa que el usuario de prueba
+      tipoServicio: TipoServicio.AUDITORIA_FORENSE,
+      fiscalYear: 2024,
+      description: 'Informe pericial urgente (Test de Pago)',
+      urgente: true,
+      status: AuditoriaStatus.PENDIENTE_DE_PAGO,
+      presupuesto: 5000.00,
+      presupuestoNotas: 'Informe pericial completo',
+      presupuestoValidoHasta: new Date('2026-06-30'),
+      fechaSolicitud: new Date('2026-01-25'),
+      fechaPresupuesto: new Date('2026-01-26'),
+      fechaAprobacion: new Date('2026-01-27'),
+    },
+  })
+
   // 8. COMISIONES
   console.log('💰 Creating commissions...')
 
