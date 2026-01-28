@@ -86,6 +86,7 @@ model Empresa {
   colaborador   Colaborador?         @relation(fields: [colaboradorId], references: [id])
   user          User?                @relation(fields: [userId], references: [id])
   solicitudes   SolicitudDocumento[]
+  invoices      Invoice[]
 
   @@index([userId])
   @@index([colaboradorId])
@@ -122,6 +123,7 @@ model Auditoria {
   comisiones             Comision[]
   documentos             Documento[]
   solicitudes            SolicitudDocumento[]
+  invoice                Invoice?
 
   @@index([empresaId])
   @@index([colaboradorId])
@@ -334,4 +336,32 @@ model NotificationRead {
   @@unique([userId, notificationId])
   @@index([userId])
   @@map("notification_reads")
+}
+
+model Invoice {
+  id          String        @id @default(cuid())
+  number      String        @unique // e.g. INV-2024-001
+  date        DateTime      @default(now())
+  amount      Decimal       @db.Decimal(12, 2)
+  tax         Decimal       @db.Decimal(12, 2)
+  total       Decimal       @db.Decimal(12, 2)
+  status      InvoiceStatus @default(PAID) // Usually created upon payment success
+  empresaId   String
+  auditoriaId String?       @unique
+
+  empresa   Empresa    @relation(fields: [empresaId], references: [id])
+  auditoria Auditoria? @relation(fields: [auditoriaId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([empresaId])
+  @@map("invoices")
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  CANCELLED
 }

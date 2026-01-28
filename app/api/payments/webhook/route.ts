@@ -66,21 +66,19 @@ export async function POST(req: NextRequest) {
         console.error("⚠️ Error generating commission:", commError);
       }
 
-      // 3. Create real or mock invoice URL (Stripe sends invoice_url usually if configured)
-      // If Stripe handles invoices, we can store session.invoice (ID) or hosted_invoice_url.
-      const invoiceUrl = session.invoice_url || "https://mindaudit.com/invoice-placeholder"; 
+      // 3. Create actual Invoice record
+      const invoiceNumber = `INV-${new Date().getFullYear()}-${session.id.slice(-6).toUpperCase()}`;
       
-      const invoice = await prisma.documento.create({
+      const invoice = await prisma.invoice.create({
         data: {
-          fileName: `Factura_${auditoria.empresa.companyName.replace(/\s+/g, '_')}_${auditoria.id.substring(0, 8)}.pdf`,
-          fileUrl: invoiceUrl, // Use URL from Stripe if available
-          fileType: "application/pdf",
-          fileSize: 0, 
-          tipoDocumento: "OTRO", 
+          number: invoiceNumber,
+          date: new Date(),
+          amount: auditoria.presupuesto || 0,
+          tax: (Number(auditoria.presupuesto) * 0.21) || 0, // Assumption: 21% VAT or included?
+          total: (Number(auditoria.presupuesto) * 1.21) || 0,
+          status: 'PAID',
           empresaId: auditoria.empresaId,
-          auditoriaId: auditoria.id,
-          uploadedBy: "SYSTEM", 
-          description: "Factura de pago generada por Stripe",
+          auditoriaId: auditoria.id
         }
       });
 
@@ -112,7 +110,7 @@ export async function POST(req: NextRequest) {
             contactEmail: auditoria.empresa.contactEmail,
             cif: auditoria.empresa.cif,
           },
-          invoiceUrl
+          `/empresa/facturas` // Direct them to the invoices page to download
         );
       } catch (emailErr) {
         console.error("⚠️ Failed to send email:", emailErr);
