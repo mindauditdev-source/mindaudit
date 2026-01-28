@@ -19,6 +19,7 @@ export async function middleware(req: NextRequest) {
     '/contacto',
     '/trabaja-con-nosotros',
     '/legal',
+    '/api/payments/webhook',
   ]
 
   // Verificar si es una ruta pública
