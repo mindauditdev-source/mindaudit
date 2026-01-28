@@ -35,9 +35,12 @@ export default function EmpresaFacturasPage() {
   async function fetchInvoices() {
     try {
       const res = await fetch('/api/empresa/invoices');
+      console.log("RESPONNSEEE**********", res);
       const data = await res.json();
-      if (data.statusCode === 200) {
+      if (data.success) {
           setInvoices(data.data.items);
+      } else {
+        console.error("Error fetching invoices:", data.error);
       }
     } catch (error) {
       console.error("Error loading invoices:", error);

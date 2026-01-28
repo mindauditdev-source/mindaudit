@@ -30,14 +30,19 @@ export async function GET(req: NextRequest) {
     });
 
     // 2. Fetch "legacy" invoices (Auditorias with budget but no invoice record)
-    // using "none" filter on the 1-1 relation if possible, or just checking null
-    const legacyAudits = await prisma.auditoria.findMany({
+    // Fetch ALL audits with budget, then filter in memory to be safe against schema sync issues
+    const potentialLegacyAudits = await prisma.auditoria.findMany({
        where: {
           empresaId: empresa.id,
-          presupuesto: { gt: 0 },
-          invoice: null // This finds auditorias where the relation 'invoice' is null
+          presupuesto: { gt: 0 }
+       },
+       include: {
+          invoice: true // Include the relation to check existence
        }
     });
+    
+    // Filter those that DO NOT have an invoice
+    const legacyAudits = potentialLegacyAudits.filter(a => !a.invoice);
 
     // 3. Map legacy to Invoice interface
     const legacyInvoices = legacyAudits.map(audit => {
@@ -75,7 +80,10 @@ export async function GET(req: NextRequest) {
         new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
-    return successResponse({ count: allInvoices.length, items: allInvoices });
+    return successResponse({ 
+        count: allInvoices.length, 
+        items: allInvoices,
+    });
 
   } catch (error) {
     console.error("Error fetching invoices:", error);
