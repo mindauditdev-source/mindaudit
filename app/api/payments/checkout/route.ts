@@ -58,7 +58,8 @@ export async function POST(req: NextRequest) {
       metadata: {
         auditoriaId: auditoria.id,
       },
-      customer_email: user.email, 
+      customer_email: user.email,
+      automatic_tax: { enabled: false }, 
     });
 
     return NextResponse.json({

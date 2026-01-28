@@ -69,13 +69,17 @@ export async function POST(req: NextRequest) {
       // 3. Create actual Invoice record
       const invoiceNumber = `INV-${new Date().getFullYear()}-${session.id.slice(-6).toUpperCase()}`;
       
+      const totalAmount = Number(auditoria.presupuesto) || 0;
+      const baseAmount = totalAmount / 1.21;
+      const taxAmount = totalAmount - baseAmount;
+
       const invoice = await prisma.invoice.create({
         data: {
           number: invoiceNumber,
           date: new Date(),
-          amount: auditoria.presupuesto || 0,
-          tax: (Number(auditoria.presupuesto) * 0.21) || 0, // Assumption: 21% VAT or included?
-          total: (Number(auditoria.presupuesto) * 1.21) || 0,
+          amount: baseAmount,
+          tax: taxAmount,
+          total: totalAmount,
           status: 'PAID',
           empresaId: auditoria.empresaId,
           auditoriaId: auditoria.id

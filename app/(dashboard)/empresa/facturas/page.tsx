@@ -163,11 +163,17 @@ export default function EmpresaFacturasPage() {
                             <td className="px-4 py-3 font-bold text-slate-900">
                                {formatCurrency(Number(inv.total))}
                             </td>
-                            <td className="px-4 py-3">
-                               <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1">
-                                  <CheckCircle className="h-3 w-3" /> Pagada
-                               </Badge>
-                            </td>
+                             <td className="px-4 py-3">
+                                {inv.status === 'PAID' ? (
+                                   <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1">
+                                      <CheckCircle className="h-3 w-3" /> Pagada
+                                   </Badge>
+                                ) : (
+                                   <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 gap-1">
+                                      <Clock className="h-3 w-3" /> Pendiente
+                                   </Badge>
+                                )}
+                             </td>
                             <td className="px-4 py-3 text-right">
                                <Button 
                                   variant="ghost" 

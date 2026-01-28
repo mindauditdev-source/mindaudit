@@ -29,56 +29,8 @@ export async function GET(req: NextRequest) {
        }
     });
 
-    // 2. Fetch "legacy" invoices (Auditorias with budget but no invoice record)
-    // Fetch ALL audits with budget, then filter in memory to be safe against schema sync issues
-    const potentialLegacyAudits = await prisma.auditoria.findMany({
-       where: {
-          empresaId: empresa.id,
-          presupuesto: { gt: 0 }
-       },
-       include: {
-          invoice: true // Include the relation to check existence
-       }
-    });
-    
-    // Filter those that DO NOT have an invoice
-    const legacyAudits = potentialLegacyAudits.filter(a => !a.invoice);
-
-    // 3. Map legacy to Invoice interface
-    const legacyInvoices = legacyAudits.map(audit => {
-        // Simple logic to determine status based on audit status
-        let status = 'DRAFT';
-        if (audit.status === 'COMPLETADA' || audit.status === 'EN_PROCESO' || audit.comisionPagada) {
-            status = 'PAID';
-        } else if (audit.status === 'PENDIENTE_DE_PAGO' || audit.presupuesto) {
-            status = 'ISSUED';
-        }
-
-        const amount = Number(audit.presupuesto);
-        const tax = amount * 0.21; // Assuming 21% VAT
-        const total = amount + tax;
-
-        return {
-            id: `legacy-${audit.id}`,
-            number: `PRE-${audit.fiscalYear}-${audit.id.substring(0, 4).toUpperCase()}`, // Placeholder number
-            date: audit.fechaPresupuesto || audit.createdAt,
-            amount: audit.presupuesto,
-            tax: tax,
-            total: total,
-            status: status,
-            empresaId: audit.empresaId,
-            auditoriaId: audit.id,
-            auditoria: {
-                fiscalYear: audit.fiscalYear,
-                tipoServicio: audit.tipoServicio
-            }
-        };
-    });
-
-    // 4. Combine and Sort
-    const allInvoices = [...realInvoices, ...legacyInvoices].sort((a, b) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+    // 4. Combine and Sort (Just real invoices now)
+    const allInvoices = realInvoices;
 
     return successResponse({ 
         count: allInvoices.length, 
