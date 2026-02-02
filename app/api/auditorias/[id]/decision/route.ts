@@ -51,7 +51,9 @@ export async function PATCH(
       where: { id },
       data: {
         status: nextStatus,
-        presupuestoNotas: feedback ? `${auditoria.presupuestoNotas || ""}\n\n[Feedback Cliente]: ${feedback}` : auditoria.presupuestoNotas
+        presupuestoNotas: feedback ? `${auditoria.presupuestoNotas || ""}\n\n[Feedback Cliente]: ${feedback}` : auditoria.presupuestoNotas,
+        meetingRequestedBy: decision === 'MEETING' ? 'EMPRESA' : undefined,
+        meetingStatus: decision === 'MEETING' ? 'PENDING' : undefined
       }
     });
 

@@ -23,6 +23,11 @@ model User {
   colaborador    Colaborador?
   empresa        Empresa?
 
+  // Sistema de Consultas
+  horasDisponibles Float         @default(0)
+  consultas        Consulta[]    @relation("ConsultasColaborador")
+  comprasHoras     CompraHoras[] @relation("ComprasHoras")
+
   @@index([email])
   @@index([role])
   @@index([status])
@@ -116,6 +121,13 @@ model Auditoria {
   fechaAprobacion        DateTime?
   fechaInicio            DateTime?
   fechaFinalizacion      DateTime?
+  
+  // Meeting Fields
+  meetingRequestedBy     UserRole?
+  meetingStatus          MeetingStatus        @default(PENDING)
+  meetingDate            DateTime?
+  meetingLink            String?
+
   createdAt              DateTime             @default(now())
   updatedAt              DateTime             @updatedAt
   colaborador            Colaborador?         @relation(fields: [colaboradorId], references: [id])
@@ -314,6 +326,13 @@ enum SolicitudStatus {
   CANCELADA
 }
 
+enum MeetingStatus {
+  PENDING
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
 enum AuditAction {
   CREATE
   UPDATE
@@ -364,4 +383,134 @@ enum InvoiceStatus {
   ISSUED
   PAID
   CANCELLED
+}
+
+// ============================================
+// SISTEMA DE CONSULTAS
+// ============================================
+
+model Consulta {
+  id                String              @id @default(cuid())
+  titulo            String
+  descripcion       String              @db.Text
+  esUrgente         Boolean             @default(false)
+  requiereVideo     Boolean             @default(false)
+  archivos          ArchivoConsulta[]
+  
+  colaboradorId     String
+  colaborador       User                @relation("ConsultasColaborador", fields: [colaboradorId], references: [id], onDelete: Cascade)
+  
+  categoriaId       String?
+  categoria         CategoriaConsulta?  @relation(fields: [categoriaId], references: [id])
+  
+  horasAsignadas    Float?
+  horasCustom       Float?              // Para categoría custom
+  
+  status            ConsultaStatus      @default(PENDIENTE)
+  feedback          String?             @db.Text  // Respuesta del auditor
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  respondidaAt      DateTime?
+  aceptadaAt        DateTime?
+  
+  @@index([colaboradorId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("consultas")
+}
+
+model CategoriaConsulta {
+  id          String      @id @default(cuid())
+  nombre      String      @unique
+  descripcion String?     @db.Text
+  horas       Float       // Valor en horas
+  isCustom    Boolean     @default(false)
+  activo      Boolean     @default(true)
+  orden       Int         @default(0)  // Para ordenar en UI
+  consultas   Consulta[]
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  @@index([activo])
+  @@map("categorias_consulta")
+}
+
+model ArchivoConsulta {
+  id          String    @id @default(cuid())
+  consultaId  String
+  consulta    Consulta  @relation(fields: [consultaId], references: [id], onDelete: Cascade)
+  
+  nombre      String
+  url         String
+  size        Int
+  tipo        String
+  
+  createdAt   DateTime  @default(now())
+  
+  @@index([consultaId])
+  @@map("archivos_consulta")
+}
+
+model PaqueteHoras {
+  id          String        @id @default(cuid())
+  nombre      String
+  descripcion String?       @db.Text
+  horas       Int
+  precio      Decimal       @db.Decimal(10, 2)  // En euros
+  descuento   Int?          // Porcentaje de descuento sobre precio base
+  destacado   Boolean       @default(false)  // Para marcar como "más popular"
+  activo      Boolean       @default(true)
+  orden       Int           @default(0)  // Para ordenar en UI
+  
+  compras     CompraHoras[]
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  @@index([activo])
+  @@map("paquetes_horas")
+}
+
+model CompraHoras {
+  id              String        @id @default(cuid())
+  colaboradorId   String
+  colaborador     User          @relation("ComprasHoras", fields: [colaboradorId], references: [id], onDelete: Cascade)
+  
+  paqueteId       String
+  paquete         PaqueteHoras  @relation(fields: [paqueteId], references: [id])
+  
+  horas           Int           // Horas compradas
+  precio          Decimal       @db.Decimal(10, 2)  // Precio pagado
+  
+  stripeSessionId String?       @unique
+  stripePiId      String?       @unique
+  
+  status          PagoStatus    @default(PENDIENTE)
+  
+  createdAt       DateTime      @default(now())
+  completedAt     DateTime?
+  
+  @@index([colaboradorId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("compras_horas")
+}
+
+enum ConsultaStatus {
+  PENDIENTE      // Enviada por Colaborador
+  COTIZADA       // Auditor respondió con horas
+  ACEPTADA       // Colaborador aceptó
+  RECHAZADA      // Colaborador rechazó
+  EN_PROCESO     // Auditor trabajando en ella
+  COMPLETADA     // Finalizada
+  CANCELADA      // Cancelada por alguna razón
+}
+
+enum PagoStatus {
+  PENDIENTE
+  COMPLETADO
+  FALLIDO
+  REEMBOLSADO
 }

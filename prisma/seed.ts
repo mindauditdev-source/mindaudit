@@ -12,6 +12,14 @@ async function main() {
   await prisma.documento.deleteMany()
   await prisma.comision.deleteMany()
   await prisma.auditoria.deleteMany()
+  
+  // Cleanup consultation system
+  await prisma.archivoConsulta.deleteMany()
+  await prisma.compraHoras.deleteMany()
+  await prisma.consulta.deleteMany()
+  await prisma.categoriaConsulta.deleteMany()
+  await prisma.paqueteHoras.deleteMany()
+  
   await prisma.empresa.deleteMany()
   await prisma.colaborador.deleteMany()
   await prisma.user.deleteMany()
@@ -366,6 +374,114 @@ async function main() {
     },
   })
 
+  // 10. CATEGORÍAS DE CONSULTA
+  console.log('📚 Creating consultation categories...')
+  
+  await prisma.categoriaConsulta.create({
+    data: {
+      nombre: 'Consulta Básica',
+      descripcion: 'Consultas simples y rápidas (ej: dudas sobre declaraciones)',
+      horas: 1,
+      isCustom: false,
+      orden: 1,
+      activo: true,
+    },
+  })
+
+  await prisma.categoriaConsulta.create({
+    data: {
+      nombre: 'Consulta Estándar',
+      descripcion: 'Consultas de complejidad media (ej: revisión de documentos)',
+      horas: 3,
+      isCustom: false,
+      orden: 2,
+      activo: true,
+    },
+  })
+
+  await prisma.categoriaConsulta.create({
+    data: {
+      nombre: 'Consulta Avanzada',
+      descripcion: 'Consultas complejas (ej: planificación fiscal, restructuraciones)',
+      horas: 5,
+      isCustom: false,
+      orden: 3,
+      activo: true,
+    },
+  })
+
+  await prisma.categoriaConsulta.create({
+    data: {
+      nombre: 'Consulta Urgente',
+      descripcion: 'Atención prioritaria inmediata',
+      horas: 2,
+      isCustom: false,
+      orden: 4,
+      activo: true,
+    },
+  })
+
+  await prisma.categoriaConsulta.create({
+    data: {
+      nombre: 'Personalizado',
+      descripcion: 'El auditor asigna horas manualmente',
+      horas: 0,
+      isCustom: true,
+      orden: 99,
+      activo: true,
+    },
+  })
+
+  // 11. PAQUETES DE HORAS
+  console.log('⏱️ Creating hour packages...')
+
+  await prisma.paqueteHoras.create({
+    data: {
+      nombre: 'Paquete Básico',
+      descripcion: 'Perfect para consultas ocasionales',
+      horas: 10,
+      precio: 500.00,
+      descuento: 0,
+      destacado: false,
+      orden: 1,
+      activo: true,
+    },
+  })
+
+  await prisma.paqueteHoras.create({
+    data: {
+      nombre: 'Paquete Estándar',
+      descripcion: 'El más popular - Ahorra 15%',
+      horas: 25,
+      precio: 1062.50, // 25 * 50 = 1250, con 15% descuento = 1062.50
+      descuento: 15,
+      destacado: true,
+      orden: 2,
+      activo: true,
+    },
+  })
+
+  await prisma.paqueteHoras.create({
+    data: {
+      nombre: 'Paquete Premium',
+      descripcion: 'Máximo ahorro - 25% de descuento',
+      horas: 50,
+      precio: 1875.00, // 50 * 50 = 2500, con 25% descuento = 1875
+      descuento: 25,
+      destacado: false,
+      orden: 3,
+      activo: true,
+    },
+  })
+
+  // Dar 5 horas iniciales al colaborador 1 para testing
+  await prisma.user.update({
+    where: { id: colaborador1User.id },
+    data: {
+      horasDisponibles: 5,
+    },
+  })
+
   console.log('✅ Database seeding completed successfully!')
   console.log('')
   console.log('📊 Summary:')
@@ -374,10 +490,12 @@ async function main() {
   console.log(`- Empresas created: ${await prisma.empresa.count()}`)
   console.log(`- Auditorías created: ${await prisma.auditoria.count()}`)
   console.log(`- Comisiones created: ${await prisma.comision.count()}`)
+  console.log(`- Categorías de Consulta: ${await prisma.categoriaConsulta.count()}`)
+  console.log(`- Paquetes de Horas: ${await prisma.paqueteHoras.count()}`)
   console.log('')
   console.log('🔑 Test credentials:')
   console.log('Admin: admin@mindaudit.es / admin123')
-  console.log('Colaborador 1: garcia@gestoria.es / colaborador123')
+  console.log('Colaborador 1: garcia@gestoria.es / colaborador123 (5 horas disponibles)')
   console.log('Colaborador 2: martinez@asesoria.es / colaborador123')
   console.log('Empresa Directa: info@techsolutions.es / empresa123')
 }

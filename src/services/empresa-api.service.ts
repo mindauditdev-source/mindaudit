@@ -143,4 +143,11 @@ export class EmpresaApiService {
       body: JSON.stringify(data),
     });
   }
+
+  static async scheduleMeeting(id: string, data: { date: string; link?: string; status: 'SCHEDULED' }) {
+    return this.fetch(`/auditorias/${id}/meeting`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  }
 }

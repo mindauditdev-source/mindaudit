@@ -93,6 +93,11 @@ export async function GET(
         fechaFinalizacion: auditoria.fechaFinalizacion,
         createdAt: auditoria.createdAt,
         updatedAt: auditoria.updatedAt,
+        // Meeting Fields
+        meetingRequestedBy: auditoria.meetingRequestedBy,
+        meetingStatus: auditoria.meetingStatus,
+        meetingDate: auditoria.meetingDate,
+        meetingLink: auditoria.meetingLink,
         empresa: {
           id: auditoria.empresa.id,
           companyName: auditoria.empresa.companyName,

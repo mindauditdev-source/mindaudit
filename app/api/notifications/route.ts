@@ -86,6 +86,50 @@ export async function GET(_req: NextRequest) {
         });
       });
 
+      // 4. Solicitudes de Reunión (Auditor/Admin)
+      const meetingRequests = await prisma.auditoria.findMany({
+        where: {
+          empresaId: user.empresaId,
+          meetingStatus: 'PENDING',
+          meetingRequestedBy: { not: 'EMPRESA' } // Requested by ADMIN or COLABORADOR
+        },
+        select: { id: true, fiscalYear: true }
+      });
+
+      meetingRequests.forEach(audit => {
+         notifications.push({
+            id: `meet-${audit.id}`,
+            type: 'MEETING_REQUESTED',
+            title: 'Solicitud de Reunión',
+            message: `El auditor solicita agendar una reunión para el ejercicio ${audit.fiscalYear}.`,
+            link: `/empresa/auditorias/${audit.id}?tab=agenda`,
+            severity: 'MEDIUM',
+            date: new Date().toISOString()
+         });
+      });
+
+      // 5. Reuniones Agendadas (Recordatorio)
+      const scheduledMeetings = await prisma.auditoria.findMany({
+         where: {
+            empresaId: user.empresaId,
+            meetingStatus: 'SCHEDULED',
+            meetingDate: { gte: new Date() }
+         },
+         select: { id: true, meetingDate: true, fiscalYear: true }
+      });
+
+      scheduledMeetings.forEach(audit => {
+         notifications.push({
+            id: `sched-${audit.id}`,
+            type: 'MEETING_SCHEDULED',
+            title: 'Próxima Reunión',
+            message: `Tienes una reunión el ${audit.meetingDate ? new Date(audit.meetingDate).toLocaleDateString() : 'fecha por confirmar'} (Ej. ${audit.fiscalYear})`,
+            link: `/empresa/auditorias/${audit.id}?tab=agenda`,
+            severity: 'LOW',
+            date: new Date().toISOString()
+         });
+      });
+
     } else {
       // ADMIN o COLABORADOR (AUDITOR)
       

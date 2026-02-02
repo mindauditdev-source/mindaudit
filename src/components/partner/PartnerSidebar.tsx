@@ -11,7 +11,9 @@ import {
   PieChart,
   LogOut,
   Users,
-  Briefcase
+  Briefcase,
+  MessageCircle,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -26,16 +28,26 @@ const sidebarItems = [
     href: "/partner/clientes",
     icon: Building2,
   },
+  // {
+  //   title: "Mis Auditorías",
+  //   href: "/partner/auditorias",
+  //   icon: FileText,
+  // },
   {
-    title: "Mis Auditorías",
-    href: "/partner/auditorias",
-    icon: FileText,
+    title: "Mis Consultas",
+    href: "/partner/consultas",
+    icon: MessageCircle,
   },
   {
-    title: "Comisiones",
-    href: "/partner/facturas", // Using facturas for now based on folder structure
-    icon: PieChart,
+    title: "Paquetes de Horas",
+    href: "/partner/paquetes-horas",
+    icon: Clock,
   },
+  // {
+  //   title: "Comisiones",
+  //   href: "/partner/facturas", // Using facturas for now based on folder structure
+  //   icon: PieChart,
+  // },
 ];
 
 export function PartnerSidebar() {
