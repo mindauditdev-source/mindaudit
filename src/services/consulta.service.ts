@@ -27,11 +27,16 @@ export interface ConsultaListItem {
     id: string;
     nombre: string;
   } | null;
-  createdAt: Date;
-  respondidaAt: Date | null;
+  archivos: Array<{
+    id: string;
+    nombre: string;
+    url: string;
+  }>;
+  createdAt: string;
+  respondidaAt: string | null;
 }
 
-export interface ConsultaDetalle extends ConsultaListItem {
+export interface ConsultaDetalle extends Omit<ConsultaListItem, 'archivos'> {
   feedback: string | null;
   horasCustom: number | null;
   archivos: Array<{
@@ -40,9 +45,14 @@ export interface ConsultaDetalle extends ConsultaListItem {
     url: string;
     size: number;
     tipo: string;
-    createdAt: Date;
+    createdAt: string;
   }>;
-  aceptadaAt: Date | null;
+  colaborador: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  aceptadaAt: string | null;
 }
 
 export class ConsultaService {
@@ -105,6 +115,13 @@ export class ConsultaService {
             nombre: true,
           },
         },
+        archivos: {
+          select: {
+            id: true,
+            nombre: true,
+            url: true,
+          },
+        },
         createdAt: true,
         respondidaAt: true,
       },
@@ -113,7 +130,11 @@ export class ConsultaService {
       },
     });
 
-    return consultas;
+    return consultas.map(c => ({
+      ...c,
+      createdAt: c.createdAt.toISOString(),
+      respondidaAt: c.respondidaAt?.toISOString() || null,
+    })) as ConsultaListItem[];
   }
 
   /**
@@ -121,13 +142,18 @@ export class ConsultaService {
    */
   static async obtenerDetalle(
     consultaId: string,
-    userId: string
+    userId: string,
+    isAdminView: boolean = false
   ): Promise<ConsultaDetalle | null> {
+    const where: any = { id: consultaId };
+    
+    // Si no es vista de admin, filtrar por el colaborador (dueño)
+    if (!isAdminView) {
+      where.colaboradorId = userId;
+    }
+
     const consulta = await prisma.consulta.findFirst({
-      where: {
-        id: consultaId,
-        colaboradorId: userId,
-      },
+      where,
       select: {
         id: true,
         titulo: true,
@@ -154,13 +180,31 @@ export class ConsultaService {
             createdAt: true,
           },
         },
+        colaborador: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
         createdAt: true,
         respondidaAt: true,
         aceptadaAt: true,
       },
     });
 
-    return consulta;
+    if (!consulta) return null;
+
+    return {
+      ...consulta,
+      createdAt: consulta.createdAt.toISOString(),
+      respondidaAt: consulta.respondidaAt?.toISOString() || null,
+      aceptadaAt: consulta.aceptadaAt?.toISOString() || null,
+      archivos: consulta.archivos.map(a => ({
+        ...a,
+        createdAt: a.createdAt.toISOString(),
+      })),
+    } as unknown as ConsultaDetalle;
   }
 
   /**
@@ -271,6 +315,13 @@ export class ConsultaService {
             nombre: true,
           },
         },
+        archivos: {
+          select: {
+            id: true,
+            nombre: true,
+            url: true,
+          },
+        },
         createdAt: true,
         respondidaAt: true,
       },
@@ -280,7 +331,11 @@ export class ConsultaService {
       ],
     });
 
-    return consultas;
+    return consultas.map(c => ({
+      ...c,
+      createdAt: c.createdAt.toISOString(),
+      respondidaAt: c.respondidaAt?.toISOString() || null,
+    })) as ConsultaListItem[];
   }
 
   /**

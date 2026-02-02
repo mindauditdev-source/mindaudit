@@ -260,7 +260,7 @@ export default function ConsultaDetallePage() {
         </Card>
 
         {/* Respuesta del Auditor (si existe) */}
-        {consulta.status === "COTIZADA" && consulta.feedback && (
+        {consulta.status === "COTIZADA" && (
           <Card className="p-6 border-2 border-blue-200 bg-blue-50/50">
             <div className="flex items-center gap-2 mb-4">
               <AlertCircle className="h-5 w-5 text-blue-600" />

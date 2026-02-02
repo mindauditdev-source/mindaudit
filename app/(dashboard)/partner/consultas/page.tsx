@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Clock, CheckCircle, XCircle, AlertCircle, Loader2 } from "lucide-react";
+import { Plus, Clock, CheckCircle, XCircle, AlertCircle, Loader2, FileText } from "lucide-react";
 import { NuevaConsultaModal } from "@/components/consultas/NuevaConsultaModal";
 import Link from "next/link";
 import type { ConsultaStatus } from "@prisma/client";
@@ -21,6 +21,11 @@ interface Consulta {
     id: string;
     nombre: string;
   } | null;
+  archivos: Array<{
+    id: string;
+    nombre: string;
+    url: string;
+  }>;
   createdAt: string;
   respondidaAt: string | null;
 }
@@ -165,6 +170,12 @@ export default function ConsultasPage() {
                         {consulta.requiereVideo && (
                           <Badge className="bg-purple-100 text-purple-800 border-purple-300">
                             Videollamada
+                          </Badge>
+                        )}
+                        {consulta.archivos && consulta.archivos.length > 0 && (
+                          <Badge className="bg-blue-50 text-blue-700 border-blue-200 uppercase text-[10px] font-black tracking-widest px-2 flex items-center gap-1">
+                            <FileText className="h-3 w-3" />
+                            {consulta.archivos.length} {consulta.archivos.length === 1 ? 'Archivo' : 'Archivos'}
                           </Badge>
                         )}
                       </div>

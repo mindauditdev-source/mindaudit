@@ -12,7 +12,9 @@ import {
   Settings,
   LogOut,
   ShieldCheck,
-  ClipboardList
+  ClipboardList,
+  MessageCircle,
+  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -33,9 +35,19 @@ const sidebarItems = [
     icon: Building2,
   },
   {
-    title: "Gestión de Auditorías",
-    href: "/auditor/auditorias",
-    icon: ClipboardList,
+    title: "Gestión de Consultas",
+    href: "/auditor/consultas",
+    icon: MessageCircle,
+  },
+  // {
+  //   title: "Gestión de Auditorías",
+  //   href: "/auditor/auditorias",
+  //   icon: ClipboardList,
+  // },
+  {
+    title: "Paquetes y Categorías",
+    href: "/auditor/configuracion", // Mapping to existing configuracion or new one
+    icon: Package,
   },
   {
     title: "Finanzas",

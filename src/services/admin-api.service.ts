@@ -8,6 +8,11 @@ export interface AdminStats {
   pendingAudits: number;
   commissionPaid: number;
   revenueByMonth: Array<{ month: string; amount: number }>;
+  // Consultas
+  totalConsultas: number;
+  consultasPendientes: number;
+  totalComprasHoras: number;
+  totalHorasVendidas: number;
 }
 
 export interface AdminColaborador {
@@ -60,6 +65,11 @@ export const AdminApiService = {
       pendingAudits: pendingCount,
       commissionPaid: s.comisiones?.pagadas?.total || 0,
       revenueByMonth: [],
+      // Consultas
+      totalConsultas: s.totalConsultas || 0,
+      consultasPendientes: s.consultasPendientes || 0,
+      totalComprasHoras: s.totalComprasHoras || 0,
+      totalHorasVendidas: s.totalHorasVendidas || 0,
     };
   },
 

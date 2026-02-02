@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bell, AlertCircle, FileText, CreditCard, Calendar, CheckCircle2 } from "lucide-react";
+import { Bell, AlertCircle, FileText, CreditCard, Calendar, CheckCircle2, XCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,6 +56,11 @@ export function NotificationPopover() {
       case 'AUDIT_REQUESTED': return <FileText className="h-5 w-5 text-blue-500" />;
       case 'MEETING_REQUESTED': return <Calendar className="h-5 w-5 text-amber-500" />;
       case 'DOC_REVIEW': return <CheckCircle2 className="h-5 w-5 text-emerald-500" />;
+      case 'CONSULTA_COTIZADA': return <CreditCard className="h-5 w-5 text-blue-500" />;
+      case 'CONSULTA_PENDIENTE': return <AlertCircle className="h-5 w-5 text-amber-500" />;
+      case 'CONSULTA_ACEPTADA': return <CheckCircle2 className="h-5 w-5 text-emerald-500" />;
+      case 'CONSULTA_RECHAZADA': return <XCircle className="h-5 w-5 text-red-500" />;
+      case 'CONSULTA_COMPLETADA': return <CheckCircle2 className="h-5 w-5 text-emerald-500" />;
       default: return <Bell className="h-5 w-5 text-slate-500" />;
     }
   };

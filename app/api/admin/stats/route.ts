@@ -16,16 +16,7 @@ export async function GET(request: NextRequest) {
     requireAdmin(user)
 
     // Obtener estadísticas en paralelo
-    const [
-      totalColaboradores,
-      totalEmpresas,
-      totalAuditorias,
-      auditoriasActivas,
-      empresasPorOrigen,
-      comisionesPendientes,
-      comisionesPagadas,
-      auditoriasPorEstado,
-    ] = await Promise.all([
+    const results = await Promise.all([
       // Total colaboradores
       prisma.colaborador.count(),
 
@@ -69,7 +60,46 @@ export async function GET(request: NextRequest) {
         by: ['status'],
         _count: true,
       }),
+
+      // --- SISTEMA DE CONSULTAS ---
+      // Total consultas
+      prisma.consulta.count(),
+
+      // Consultas pendientes (requieren acción del auditor)
+      prisma.consulta.count({
+        where: {
+          status: {
+            in: ['PENDIENTE', 'ACEPTADA'] // PENDIENTE: Cotizar, ACEPTADA: Trabajar
+          }
+        }
+      }),
+
+      // Compras de horas completadas
+      prisma.compraHoras.count({
+        where: { status: 'COMPLETADO' }
+      }),
+
+      // Total horas vendidas
+      prisma.compraHoras.aggregate({
+        where: { status: 'COMPLETADO' },
+        _sum: { horas: true }
+      }),
     ])
+
+    const totalColaboradores = results[0] as number;
+    const totalEmpresas = results[1] as number;
+    const totalAuditorias = results[2] as number;
+    const auditoriasActivas = results[3] as number;
+    const empresasPorOrigen = results[4] as any[];
+    const comisionesPendientes = results[5] as any;
+    const comisionesPagadas = results[6] as any;
+    const auditoriasPorEstado = results[7] as any[];
+
+    const totalConsultas = results[results.length - 4] as number;
+    const consultasPendientes = results[results.length - 3] as number;
+    const totalComprasHoras = results[results.length - 2] as number;
+    const totalHorasVendidasAgg = results[results.length - 1] as any;
+    const totalHorasVendidas = totalHorasVendidasAgg._sum.horas || 0;
 
     // Calcular ingresos totales (presupuestos de auditorías aprobadas/en proceso/completadas)
     const ingresosTotales = await prisma.auditoria.aggregate({
@@ -100,6 +130,10 @@ export async function GET(request: NextRequest) {
         totalEmpresas,
         totalAuditorias,
         auditoriasActivas,
+        totalConsultas,
+        consultasPendientes,
+        totalComprasHoras,
+        totalHorasVendidas,
         ingresosTotales: ingresosTotales._sum.presupuesto?.toNumber() || 0,
         empresasPorOrigen: empresasPorOrigen.reduce(
           (acc, item) => {

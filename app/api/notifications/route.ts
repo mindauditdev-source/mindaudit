@@ -130,20 +130,96 @@ export async function GET(_req: NextRequest) {
          });
       });
 
+      // 6. Consultas Cotizadas (PARA COLABORADOR/PARTNER)
+      // Como el partner usa el rol COLABORADOR pero la API a veces lo trata como EMPRESA en el login...
+      // REVISIÓN: El partner es ROLE: COLABORADOR. La sección de arriba es para ROLE: EMPRESA.
+      // Así que esto debe ir en la sección ELSE (Admin o Colaborador).
+
     } else {
-      // ADMIN o COLABORADOR (AUDITOR)
+      // ADMIN o COLABORADOR (AUDITOR/PARTNER)
       
       // Filtros básicos
       const auditWhere: Prisma.AuditoriaWhereInput = {};
       const docWhere: Prisma.SolicitudDocumentoWhereInput = {};
 
-      if (user.role === 'COLABORADOR' && user.colaboradorId) {
-        auditWhere.colaboradorId = user.colaboradorId;
-        // Para docs, fitramos por auditorías asignadas al colaborador
-        docWhere.auditoria = { colaboradorId: user.colaboradorId };
+      if (user.role === 'COLABORADOR') {
+        // --- PARTNER: Consultas Cotizadas y Completadas (Usa user.id) ---
+        const partnerConsultas = await prisma.consulta.findMany({
+          where: {
+            colaboradorId: user.id,
+            status: { in: ['COTIZADA', 'COMPLETADA'] }
+          },
+          select: { id: true, titulo: true, respondidaAt: true, status: true, updatedAt: true }
+        });
+
+        partnerConsultas.forEach(c => {
+          notifications.push({
+            id: `cons-${c.status.toLowerCase()}-${c.id}`,
+            type: c.status === 'COTIZADA' ? 'CONSULTA_COTIZADA' : 'CONSULTA_COMPLETADA',
+            title: c.status === 'COTIZADA' ? 'Consulta Cotizada' : 'Consulta Finalizada',
+            message: c.status === 'COTIZADA' 
+              ? `Tu consulta "${c.titulo}" ya tiene presupuesto.`
+              : `La consulta "${c.titulo}" ha sido marcada como completada.`,
+            link: `/partner/consultas/${c.id}`,
+            severity: c.status === 'COTIZADA' ? 'HIGH' : 'MEDIUM',
+            date: c.status === 'COTIZADA' ? (c.respondidaAt || c.updatedAt) : c.updatedAt
+          });
+        });
+
+        // --- AUDITOR (si tiene colaboradorId): Auditorías y Documentos ---
+        if (user.colaboradorId) {
+          auditWhere.colaboradorId = user.colaboradorId;
+          docWhere.auditoria = { colaboradorId: user.colaboradorId };
+        } else if (user.role !== 'ADMIN') {
+          // Si es COLABORADOR pero no tiene colaboradorId (perfil incompleto), 
+          // evitamos que vea auditorías de otros o que la query falle
+          auditWhere.id = 'none'; 
+          docWhere.id = 'none';
+        }
+      }
+
+      // --- AUDITOR (ADMIN): Nuevas, Aceptadas y Rechazadas ---
+      if (user.role === 'ADMIN') {
+        const adminConsultas = await prisma.consulta.findMany({
+          where: { status: { in: ['PENDIENTE', 'ACEPTADA', 'RECHAZADA'] } },
+          include: { colaborador: { select: { name: true } } }
+        });
+
+        adminConsultas.forEach(c => {
+          let type = 'CONSULTA_PENDIENTE';
+          let title = 'Nueva Consulta';
+          let message = `${c.colaborador.name} ha enviado una consulta.`;
+          let severity: 'HIGH' | 'MEDIUM' | 'LOW' = 'HIGH';
+          let date = c.createdAt;
+
+          if (c.status === 'ACEPTADA') {
+            type = 'CONSULTA_ACEPTADA';
+            title = 'Consulta Aceptada';
+            message = `${c.colaborador.name} ha aceptado la cotización.`;
+            severity = 'MEDIUM';
+            date = c.aceptadaAt || new Date();
+          } else if (c.status === 'RECHAZADA') {
+            type = 'CONSULTA_RECHAZADA'; // Note: Ensure this type exists in NotificationPopover.tsx
+            title = 'Cotización Rechazada';
+            message = `${c.colaborador.name} ha rechazado la cotización.`;
+            severity = 'LOW';
+            date = c.updatedAt;
+          }
+
+          notifications.push({
+            id: `cons-admin-${c.status.toLowerCase()}-${c.id}`,
+            type,
+            title,
+            message,
+            link: `/auditor/consultas/${c.id}`,
+            severity,
+            date
+          });
+        });
       }
 
       // 1. Nuevas Solicitudes (Falta Presupuesto)
+      // ... rest of existing code
       const requestedAudits = await prisma.auditoria.findMany({
         where: {
           ...auditWhere,

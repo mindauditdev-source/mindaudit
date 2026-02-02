@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Clock,
   CheckCircle,
@@ -12,7 +11,7 @@ import {
   Loader2,
   FileText,
 } from "lucide-react";
-import { CotizarConsultaModal } from "@/components/consultas/CotizarConsultaModal";
+import Link from "next/link";
 import type { ConsultaStatus } from "@prisma/client";
 
 interface Consulta {
@@ -27,6 +26,11 @@ interface Consulta {
     id: string;
     nombre: string;
   } | null;
+  archivos: Array<{
+    id: string;
+    nombre: string;
+    url: string;
+  }>;
   createdAt: string;
   respondidaAt: string | null;
 }
@@ -75,8 +79,6 @@ const statusConfig: Record<
 export default function AuditorConsultasPage() {
   const [consultas, setConsultas] = useState<Consulta[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedConsulta, setSelectedConsulta] = useState<Consulta | null>(null);
-  const [cotizarModalOpen, setCotizarModalOpen] = useState(false);
 
   const fetchConsultas = async () => {
     try {
@@ -94,30 +96,6 @@ export default function AuditorConsultasPage() {
   useEffect(() => {
     fetchConsultas();
   }, []);
-
-  const handleCotizar = (consulta: Consulta) => {
-    setSelectedConsulta(consulta);
-    setCotizarModalOpen(true);
-  };
-
-  const handleCotizarSuccess = () => {
-    setCotizarModalOpen(false);
-    fetchConsultas();
-  };
-
-  const handleCompletar = async (consultaId: string) => {
-    try {
-      const res = await fetch(`/api/auditor/consultas/${consultaId}/complete`, {
-        method: "PATCH",
-      });
-
-      if (res.ok) {
-        fetchConsultas();
-      }
-    } catch (error) {
-      console.error("Error completando consulta:", error);
-    }
-  };
 
   const pendientes = consultas.filter((c) => c.status === "PENDIENTE");
   const cotizadas = consultas.filter((c) => c.status === "COTIZADA");
@@ -180,95 +158,79 @@ export default function AuditorConsultasPage() {
       )}
 
       {!loading && consultas.length > 0 && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {consultas.map((consulta) => {
             const StatusIcon = statusConfig[consulta.status].icon;
 
             return (
-              <Card key={consulta.id} className="p-6 border-2 hover:shadow-lg transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900">
+              <Link 
+                key={consulta.id} 
+                href={`/auditor/consultas/${consulta.id}`}
+                className="block group"
+              >
+                <Card className="h-full p-6 border-2 group-hover:border-blue-500 group-hover:shadow-md transition-all">
+                  <div className="flex flex-col h-full justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <Badge
+                          className={`${
+                            statusConfig[consulta.status].color
+                          } flex items-center gap-1 px-3 py-1 border shadow-none`}
+                        >
+                          <StatusIcon className="h-4 w-4" />
+                          {statusConfig[consulta.status].label}
+                        </Badge>
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                          {new Date(consulta.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      <h3 className="text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors mb-4 line-clamp-2">
                         {consulta.titulo}
                       </h3>
-                      {consulta.esUrgente && (
-                        <Badge className="bg-red-100 text-red-800 border-red-300">
-                          Urgente
-                        </Badge>
-                      )}
-                      {consulta.requiereVideo && (
-                        <Badge className="bg-purple-100 text-purple-800 border-purple-300">
-                          Videollamada
-                        </Badge>
-                      )}
+
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {consulta.esUrgente && (
+                          <Badge className="bg-red-100 text-red-800 border-red-200 uppercase text-[10px] font-black tracking-widest px-2">
+                            Urgente
+                          </Badge>
+                        )}
+                        {consulta.requiereVideo && (
+                          <Badge className="bg-purple-100 text-purple-800 border-purple-200 uppercase text-[10px] font-black tracking-widest px-2">
+                            Videollamada
+                          </Badge>
+                        )}
+                        {consulta.archivos && consulta.archivos.length > 0 && (
+                          <Badge className="bg-blue-50 text-blue-700 border-blue-200 uppercase text-[10px] font-black tracking-widest px-2 flex items-center gap-1">
+                            <FileText className="h-3 w-3" />
+                            {consulta.archivos.length} {consulta.archivos.length === 1 ? 'Archivo' : 'Archivos'}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
 
-                    <p className="text-gray-600 mb-3 line-clamp-2">
-                      {consulta.descripcion}
-                    </p>
-
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span>
-                        {new Date(consulta.createdAt).toLocaleDateString()}
-                      </span>
-                      {consulta.categoria && (
-                        <span className="text-blue-600 font-medium">
-                          {consulta.categoria.nombre}
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Categoría</span>
+                        <span className="text-sm font-bold text-slate-700">
+                          {consulta.categoria?.nombre || "Sin categorizar"}
                         </span>
-                      )}
+                      </div>
                       {consulta.horasAsignadas !== null && (
-                        <span className="font-semibold text-gray-700">
-                          {consulta.horasAsignadas} horas
-                        </span>
+                        <div className="flex flex-col items-end">
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Horas</span>
+                          <span className="text-sm font-black text-blue-600">
+                            {consulta.horasAsignadas}h
+                          </span>
+                        </div>
                       )}
                     </div>
                   </div>
-
-                  <div className="flex flex-col items-end gap-3">
-                    <Badge
-                      className={`${
-                        statusConfig[consulta.status].color
-                      } flex items-center gap-1 px-3 py-1 border`}
-                    >
-                      <StatusIcon className="h-4 w-4" />
-                      {statusConfig[consulta.status].label}
-                    </Badge>
-
-                    {consulta.status === "PENDIENTE" && (
-                      <Button
-                        onClick={() => handleCotizar(consulta)}
-                        size="sm"
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
-                        Cotizar
-                      </Button>
-                    )}
-
-                    {consulta.status === "ACEPTADA" && (
-                      <Button
-                        onClick={() => handleCompletar(consulta.id)}
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        Marcar Completada
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </Link>
             );
           })}
         </div>
-      )}
-
-      {selectedConsulta && (
-        <CotizarConsultaModal
-          open={cotizarModalOpen}
-          onOpenChange={setCotizarModalOpen}
-          consulta={selectedConsulta}
-          onSuccess={handleCotizarSuccess}
-        />
       )}
     </div>
   );
