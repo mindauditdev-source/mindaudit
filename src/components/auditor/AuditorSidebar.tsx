@@ -9,10 +9,8 @@ import {
   Users,
   Building2,
   PieChart,
-  Settings,
   LogOut,
   ShieldCheck,
-  ClipboardList,
   MessageCircle,
   Package,
 } from "lucide-react";
@@ -39,11 +37,6 @@ const sidebarItems = [
     href: "/auditor/consultas",
     icon: MessageCircle,
   },
-  // {
-  //   title: "Gestión de Auditorías",
-  //   href: "/auditor/auditorias",
-  //   icon: ClipboardList,
-  // },
   {
     title: "Paquetes y Categorías",
     href: "/auditor/configuracion", // Mapping to existing configuracion or new one

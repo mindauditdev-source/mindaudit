@@ -3,8 +3,9 @@ import { ColaboradorStatus, EmpresaStatus } from "@prisma/client";
 // Tipos basados en las respuestas de la API
 export interface PartnerStats {
   totalEmpresas: number;
-  totalAuditorias: number;
-  totalComisiones: number;
+  totalAuditorias?: number;
+  totalComisiones?: number;
+  totalConsultas: number;
 }
 
 export interface PartnerProfile {
@@ -27,6 +28,7 @@ export interface PartnerProfile {
     name: string;
     email: string;
     image?: string;
+    horasDisponibles: number;
   };
 }
 

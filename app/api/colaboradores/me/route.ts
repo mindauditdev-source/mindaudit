@@ -8,7 +8,7 @@ import { prisma } from '@/lib/db/prisma'
  * GET /api/colaboradores/me
  * Obtiene el perfil del colaborador autenticado
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Autenticar usuario
     const user = await getAuthenticatedUser()
@@ -26,6 +26,12 @@ export async function GET(request: NextRequest) {
             status: true,
             emailVerified: true,
             createdAt: true,
+            horasDisponibles: true,
+            _count: {
+              select: {
+                consultas: true,
+              }
+            }
           },
         },
         _count: {
@@ -41,6 +47,9 @@ export async function GET(request: NextRequest) {
     if (!colaborador) {
       return errorResponse('Perfil de colaborador no encontrado', 404)
     }
+
+    // Cast user to include _count with proper typing
+    const userData = colaborador.user as any; 
 
     return successResponse({
       colaborador: {
@@ -65,8 +74,7 @@ export async function GET(request: NextRequest) {
         user: colaborador.user,
         stats: {
           totalEmpresas: colaborador._count.empresas,
-          totalAuditorias: colaborador._count.auditorias,
-          totalComisiones: colaborador._count.comisiones,
+          totalConsultas: userData._count?.consultas || 0,
         },
       },
     })

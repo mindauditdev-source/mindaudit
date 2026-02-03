@@ -35,6 +35,11 @@ export async function POST(request: Request) {
       );
     }
 
+    // Calcular precio final con descuento si aplica
+    const precioBase = Number(paqueteSeleccionado.precio);
+    const descuento = paqueteSeleccionado.descuento || 0;
+    const precioFinal = precioBase * (1 - descuento / 100);
+
     // Crear sesión de Stripe
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -46,9 +51,9 @@ export async function POST(request: Request) {
             currency: "eur",
             product_data: {
               name: paqueteSeleccionado.nombre,
-              description: `${paqueteSeleccionado.horas} horas de consultoría`,
+              description: `${paqueteSeleccionado.horas} horas de consultoría${descuento > 0 ? ` (Incluye ${descuento}% de descuento)` : ''}`,
             },
-            unit_amount: Math.round(Number(paqueteSeleccionado.precio) * 100),
+            unit_amount: Math.round(precioFinal * 100),
           },
           quantity: 1,
         },

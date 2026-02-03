@@ -5,14 +5,12 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Building2, FileText, Plus, TrendingUp, AlertCircle, ArrowRight, Wallet } from "lucide-react";
-import { PartnerApiService, PartnerProfile, PartnerCommissionSummary } from "@/services/partner-api.service";
-import { formatCurrency } from "@/lib/utils";
+import { Building2, Plus, AlertCircle, ArrowRight, MessageCircle, Clock } from "lucide-react";
+import { PartnerApiService, PartnerProfile } from "@/services/partner-api.service";
 
 export default function PartnerDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<PartnerProfile | null>(null);
-  const [commissionSummary, setCommissionSummary] = useState<PartnerCommissionSummary | null>(null);
   const [companiesStats, setCompaniesStats] = useState<{ totalEmpresas: number; empresasActivas: number; totalAuditorias: number } | null>(null);
 
   useEffect(() => {
@@ -20,15 +18,13 @@ export default function PartnerDashboardPage() {
       try {
         setLoading(true);
         // Fetch all data in parallel
-        const [profileData, companiesData, commissionsData] = await Promise.all([
+        const [profileData, companiesData] = await Promise.all([
           PartnerApiService.getProfile(),
           PartnerApiService.getEmpresas(),
-          PartnerApiService.getComisiones(),
         ]);
 
         setProfile(profileData);
         setCompaniesStats(companiesData.stats);
-        setCommissionSummary(commissionsData.summary);
       } catch (error) {
         console.error("Error loading dashboard data:", error);
       } finally {
@@ -54,10 +50,10 @@ export default function PartnerDashboardPage() {
           </p>
         </div>
         <div className="flex gap-3">
-          <Link href="/partner/auditorias/nueva">
+          <Link href="/partner/consultas">
             <Button className="bg-[#0a3a6b] hover:bg-[#082e56] shadow-md">
               <Plus className="mr-2 h-4 w-4" />
-              Nueva Auditoría
+              Nueva Consulta
             </Button>
           </Link>
           <Link href="/partner/clientes/nuevo">
@@ -70,7 +66,7 @@ export default function PartnerDashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Empresas Stats */}
         <Card className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -89,56 +85,38 @@ export default function PartnerDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Auditorías Stats */}
+        {/* Consultas Stats */}
         <Card className="border-l-4 border-l-amber-500 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-slate-500">
-              Auditorías Totales
+              Mis Consultas
             </CardTitle>
-            <FileText className="h-4 w-4 text-amber-500" />
+            <MessageCircle className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
-              {profile?.stats.totalAuditorias || 0}
+              {profile?.stats?.totalConsultas || 0}
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Solicitadas históricamente
+              Total de consultas realizadas
             </p>
           </CardContent>
         </Card>
 
-        {/* Comisiones Pendientes */}
+        {/* Horas Disponibles Stats */}
         <Card className="border-l-4 border-l-emerald-500 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-slate-500">
-              Comis. Pendientes
+              Horas Disponibles
             </CardTitle>
-            <TrendingUp className="h-4 w-4 text-emerald-500" />
+            <Clock className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
-              {formatCurrency(commissionSummary?.totalPendiente || 0)}
+              {profile?.user.horasDisponibles || 0}h
             </div>
             <p className="text-xs text-emerald-600 font-medium mt-1">
-              {commissionSummary?.comisionesPendientes || 0} pendientes de pago
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Comisiones Totales */}
-        <Card className="border-l-4 border-l-indigo-500 shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">
-              Total Ganado
-            </CardTitle>
-            <Wallet className="h-4 w-4 text-indigo-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
-              {formatCurrency(commissionSummary?.totalPagado || 0)}
-            </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Acumulado histórico
+              Saldo para nuevas consultas
             </p>
           </CardContent>
         </Card>
@@ -147,23 +125,23 @@ export default function PartnerDashboardPage() {
       {/* Recent Activity & Quick Lists */}
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">
         
-        {/* Main List - Placeholder for now until we have recent activity endpoint specifically */}
+        {/* Main List */}
         <Card className="col-span-4 shadow-sm border-slate-100">
           <CardHeader>
-            <CardTitle>Resumen de Actividad</CardTitle>
+            <CardTitle>Estado de la Cuenta</CardTitle>
             <CardDescription>
-              Tus estadísticas clave actuales.
+              Información general de tu perfil de colaborador.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
               <div className="flex items-center justify-between border-b border-slate-50 pb-4">
                 <div className="space-y-1">
-                  <p className="text-sm font-bold text-slate-900">Tasa de Comisión Actual</p>
-                  <p className="text-xs text-slate-500">Porcentaje aplicado a nuevas auditorías</p>
+                  <p className="text-sm font-bold text-slate-900">ID de Colaborador</p>
+                  <p className="text-xs text-slate-500">Identificador único en el sistema</p>
                 </div>
-                <div className="text-xl font-bold text-blue-600">
-                  {profile?.commissionRate}%
+                <div className="text-sm font-mono text-slate-500">
+                  {profile?.id.substring(0, 8)}...
                 </div>
               </div>
               
@@ -185,9 +163,9 @@ export default function PartnerDashboardPage() {
             </div>
             
             <div className="mt-6">
-              <Link href="/partner/auditorias">
+              <Link href="/partner/consultas">
                 <Button variant="outline" className="w-full">
-                  Ver todas las auditorías <ArrowRight className="ml-2 h-4 w-4" />
+                  Ver todas las consultas <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
             </div>
@@ -213,14 +191,14 @@ export default function PartnerDashboardPage() {
                 </Button>
               </Link>
 
-              <Link href="/partner/auditorias/nueva">
+              <Link href="/partner/paquetes-horas">
                 <Button variant="outline" className="w-full justify-start bg-white hover:bg-amber-50 h-auto py-3">
                   <div className="rounded-full bg-amber-100 p-2 text-amber-600 mr-3">
-                    <FileText className="h-4 w-4" />
+                    <Clock className="h-4 w-4" />
                   </div>
                   <div className="text-left">
-                    <p className="font-semibold text-slate-900">Solicitar Auditoría</p>
-                    <p className="text-xs text-slate-500">Para uno de tus clientes</p>
+                    <p className="font-semibold text-slate-900">Comprar Horas</p>
+                    <p className="text-xs text-slate-500">Añadir saldo a tu cuenta</p>
                   </div>
                 </Button>
               </Link>
@@ -257,8 +235,8 @@ function DashboardSkeleton() {
           <Skeleton className="h-10 w-40" />
         </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3].map((i) => (
           <Skeleton key={i} className="h-32 w-full" />
         ))}
       </div>

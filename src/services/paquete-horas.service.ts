@@ -91,12 +91,16 @@ export class PaqueteHorasService {
       throw new Error("Paquete no encontrado");
     }
 
+    const precioBase = Number(paquete.precio);
+    const descuento = paquete.descuento || 0;
+    const precioFinal = precioBase * (1 - descuento / 100);
+
     const compra = await prisma.compraHoras.create({
       data: {
         colaboradorId: data.colaboradorId,
         paqueteId: data.paqueteId,
         horas: paquete.horas,
-        precio: paquete.precio,
+        precio: precioFinal,
         stripeSessionId: data.stripeSessionId,
         status: "PENDIENTE",
       },
