@@ -170,7 +170,7 @@ export async function GET(_req: NextRequest) {
         if (user.colaboradorId) {
           auditWhere.colaboradorId = user.colaboradorId;
           docWhere.auditoria = { colaboradorId: user.colaboradorId };
-        } else if (user.role !== 'ADMIN') {
+        } else {
           // Si es COLABORADOR pero no tiene colaboradorId (perfil incompleto), 
           // evitamos que vea auditorías de otros o que la query falle
           auditWhere.id = 'none'; 

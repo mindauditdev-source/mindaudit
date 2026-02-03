@@ -41,13 +41,27 @@ export interface EmpresaAuditoria {
   status: AuditoriaStatus;
   urgente: boolean;
   presupuesto: number | null;
+  presupuestoNotas?: string | null;
+  presupuestoValidoHasta?: string | null;
   comisionAmount: number | null;
   comisionPagada: boolean;
+  meetingRequestedBy?: string | null;
+  meetingStatus?: string | null;
+  meetingDate?: string | null;
+  meetingLink?: string | null;
   fechaSolicitud: string;
   fechaPresupuesto: string | null;
   fechaAprobacion: string | null;
   fechaFinalizacion: string | null;
   createdAt: string;
+  empresa: {
+    id: string;
+    companyName: string;
+    cif: string;
+    contactName: string;
+    contactEmail: string;
+    contactPhone: string | null;
+  };
   colaborador?: {
     id: string;
     companyName: string;

@@ -215,8 +215,8 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
   if (!audit) return <div className="text-center py-20">No se encontró el expediente.</div>;
 
   const isPendingDecision = audit.status === 'PRESUPUESTADA' || audit.status === 'REUNION_SOLICITADA';
-  const meetingStatus = (audit as any).meetingStatus;
-  const meetingRequestedBy = (audit as any).meetingRequestedBy;
+  const meetingStatus = audit.meetingStatus;
+  const meetingRequestedBy = audit.meetingRequestedBy;
 
   return (
     <div className="space-y-8 pb-10">
@@ -234,7 +234,7 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
          <TabsList className="bg-slate-100 p-1 rounded-2xl h-14 w-full justify-start max-w-md mx-auto sm:mx-0">
              <TabsTrigger value="detalles" className="rounded-xl h-12 px-6 font-bold data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm">Detalles del Expediente</TabsTrigger>
              <TabsTrigger value="agenda" className="rounded-xl h-12 px-6 font-bold data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">
-                Agenda {meetingRequestedBy !== 'EMPRESA' && meetingStatus === 'PENDING' && <span className="ml-2 h-2 w-2 rounded-full bg-red-500 animate-pulse" />}
+                Agenda {audit.meetingRequestedBy !== 'EMPRESA' && audit.meetingStatus === 'PENDING' && <span className="ml-2 h-2 w-2 rounded-full bg-red-500 animate-pulse" />}
              </TabsTrigger>
          </TabsList>
 
@@ -318,17 +318,17 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
                                         </div>
                                         <div>
                                             <p className="text-xs font-bold text-slate-400 uppercase">Validez de la oferta</p>
-                                            <p className="font-black text-slate-700">
-                                                {(audit as any).presupuestoValidoHasta ? new Date((audit as any).presupuestoValidoHasta).toLocaleDateString() : 'Consultar'}
-                                            </p>
+                                             <p className="font-black text-slate-700">
+                                                 {audit.presupuestoValidoHasta ? new Date(audit.presupuestoValidoHasta).toLocaleDateString() : 'Consultar'}
+                                             </p>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="p-5 bg-white rounded-2xl border border-slate-200">
                                     <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Notas del Auditor</p>
-                                    <p className="text-sm font-medium text-slate-600 italic">
-                                        {(audit as any).presupuestoNotas || "Sin observaciones adicionales sobre el coste."}
-                                    </p>
+                                     <p className="text-sm font-medium text-slate-600 italic">
+                                         {audit.presupuestoNotas || "Sin observaciones adicionales sobre el coste."}
+                                     </p>
                                 </div>
                                 </div>
                             </div>
@@ -588,13 +588,13 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
                              </div>
                              <h3 className="text-2xl font-black text-emerald-800 tracking-tight">¡Reunión Confirmada!</h3>
                              <p className="text-emerald-700 font-medium text-lg">Tu cita ha sido agendada correctamente.</p>
-                             <div className="py-6 flex flex-col items-center gap-4 min-h-[100px] justify-center">
+                              <div className="py-6 flex flex-col items-center gap-4 min-h-[100px] justify-center">
                                  <Badge className="bg-white text-emerald-900 font-black text-lg px-6 py-2 shadow-sm border border-emerald-100">
-                                     {(audit as any).meetingDate ? new Date((audit as any).meetingDate).toLocaleDateString() + " " + new Date((audit as any).meetingDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Fecha confirmada'}
+                                     {audit.meetingDate ? new Date(audit.meetingDate).toLocaleDateString() + " " + new Date(audit.meetingDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Fecha confirmada'}
                                  </Badge>
                                  
-                                 {(audit as any).meetingLink && (audit as any).meetingLink !== process.env.NEXT_PUBLIC_CALENDLY_URL ? (
-                                     <a href={(audit as any).meetingLink} target="_blank" rel="noreferrer" className="w-full max-w-xs bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-blue-200 hover:scale-105 transition-transform animate-in fade-in zoom-in duration-300">
+                                 {audit.meetingLink && audit.meetingLink !== process.env.NEXT_PUBLIC_CALENDLY_URL ? (
+                                     <a href={audit.meetingLink} target="_blank" rel="noreferrer" className="w-full max-w-xs bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-blue-200 hover:scale-105 transition-transform animate-in fade-in zoom-in duration-300">
                                          <Video className="h-5 w-5" /> Unirse a la Videollamada
                                      </a>
                                  ) : (

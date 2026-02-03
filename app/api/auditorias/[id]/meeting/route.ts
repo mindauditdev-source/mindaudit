@@ -35,8 +35,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     });
 
     return successResponse({ message: "Solicitud de reunión enviada", auditoria: updated });
-  } catch (error) {
-    return serverErrorResponse(error);
+  } catch (error: any) {
+    return serverErrorResponse(error.message);
   }
 }
 
@@ -67,7 +67,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     });
 
     return successResponse({ message: "Reunión actualizada", auditoria: updated });
-  } catch (error) {
-    return serverErrorResponse(error);
+  } catch (error: any) {
+    return serverErrorResponse(error.message);
   }
 }
