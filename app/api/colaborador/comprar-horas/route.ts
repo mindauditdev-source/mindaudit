@@ -53,8 +53,8 @@ export async function POST(request: Request) {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.NEXTAUTH_URL}/colaborador/paquetes-horas?success=true`,
-      cancel_url: `${process.env.NEXTAUTH_URL}/colaborador/paquetes-horas?canceled=true`,
+      success_url: `${process.env.NEXTAUTH_URL}/partner/paquetes-horas?success=true`,
+      cancel_url: `${process.env.NEXTAUTH_URL}/partner/paquetes-horas?canceled=true`,
       metadata: {
         userId,
         paqueteId: data.paqueteId,

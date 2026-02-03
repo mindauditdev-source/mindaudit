@@ -4,11 +4,11 @@ import { EmailService } from "@/lib/email/email-service";
 import { CommissionService } from "@/services/commission.service";
 import { stripe } from "@/lib/stripe";
 import { AuditoriaStatus, UserRole } from "@prisma/client";
+import { PaqueteHorasService } from "@/services/paquete-horas.service";
 
 /**
  * POST /api/payments/webhook
- * Mock Webhook handler for Stripe events.
- * Triggered when a payment is successful.
+ * Unified Webhook handler for Stripe events.
  */
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -32,12 +32,34 @@ export async function POST(req: NextRequest) {
 
   try {
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as any; // Using any or Stripe.Checkout.Session
+      const session = event.data.object as any;
+      const tipo = session.metadata?.tipo;
+
+      console.log(`💳 Processing checkout.session.completed: ${session.id}, tipo: ${tipo}`);
+
+      // CASO 1: Compra de Horas
+      if (tipo === "compra_horas") {
+        try {
+          console.log("⏳ Processing Hour Purchase...");
+          const compra = await PaqueteHorasService.confirmarCompra(
+            session.id,
+            session.payment_intent as string
+          );
+          console.log(`✅ SUCCESS: Credited ${compra.horas} hours to user ${compra.colaboradorId}`);
+          return NextResponse.json({ received: true, type: "compra_horas" });
+        } catch (error: any) {
+          console.error("❌ Error confirming hour purchase:", error.message);
+          return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+      }
+
+      // CASO 2: Pago de Auditoría (Flujo original)
       const auditoriaId = session.metadata?.auditoriaId;
 
       if (!auditoriaId) {
-        console.error("❌ Webhook Error: No auditoriaId in session metadata");
-        return NextResponse.json({ error: "No auditoriaId in metadata" }, { status: 400 });
+        // Si no es compra_horas y no tiene auditoriaId, simplemente ignoramos con 200 para no dar error a Stripe
+        console.warn("⚠️ Webhook received unknown session metadata:", session.metadata);
+        return NextResponse.json({ received: true, message: "No handled type" });
       }
 
       // 1. Get Audit and Empresa info

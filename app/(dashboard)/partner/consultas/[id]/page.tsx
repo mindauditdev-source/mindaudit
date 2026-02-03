@@ -95,6 +95,10 @@ export default function ConsultaDetallePage() {
   const [consulta, setConsulta] = useState<ConsultaDetalle | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [insufficientHours, setInsufficientHours] = useState<{
+    required: number;
+    available: number;
+  } | null>(null);
 
   const fetchConsulta = async () => {
     try {
@@ -126,6 +130,7 @@ export default function ConsultaDetallePage() {
     if (!consulta) return;
 
     setActionLoading(true);
+    setInsufficientHours(null);
 
     try {
       const res = await fetch(
@@ -139,15 +144,11 @@ export default function ConsultaDetallePage() {
 
       if (!res.ok) {
         if (data.error === "HORAS_INSUFICIENTES") {
-          toast.error(
-            `No tienes suficientes horas. Necesitas ${data.horasRequeridas} horas pero solo tienes ${data.horasDisponibles}`,
-            {
-              action: {
-                label: "Comprar Horas",
-                onClick: () => router.push("/partner/paquetes-horas"),
-              },
-            }
-          );
+          setInsufficientHours({
+            required: data.horasRequeridas,
+            available: data.horasDisponibles,
+          });
+          toast.error("Horas insuficientes para aceptar la cotización");
           return;
         }
         throw new Error(data.error || "Error al aceptar");
@@ -261,13 +262,34 @@ export default function ConsultaDetallePage() {
 
         {/* Respuesta del Auditor (si existe) */}
         {consulta.status === "COTIZADA" && (
-          <Card className="p-6 border-2 border-blue-200 bg-blue-50/50">
+          <Card className={`p-6 border-2 transition-all ${insufficientHours ? 'border-red-500 bg-red-50/30' : 'border-blue-200 bg-blue-50/50'}`}>
             <div className="flex items-center gap-2 mb-4">
-              <AlertCircle className="h-5 w-5 text-blue-600" />
-              <h2 className="text-lg font-semibold text-blue-900">
+              <AlertCircle className={`h-5 w-5 ${insufficientHours ? 'text-red-600' : 'text-blue-600'}`} />
+              <h2 className={`text-lg font-semibold ${insufficientHours ? 'text-red-900' : 'text-blue-900'}`}>
                 Cotización del Auditor
               </h2>
             </div>
+
+            {insufficientHours && (
+              <div className="mb-6 p-4 bg-red-100 border border-red-200 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 bg-red-200 rounded-full flex items-center justify-center shrink-0">
+                    <AlertTriangle className="h-6 w-6 text-red-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-red-900 leading-tight">Horas Insuficientes</p>
+                    <p className="text-xs text-red-700 mt-0.5">
+                      Necesitas <span className="font-bold">{insufficientHours.required}h</span> y solo dispones de <span className="font-bold">{insufficientHours.available}h</span>.
+                    </p>
+                  </div>
+                </div>
+                <Link href="/partner/paquetes-horas">
+                  <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white font-bold whitespace-nowrap">
+                    Comprar Paquete de Horas
+                  </Button>
+                </Link>
+              </div>
+            )}
 
             {consulta.categoria && (
               <div className="mb-3">
@@ -301,7 +323,7 @@ export default function ConsultaDetallePage() {
               <Button
                 onClick={handleAceptar}
                 disabled={actionLoading}
-                className="bg-green-600 hover:bg-green-700 flex-1"
+                className={`flex-1 font-bold ${insufficientHours ? 'bg-slate-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
               >
                 {actionLoading ? (
                   <>
@@ -320,7 +342,7 @@ export default function ConsultaDetallePage() {
                 onClick={handleRechazar}
                 disabled={actionLoading}
                 variant="outline"
-                className="border-red-300 text-red-700 hover:bg-red-50 flex-1"
+                className="border-red-300 text-red-700 hover:bg-red-50 flex-1 font-bold"
               >
                 <XCircle className="h-4 w-4 mr-2" />
                 Rechazar
@@ -328,6 +350,7 @@ export default function ConsultaDetallePage() {
             </div>
           </Card>
         )}
+
 
         {/* Información adicional */}
         {(consulta.status === "ACEPTADA" ||

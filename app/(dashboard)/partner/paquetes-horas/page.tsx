@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Check, Clock, ShoppingCart, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { loadStripe } from "@stripe/stripe-js";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { useSession } from "next-auth/react";
 
 const stripePromise = loadStripe(
@@ -35,13 +37,17 @@ interface CompraHistorial {
   };
 }
 
-export default function PaquetesHorasPage() {
+function PaquetesHorasContent() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const [paquetes, setPaquetes] = useState<Paquete[]>([]);
   const [horasDisponibles, setHorasDisponibles] = useState<number>(0);
   const [compras, setCompras] = useState<CompraHistorial[]>([]);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const isSuccess = searchParams.get("success") === "true";
 
   const fetchData = async () => {
     try {
@@ -52,8 +58,13 @@ export default function PaquetesHorasPage() {
       const dataPaquetes = await resPaquetes.json();
       setPaquetes(dataPaquetes.paquetes || []);
 
-      // Fetch horas disponibles (desde el usuario)
-      if (session?.user) {
+      // Fetch balance REAL desde DB (no del session que puede estar stale)
+      const resBalance = await fetch("/api/colaborador/balance");
+      if (resBalance.ok) {
+        const dataBalance = await resBalance.json();
+        setHorasDisponibles(dataBalance.horasDisponibles);
+      } else if (session?.user) {
+        // Fallback
         const userHoras = (session.user as any).horasDisponibles || 0;
         setHorasDisponibles(userHoras);
       }
@@ -62,6 +73,11 @@ export default function PaquetesHorasPage() {
       const resCompras = await fetch("/api/colaborador/mis-compras");
       const dataCompras = await resCompras.json();
       setCompras(dataCompras.compras || []);
+
+      if (isSuccess) {
+        setShowSuccess(true);
+        toast.success("Pago completado exitosamente");
+      }
     } catch (error) {
       console.error("Error cargando datos:", error);
       toast.error("Error al cargar información");
@@ -72,7 +88,7 @@ export default function PaquetesHorasPage() {
 
   useEffect(() => {
     fetchData();
-  }, [session]);
+  }, [session, isSuccess]);
 
   const handleComprar = async (paqueteId: string) => {
     setPurchasing(paqueteId);
@@ -132,18 +148,57 @@ export default function PaquetesHorasPage() {
         </p>
       </div>
 
+      {/* Success Message */}
+      {showSuccess && (
+        <Card className="p-6 mb-8 border-2 border-emerald-500 bg-emerald-50 animate-in fade-in slide-in-from-top-4 duration-500 overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-2">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-emerald-600 hover:bg-emerald-100"
+              onClick={() => setShowSuccess(false)}
+            >
+              <Check className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex items-start gap-4">
+            <div className="h-12 w-12 bg-emerald-200 rounded-full flex items-center justify-center shrink-0">
+              <Check className="h-6 w-6 text-emerald-600" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-emerald-900">¡Pago completado con éxito!</h3>
+              <p className="text-emerald-700 mt-1">
+                Tus horas han sido acreditadas correctamente. Ya puedes seguir utilizando el sistema de consultas.
+              </p>
+              {compras.length > 0 && compras[0].status === "COMPLETADO" && (
+                <div className="mt-4 flex items-center gap-3">
+                  <div className="px-3 py-1 bg-white rounded-lg border border-emerald-200 text-sm font-bold text-emerald-800">
+                    +{compras[0].horas} Horas
+                  </div>
+                  <div className="text-sm text-emerald-600 italic">
+                    Paquete: {compras[0].paquete.nombre}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* Horas Disponibles */}
-      <Card className="p-6 mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200">
+      <Card className="p-6 mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 shadow-sm transition-all hover:shadow-md">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-600 mb-1">
               Tus Horas Disponibles
             </p>
-            <p className="text-4xl font-bold text-blue-600">
+            <p className="text-5xl font-extrabold text-blue-600 tracking-tight">
               {horasDisponibles}
             </p>
           </div>
-          <Clock className="h-16 w-16 text-blue-300" />
+          <div className="h-20 w-20 bg-blue-100 rounded-2xl flex items-center justify-center rotate-3 transition-transform hover:rotate-0">
+             <Clock className="h-12 w-12 text-blue-600" />
+          </div>
         </div>
       </Card>
 
@@ -316,5 +371,17 @@ export default function PaquetesHorasPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function PaquetesHorasPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    }>
+      <PaquetesHorasContent />
+    </Suspense>
   );
 }

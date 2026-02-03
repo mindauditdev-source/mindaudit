@@ -3,15 +3,27 @@ import { headers } from "next/headers";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { PaqueteHorasService } from "@/services/paquete-horas.service";
+import fs from "fs";
+import path from "path";
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_HORAS!;
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+
+const logFile = path.join(process.cwd(), "stripe_webhook.log");
+
+function logToFile(message: string) {
+  const timestamp = new Date().toISOString();
+  fs.appendFileSync(logFile, `[${timestamp}] ${message}\n`);
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const headersList = await headers();
   const signature = headersList.get("stripe-signature");
 
+  logToFile(">>> Webhook request received");
+
   if (!signature) {
+    logToFile("!!! No signature provided");
     return NextResponse.json(
       { error: "No signature provided" },
       { status: 400 }
@@ -23,6 +35,7 @@ export async function POST(req: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err: any) {
+    logToFile(`!!! Webhook signature verification failed: ${err.message}`);
     console.error("⚠️  Webhook signature verification failed:", err.message);
     return NextResponse.json(
       { error: `Webhook Error: ${err.message}` },
@@ -30,35 +43,45 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  console.log("✅ Stripe webhook received:", event.type);
+  logToFile(`✅ Stripe event received: ${event.type}`);
+  const eventData = event.data.object as any;
+  logToFile(`📦 Event Metadata: ${JSON.stringify(eventData.metadata || {})}`);
 
   // Manejar evento de pago exitoso
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
 
-    console.log("💳 Payment completed for session:", session.id);
+    logToFile(`💳 Payment completed for session: ${session.id}`);
+    logToFile(`🖇️ Session Metadata Tipo: ${session.metadata?.tipo}`);
 
     // Verificar que sea una compra de horas
     if (session.metadata?.tipo === "compra_horas") {
       try {
+        logToFile("⏳ Attempting to confirm purchase...");
         // Confirmar compra y sumar horas
         const compra = await PaqueteHorasService.confirmarCompra(
           session.id,
           session.payment_intent as string
         );
 
+        logToFile(
+          `✅ SUCCESS: Horas sumadas: +${compra.horas} al usuario ${compra.colaboradorId}`
+        );
         console.log(
           `✅ Horas sumadas: +${compra.horas} al usuario ${compra.colaboradorId}`
         );
 
         // TODO: Enviar email de confirmación al colaborador
       } catch (error: any) {
+        logToFile(`!!! Error confirming purchase: ${error.message}`);
         console.error("Error confirmando compra de horas:", error);
         return NextResponse.json(
           { error: "Error procesando compra" },
           { status: 500 }
         );
       }
+    } else {
+      logToFile("ℹ️ Not a compra_horas event, skipping.");
     }
   }
 
