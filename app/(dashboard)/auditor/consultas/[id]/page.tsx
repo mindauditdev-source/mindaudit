@@ -54,6 +54,9 @@ interface Consulta {
   createdAt: string;
   respondidaAt: string | null;
   aceptadaAt: string | null;
+  meetingStatus?: "PENDING" | "SCHEDULED" | "COMPLETED" | "CANCELLED";
+  meetingDate?: string | null;
+  meetingLink?: string | null;
 }
 
 const statusConfig: Record<
@@ -97,12 +100,32 @@ const statusConfig: Record<
   },
 };
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+
+// ... imports
+
 export default function AuditorConsultaDetallePage() {
   const { id } = useParams();
   const router = useRouter();
   const [consulta, setConsulta] = useState<Consulta | null>(null);
   const [loading, setLoading] = useState(true);
   const [cotizarModalOpen, setCotizarModalOpen] = useState(false);
+  
+  // Meeting Link Modal State
+  const [linkModalOpen, setLinkModalOpen] = useState(false);
+  const [meetingLinkInput, setMeetingLinkInput] = useState("");
+  const [updatingLink, setUpdatingLink] = useState(false);
+
+
 
   const fetchConsulta = useCallback(async () => {
     try {
@@ -122,6 +145,39 @@ export default function AuditorConsultaDetallePage() {
   useEffect(() => {
     fetchConsulta();
   }, [fetchConsulta]);
+
+  // Open modal handler
+  const openLinkModal = () => {
+    setMeetingLinkInput(consulta?.meetingLink || "");
+    setLinkModalOpen(true);
+  };
+
+  // Submit handler
+  const handleUpdateLink = async () => {
+    if (!consulta) return;
+    
+    try {
+      setUpdatingLink(true);
+      const res = await fetch(`/api/auditor/consultas/${consulta.id}/meeting`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ meetingLink: meetingLinkInput }),
+      });
+
+      if (res.ok) {
+        toast.success("Enlace de reunión actualizado");
+        setLinkModalOpen(false);
+        fetchConsulta();
+      } else {
+        throw new Error("Error al actualizar");
+      }
+    } catch (error) {
+      console.error("Error updating link:", error);
+      toast.error("No se pudo guardar el enlace");
+    } finally {
+      setUpdatingLink(false);
+    }
+  };
 
   const handleCompletar = async () => {
     if (!consulta) return;
@@ -287,6 +343,57 @@ export default function AuditorConsultaDetallePage() {
 
         {/* Sidebar Info */}
         <div className="space-y-6">
+
+          {/* Meeting Management Card */}
+          {consulta.status === "ACEPTADA" && consulta.meetingStatus === "SCHEDULED" && (
+             <Card className="p-6 border-blue-200 bg-blue-50/50">
+               <h3 className="text-xs font-black text-blue-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+                 <Calendar className="h-4 w-4" />
+                 Gestión de Reunión
+               </h3>
+               
+               <div className="space-y-4">
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Fecha Programada</p>
+                    <p className="text-sm font-bold text-slate-900">
+                      {consulta.meetingDate ? new Date(consulta.meetingDate).toLocaleString() : "Sin fecha"}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Enlace de Reunión</p>
+                    {consulta.meetingLink && consulta.meetingLink !== process.env.NEXT_PUBLIC_CALENDLY_URL ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm text-blue-700 bg-blue-100/50 p-2 rounded border border-blue-200 break-all">
+                          <ExternalLink className="h-3 w-3 shrink-0" />
+                          <a href={consulta.meetingLink} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                            {consulta.meetingLink}
+                          </a>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={openLinkModal}
+                          className="w-full text-xs h-8"
+                        >
+                          Editar Enlace
+                        </Button>
+                      </div>
+                    ) : (
+                       <Button
+                          size="sm"
+                          className="w-full bg-blue-600 hover:bg-blue-700"
+                          onClick={openLinkModal}
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Agregar Enlace
+                        </Button>
+                    )}
+                  </div>
+               </div>
+             </Card>
+          )}
+
           <Card className="p-6">
             <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Información de la Solicitud</h3>
             <div className="space-y-4">
@@ -370,6 +477,48 @@ export default function AuditorConsultaDetallePage() {
           }}
         />
       )}
+
+      {/* Meeting Link Modal */}
+      <Dialog open={linkModalOpen} onOpenChange={setLinkModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Gestión de Reunión</DialogTitle>
+            <DialogDescription>
+              Ingresa el enlace de la reunión (Zoom, Google Meet, Teams, etc.) para que el colaborador pueda unirse.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="meeting-link">Enlace de Reunión</Label>
+              <Input
+                id="meeting-link"
+                placeholder="https://meet.google.com/..."
+                value={meetingLinkInput}
+                onChange={(e) => setMeetingLinkInput(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLinkModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleUpdateLink} 
+              disabled={!meetingLinkInput || updatingLink || meetingLinkInput === process.env.NEXT_PUBLIC_CALENDLY_URL}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {updatingLink ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                "Guardar Enlace"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

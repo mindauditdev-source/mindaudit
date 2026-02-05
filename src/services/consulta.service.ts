@@ -1,6 +1,6 @@
 
 import prisma from "@/lib/db/prisma";
-import { Prisma, type ConsultaStatus } from "@prisma/client";
+import { Prisma, type ConsultaStatus, type MeetingStatus } from "@prisma/client";
 
 export interface CreateConsultaData {
   titulo: string;
@@ -53,6 +53,9 @@ export interface ConsultaDetalle extends Omit<ConsultaListItem, 'archivos'> {
     email: string;
   };
   aceptadaAt: string | null;
+  meetingStatus?: MeetingStatus;
+  meetingDate?: Date | null;
+  meetingLink?: string | null;
 }
 
 export class ConsultaService {
@@ -190,6 +193,9 @@ export class ConsultaService {
         createdAt: true,
         respondidaAt: true,
         aceptadaAt: true,
+        meetingStatus: true,
+        meetingDate: true,
+        meetingLink: true,
       },
     });
 

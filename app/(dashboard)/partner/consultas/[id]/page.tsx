@@ -16,10 +16,14 @@ import {
   ArrowLeft,
   Loader2,
   AlertTriangle,
+  Calendar,
+  Video,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
-import type { ConsultaStatus } from "@prisma/client";
+import type { ConsultaStatus, MeetingStatus } from "@prisma/client";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CalendlyWidget } from "@/components/shared/CalendlyWidget";
 
 interface ConsultaDetalle {
   id: string;
@@ -43,6 +47,9 @@ interface ConsultaDetalle {
     tipo: string;
     createdAt: string;
   }>;
+  meetingStatus: MeetingStatus | null;
+  meetingDate: string | null;
+  meetingLink: string | null;
   createdAt: string;
   respondidaAt: string | null;
   aceptadaAt: string | null;
@@ -99,6 +106,7 @@ export default function ConsultaDetallePage() {
     required: number;
     available: number;
   } | null>(null);
+  const [calendlyModalOpen, setCalendlyModalOpen] = useState(false);
 
   const fetchConsulta = useCallback(async () => {
     try {
@@ -192,6 +200,37 @@ export default function ConsultaDetallePage() {
     }
   };
 
+  const handleMeetingScheduled = async (e: unknown) => {
+    console.log("Meeting scheduled event:", e);
+    
+    try {
+      const res = await fetch(
+        `/api/colaborador/consultas/${consulta?.id}/schedule`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            meetingStatus: "SCHEDULED",
+            meetingDate: new Date().toISOString(), // In a real app we'd get this from the Calendly event
+            // meetingLink is NOT sent. Admin must provide it.
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Error al guardar la reunión");
+      }
+
+      toast.success("Reunión agendada correctamente");
+      setCalendlyModalOpen(false);
+      fetchConsulta();
+    } catch (error: unknown) {
+      const e = error as Error;
+      console.error("Error scheduling meeting:", error);
+      toast.error(e.message || "Error al agendar la reunión");
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -203,6 +242,10 @@ export default function ConsultaDetallePage() {
   if (!consulta) {
     return null;
   }
+
+  console.log("Consulta Status:", consulta.status);
+  console.log("Meeting Status:", consulta.meetingStatus);
+  console.log("Meeting Date:", consulta.meetingDate);
 
   const StatusIcon = statusConfig[consulta.status].icon;
 
@@ -353,12 +396,13 @@ export default function ConsultaDetallePage() {
         )}
 
 
-        {/* Información adicional */}
+
+        {/* Meeting Scheduling Section */}
         {(consulta.status === "ACEPTADA" ||
           consulta.status === "EN_PROCESO" ||
           consulta.status === "COMPLETADA") && (
-          <Card className="p-6 bg-green-50/50 border-green-200">
-            <div className="flex items-center gap-2 mb-2">
+          <Card className="p-6 bg-linear-to-br from-green-50 to-blue-50 border-green-200">
+            <div className="flex items-center gap-2 mb-4">
               <CheckCircle className="h-5 w-5 text-green-600" />
               <h2 className="text-lg font-semibold text-green-900">
                 Consulta Aceptada
@@ -373,9 +417,83 @@ export default function ConsultaDetallePage() {
                   year: "numeric",
                 })}
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 mb-4">
               Horas utilizadas: <strong>{consulta.horasAsignadas}</strong>
             </p>
+
+            <Separator className="my-4" />
+
+            {/* Meeting Status Display */}
+            {consulta.meetingStatus === "SCHEDULED" ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-blue-600" />
+                  <h3 className="font-semibold text-blue-900">Reunión Agendada</h3>
+                </div>
+                <div className="bg-white p-4 rounded-xl border border-blue-200 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-gray-500" />
+                    <p className="text-sm text-gray-700">
+                      <span className="font-bold">Fecha:</span>{" "}
+                      {consulta.meetingDate ? new Date(consulta.meetingDate).toLocaleDateString("es-ES", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }) : "Por confirmar"}
+                    </p>
+                  </div>
+                  
+                  {consulta.meetingLink && consulta.meetingLink !== process.env.NEXT_PUBLIC_CALENDLY_URL ? (
+                    <Button
+                      asChild
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold"
+                    >
+                      <a
+                        href={consulta.meetingLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Video className="h-4 w-4 mr-2" />
+                        Unirse a la Reunión
+                      </a>
+                    </Button>
+                  ) : (
+                    <div className="space-y-2">
+                        <Button
+                          disabled
+                          className="w-full bg-slate-100 text-slate-400 font-bold border border-slate-200"
+                        >
+                          <Video className="h-4 w-4 mr-2" />
+                          Entrar a la Reunión
+                        </Button>
+                        <div className="p-3 bg-blue-50 text-blue-800 text-sm rounded-lg flex items-start gap-2">
+                            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                            <p>Estamos generando el enlace de la reunión. Te notificaremos cuando el administrador lo haya configurado.</p>
+                        </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-blue-600" />
+                  <h3 className="font-semibold text-blue-900">Agenda una Reunión</h3>
+                </div>
+                <p className="text-sm text-gray-600">
+                  Coordina con MindAudit para discutir los detalles de tu consulta.
+                </p>
+                <Button
+                  onClick={() => setCalendlyModalOpen(true)}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold"
+                >
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Agendar Reunión
+                </Button>
+              </div>
+            )}
           </Card>
         )}
 
@@ -408,6 +526,33 @@ export default function ConsultaDetallePage() {
           </Card>
         )}
       </div>
+
+      {/* Calendly Modal */}
+      <Dialog open={calendlyModalOpen} onOpenChange={setCalendlyModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle>Agendar Reunión con MindAudit</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            {process.env.NEXT_PUBLIC_CALENDLY_URL ? (
+              <CalendlyWidget
+                url={process.env.NEXT_PUBLIC_CALENDLY_URL}
+                onEventScheduled={handleMeetingScheduled}
+              />
+            ) : (
+              <div className="p-10 border-2 border-dashed border-slate-200 rounded-3xl text-center">
+                <Calendar className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+                <p className="text-slate-500 font-bold">
+                  El sistema de agenda no está configurado.
+                </p>
+                <p className="text-xs text-slate-400">
+                  Contacta con soporte para agendar manualmente.
+                </p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
