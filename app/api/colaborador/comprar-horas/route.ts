@@ -13,8 +13,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const userId = (session.user as any).id;
-    const userEmail = (session.user as any).email;
+    const userId = (session.user as { id: string }).id;
+    const userEmail = (session.user as { email: string }).email;
     const data = await request.json();
 
     if (!data.paqueteId) {
@@ -81,10 +81,11 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
     console.error("Error creando checkout:", error);
     return NextResponse.json(
-      { error: "Error al crear checkout", details: error.message },
+      { error: "Error al crear checkout", details: errorMessage },
       { status: 500 }
     );
   }

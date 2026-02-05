@@ -43,7 +43,20 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
   const router = useRouter();
   const searchParams = useSearchParams();
   const [audit, setAudit] = useState<EmpresaAuditoria | null>(null);
-  const [solicitudes, setSolicitudes] = useState<any[]>([]);
+  
+  interface Solicitud {
+    id: string;
+    auditoriaId?: string;
+    status: 'PENDIENTE' | 'ENTREGADO' | 'APROBADO' | 'RECHAZADO';
+    title: string;
+    description?: string;
+    documento?: {
+      fileUrl: string;
+    };
+    feedback?: string;
+  }
+
+  const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
@@ -83,7 +96,7 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
       ]);
       setAudit(auditData);
       
-      const relevantDocs = (docsData.solicitudes || []).filter((s: any) => 
+      const relevantDocs = ((docsData.solicitudes || []) as Solicitud[]).filter((s) => 
          !s.auditoriaId || s.auditoriaId === id
       );
       setSolicitudes(relevantDocs);
@@ -105,7 +118,7 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
     return () => clearInterval(interval);
   }, [isPaymentProcessing, loadData]);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, solicitud: any) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, solicitud: Solicitud) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -131,9 +144,10 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
 
       alert("Archivo subido con éxito.");
       loadData();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
       console.error("Error subiendo archivo:", err);
-      alert(`Error al subir: ${err.message || 'Error desconocido'}`);
+      alert(`Error al subir: ${errorMessage}`);
     } finally {
       setUploadingId(null);
     }
@@ -184,7 +198,7 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
     }
   };
 
-  const handleMeetingScheduled = async (e: any) => {
+  const handleMeetingScheduled = async (e: unknown) => {
     try {
         console.log("Meeting Scheduled Event:", e);
         // e.data.payload contains event info if available. 
@@ -242,7 +256,7 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
             <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex-1 space-y-6">
                     <Card className="border-none shadow-sm overflow-hidden rounded-[32px] bg-white">
-                    <div className="h-3 bg-gradient-to-r from-blue-600 to-indigo-600" />
+                    <div className="h-3 bg-linear-to-r from-blue-600 to-indigo-600" />
                     <CardHeader className="p-8">
                         <div className="flex justify-between items-start">
                             <div>
@@ -464,7 +478,7 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
                             {isPendingDecision ? (
                                 <div className="space-y-4">
                                     <div className="p-4 bg-white/5 rounded-2xl border border-white/10 mb-6">
-                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 text-center text-blue-200/50">Método de Pago Seguro</p>
+                                        <p className="text-[10px] font-black uppercase tracking-widest mb-2 text-center text-blue-200/50">Método de Pago Seguro</p>
                                         <div className="flex items-center justify-center gap-2 py-1">
                                         <span className="font-black italic text-xl text-blue-400">Stripe</span>
                                         </div>
@@ -526,7 +540,7 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
                             ) : audit.status === 'APROBADA' || audit.status === 'EN_PROCESO' ? (
                                 <div className="p-6 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 text-center">
                                     <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto mb-3" />
-                                    <p className="text-sm font-black text-emerald-400 uppercase tracking-widest mb-1 text-blue-200/50">Servicio Pagado</p>
+                                    <p className="text-sm font-black uppercase tracking-widest mb-1 text-blue-200/50">Servicio Pagado</p>
                                     <p className="text-sm font-medium text-slate-300">Expediente formalizado y en curso.</p>
                                 </div>
                             ) : (

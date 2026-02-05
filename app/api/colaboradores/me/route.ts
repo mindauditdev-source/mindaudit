@@ -49,7 +49,7 @@ export async function GET() {
     }
 
     // Cast user to include _count with proper typing
-    const userData = colaborador.user as any; 
+    const userData = colaborador.user as (typeof colaborador.user & { _count?: { consultas: number } }); 
 
     return successResponse({
       colaborador: {
@@ -78,9 +78,10 @@ export async function GET() {
         },
       },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error en GET /api/colaboradores/me:', error)
-    return serverErrorResponse(error.message)
+    const e = error as Error;
+    return serverErrorResponse(e.message)
   }
 }
 
@@ -149,8 +150,9 @@ export async function PATCH(request: NextRequest) {
       },
       'Perfil actualizado exitosamente'
     )
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error en PATCH /api/colaboradores/me:', error)
-    return serverErrorResponse(error.message)
+    const e = error as Error;
+    return serverErrorResponse(e.message)
   }
 }

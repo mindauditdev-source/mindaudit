@@ -1,5 +1,4 @@
 
-import { NextRequest } from "next/server";
 import { getAuthenticatedUser } from "@/middleware/api-auth";
 import { prisma } from "@/lib/db/prisma";
 import { successResponse, serverErrorResponse } from "@/lib/api-response";
@@ -15,7 +14,7 @@ interface NotificationItem {
   date: Date | string;
 }
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   try {
     const user = await getAuthenticatedUser();
     const notifications: NotificationItem[] = [];

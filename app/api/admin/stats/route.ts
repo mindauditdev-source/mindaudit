@@ -59,7 +59,7 @@ export async function GET() {
     const totalComprasHoras = results[4] as number;
     const totalHorasVendidasAgg = results[5] as { _sum: { horas: number | null } };
     const totalHorasVendidas = totalHorasVendidasAgg._sum.horas || 0;
-    const ingresosTotalesAgg = results[6] as { _sum: { precio: any } }; // precio is Decimal from Prisma
+    const ingresosTotalesAgg = results[6] as { _sum: { precio: { toNumber: () => number } | null } };
     const ingresosTotales = ingresosTotalesAgg._sum.precio?.toNumber() || 0;
 
     // Calcular ingresos del mes actual por venta de horas
@@ -87,8 +87,9 @@ export async function GET() {
         ingresosMes: ingresosMes._sum.precio?.toNumber() || 0,
       },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error en GET /api/admin/stats:', error)
-    return serverErrorResponse(error.message)
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    return serverErrorResponse(errorMessage)
   }
 }

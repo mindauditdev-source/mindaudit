@@ -34,17 +34,18 @@ export async function POST(req: NextRequest) {
 
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-  } catch (err: any) {
-    logToFile(`!!! Webhook signature verification failed: ${err.message}`);
-    console.error("⚠️  Webhook signature verification failed:", err.message);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Unknown";
+    logToFile(`!!! Webhook signature verification failed: ${msg}`);
+    console.error("⚠️  Webhook signature verification failed:", msg);
     return NextResponse.json(
-      { error: `Webhook Error: ${err.message}` },
+      { error: `Webhook Error: ${msg}` },
       { status: 400 }
     );
   }
 
   logToFile(`✅ Stripe event received: ${event.type}`);
-  const eventData = event.data.object as any;
+  const eventData = event.data.object as Stripe.Checkout.Session;
   logToFile(`📦 Event Metadata: ${JSON.stringify(eventData.metadata || {})}`);
 
   // Manejar evento de pago exitoso
@@ -72,8 +73,9 @@ export async function POST(req: NextRequest) {
         );
 
         // TODO: Enviar email de confirmación al colaborador
-      } catch (error: any) {
-        logToFile(`!!! Error confirming purchase: ${error.message}`);
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : "Unknow";
+        logToFile(`!!! Error confirming purchase: ${msg}`);
         console.error("Error confirmando compra de horas:", error);
         return NextResponse.json(
           { error: "Error procesando compra" },

@@ -1,6 +1,6 @@
 
 import prisma from "@/lib/db/prisma";
-import type { ConsultaStatus } from "@prisma/client";
+import { Prisma, type ConsultaStatus } from "@prisma/client";
 
 export interface CreateConsultaData {
   titulo: string;
@@ -145,7 +145,7 @@ export class ConsultaService {
     userId: string,
     isAdminView: boolean = false
   ): Promise<ConsultaDetalle | null> {
-    const where: any = { id: consultaId };
+    const where: Prisma.ConsultaWhereInput = { id: consultaId };
     
     // Si no es vista de admin, filtrar por el colaborador (dueño)
     if (!isAdminView) {

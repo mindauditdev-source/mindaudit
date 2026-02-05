@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getAuthenticatedUser } from "@/middleware/api-auth";
 import { prisma } from "@/lib/db/prisma";
+import { MeetingStatus } from "@prisma/client";
 import { 
-  errorResponse, 
   forbiddenResponse, 
   notFoundResponse, 
   successResponse,
@@ -35,14 +35,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     });
 
     return successResponse({ message: "Solicitud de reunión enviada", auditoria: updated });
-  } catch (error: any) {
-    return serverErrorResponse(error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error interno';
+    return serverErrorResponse(errorMessage);
   }
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await getAuthenticatedUser();
+    await getAuthenticatedUser();
     const { id } = await params;
     const body = await req.json();
     const { date, link, status } = body;
@@ -56,8 +57,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     // Convert status string to Enum if needed, or just string to match Prisma
     // Input: status='SCHEDULED', date=ISOString
     
-    const updateData: any = {};
-    if (status) updateData.meetingStatus = status;
+    const updateData: {
+      meetingStatus?: MeetingStatus; // Or precise enum if available
+      meetingDate?: Date;
+      meetingLink?: string;
+    } = {};
+    if (status) updateData.meetingStatus = status as MeetingStatus;
     if (date) updateData.meetingDate = new Date(date);
     if (link) updateData.meetingLink = link;
 
@@ -67,7 +72,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     });
 
     return successResponse({ message: "Reunión actualizada", auditoria: updated });
-  } catch (error: any) {
-    return serverErrorResponse(error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error interno';
+    return serverErrorResponse(errorMessage);
   }
 }

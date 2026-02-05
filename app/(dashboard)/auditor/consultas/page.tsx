@@ -37,7 +37,7 @@ interface Consulta {
 
 const statusConfig: Record<
   ConsultaStatus,
-  { label: string; color: string; icon: any }
+  { label: string; color: string; icon: React.ElementType }
 > = {
   PENDIENTE: {
     label: "Pendiente",

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+// import { Separator } from "@/components/ui/separator"; // Separator is unused
 import {
   Clock,
   CheckCircle,
@@ -22,7 +22,7 @@ import {
 import { CotizarConsultaModal } from "@/components/consultas/CotizarConsultaModal";
 import type { ConsultaStatus } from "@prisma/client";
 import { toast } from "sonner";
-import Link from "next/link";
+// import Link from "next/link"; // Link is unused
 
 interface Consulta {
   id: string;
@@ -58,7 +58,7 @@ interface Consulta {
 
 const statusConfig: Record<
   ConsultaStatus,
-  { label: string; color: string; icon: any }
+  { label: string; color: string; icon: React.ElementType }
 > = {
   PENDIENTE: {
     label: "Pendiente",
@@ -104,7 +104,7 @@ export default function AuditorConsultaDetallePage() {
   const [loading, setLoading] = useState(true);
   const [cotizarModalOpen, setCotizarModalOpen] = useState(false);
 
-  const fetchConsulta = async () => {
+  const fetchConsulta = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch(`/api/auditor/consultas/${id}`);
@@ -117,11 +117,11 @@ export default function AuditorConsultaDetallePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchConsulta();
-  }, [id]);
+  }, [fetchConsulta]);
 
   const handleCompletar = async () => {
     if (!consulta) return;
@@ -359,15 +359,17 @@ export default function AuditorConsultaDetallePage() {
         </div>
       </div>
 
-      <CotizarConsultaModal
-        open={cotizarModalOpen}
-        onOpenChange={setCotizarModalOpen}
-        consulta={consulta as any}
-        onSuccess={() => {
-          setCotizarModalOpen(false);
-          fetchConsulta();
-        }}
-      />
+      {consulta && (
+        <CotizarConsultaModal
+          open={cotizarModalOpen}
+          onOpenChange={setCotizarModalOpen}
+          consulta={consulta}
+          onSuccess={() => {
+            setCotizarModalOpen(false);
+            fetchConsulta();
+          }}
+        />
+      )}
     </div>
   );
 }

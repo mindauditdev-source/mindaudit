@@ -91,7 +91,7 @@ export const AdminApiService = {
     });
   },
 
-  getComisiones: async (colaboradorId?: string): Promise<{ comisiones: any[] }> => {
+  getComisiones: async (colaboradorId?: string): Promise<{ comisiones: unknown[] }> => {
     const query = colaboradorId ? `?colaboradorId=${colaboradorId}` : "";
     const response = await apiFetch(`/admin/comisiones${query}`);
     return response.data;
@@ -103,12 +103,12 @@ export const AdminApiService = {
     });
   },
 
-  getAuditorias: async (): Promise<{ auditorias: any[] }> => {
+  getAuditorias: async (): Promise<{ auditorias: unknown[] }> => {
     const response = await apiFetch("/auditorias");
     return response.data;
   },
 
-  getAuditoriaById: async (id: string): Promise<{ auditoria: any }> => {
+  getAuditoriaById: async (id: string): Promise<{ auditoria: unknown }> => {
     const response = await apiFetch(`/auditorias/${id}`);
     return response.data;
   },

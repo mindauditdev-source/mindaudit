@@ -12,7 +12,7 @@ export async function GET() {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const userId = (session.user as any).id;
+    const userId = (session.user as { id: string }).id;
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -24,10 +24,11 @@ export async function GET() {
     }
 
     return NextResponse.json({ horasDisponibles: user.horasDisponibles }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error obteniendo balance:", error);
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
     return NextResponse.json(
-      { error: "Error al obtener balance", details: error.message },
+      { error: "Error al obtener balance", details: errorMessage },
       { status: 500 }
     );
   }

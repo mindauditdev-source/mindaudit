@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Bell, AlertCircle, FileText, CreditCard, Calendar, CheckCircle2, XCircle } from "lucide-react";
 import {
   DropdownMenu,
@@ -27,7 +27,7 @@ export function NotificationPopover() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       const res = await fetch('/api/notifications');
       if (res.ok) {
@@ -39,14 +39,14 @@ export function NotificationPopover() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchNotifications();
     // Poll every 60 seconds
     const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchNotifications]);
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -74,7 +74,7 @@ export function NotificationPopover() {
     }
   };
 
-  const markAsRead = async (id: string, link: string) => {
+  const markAsRead = async (id: string) => {
     try {
        await fetch(`/api/notifications/${id}/read`, { method: 'POST' });
        setNotifications(prev => prev.filter(n => n.id !== id));
@@ -122,9 +122,9 @@ export function NotificationPopover() {
                 <Link 
                   key={item.id} 
                   href={item.link} 
-                  onClick={(e) => {
+                  onClick={() => {
                      // e.preventDefault(); // If we want to wait for async
-                     markAsRead(item.id, item.link);
+                     markAsRead(item.id);
                   }}
                   className={cn(
                     "flex gap-4 p-4 transition-colors border-b border-slate-100 last:border-0",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { 
   Users, 
   TrendingUp, 
@@ -94,9 +95,9 @@ export default function AuditorDashboardPage() {
              "border-none shadow-sm relative overflow-hidden group hover:shadow-xl transition-all duration-500 rounded-[24px]",
              "bg-white"
           )}>
-            <div className={cn("absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500", stat.highlight)} />
+            <div className={cn("absolute inset-0 bg-linear-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500", stat.highlight)} />
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-[11px] font-black text-slate-400 uppercase tracking-[0.1em]">{stat.title}</CardTitle>
+              <CardTitle className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{stat.title}</CardTitle>
               <div className={`${stat.bg} ${stat.color} p-2.5 rounded-[12px] border ${stat.border} group-hover:scale-110 transition-transform duration-500`}>
                 <stat.icon className="h-5 w-5" />
               </div>
@@ -172,7 +173,7 @@ export default function AuditorDashboardPage() {
                         </p>
                      </div>
                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl shadow-xl shadow-blue-200" asChild>
-                        <a href="/auditor/consultas">Ir a Gestión de Consultas</a>
+                        <Link href="/auditor/consultas">Ir a Gestión de Consultas</Link>
                      </Button>
                   </div>
                ) : (

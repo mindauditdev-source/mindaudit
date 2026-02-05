@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
       const buffer = Buffer.from(await file.arrayBuffer());
 
-      const { data, error } = await supabaseAdmin.storage
+      const { error } = await supabaseAdmin.storage
         .from("documentos")
         .upload(filePath, buffer, {
           contentType: file.type,
@@ -59,10 +59,11 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ files: uploadedFiles }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error en API de upload:", error);
+    const details = error instanceof Error ? error.message : 'Unknown';
     return NextResponse.json(
-      { error: "Error interno al subir archivos", details: error.message },
+      { error: "Error interno al subir archivos", details },
       { status: 500 }
     );
   }

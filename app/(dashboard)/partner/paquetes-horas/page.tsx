@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -49,7 +49,7 @@ function PaquetesHorasContent() {
 
   const isSuccess = searchParams.get("success") === "true";
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -65,6 +65,7 @@ function PaquetesHorasContent() {
         setHorasDisponibles(dataBalance.horasDisponibles);
       } else if (session?.user) {
         // Fallback
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userHoras = (session.user as any).horasDisponibles || 0;
         setHorasDisponibles(userHoras);
       }
@@ -84,11 +85,11 @@ function PaquetesHorasContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isSuccess, session]);
 
   useEffect(() => {
     fetchData();
-  }, [session, isSuccess]);
+  }, [fetchData]);
 
   const handleComprar = async (paqueteId: string) => {
     setPurchasing(paqueteId);
@@ -115,14 +116,16 @@ function PaquetesHorasContent() {
         if (!stripe) {
           throw new Error("Error cargando Stripe");
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (stripe as any).redirectToCheckout({
           sessionId: data.sessionId,
         });
         if (error) throw error;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const e = error as Error;
       console.error("Error comprando paquete:", error);
-      toast.error(error.message || "Error al procesar la compra");
+      toast.error(e.message || "Error al procesar la compra");
     } finally {
       setPurchasing(null);
     }
@@ -186,7 +189,7 @@ function PaquetesHorasContent() {
       )}
 
       {/* Horas Disponibles */}
-      <Card className="p-6 mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 shadow-sm transition-all hover:shadow-md">
+      <Card className="p-6 mb-8 bg-linear-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 shadow-sm transition-all hover:shadow-md">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-600 mb-1">
@@ -234,7 +237,7 @@ function PaquetesHorasContent() {
                   </div>
                 )}
 
-                <div className="flex-grow">
+                <div className="grow">
                   <div className="text-center mb-6">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
                       {paquete.nombre}

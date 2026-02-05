@@ -31,8 +31,9 @@ export async function GET(
     }
 
     return successResponse(consulta);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al obtener detalle de consulta (Auditor):", error);
-    return serverErrorResponse(error.message);
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    return serverErrorResponse(errorMessage);
   }
 }

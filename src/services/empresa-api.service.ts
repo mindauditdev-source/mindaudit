@@ -109,12 +109,12 @@ export class EmpresaApiService {
     });
   }
 
-  static async getDocumentos(): Promise<{ documentos: any[] }> {
+  static async getDocumentos(): Promise<{ documentos: unknown[] }> {
     const response = await this.fetch("/documentos");
     return response.data;
   }
 
-  static async getSolicitudesDocumento(params?: { auditoriaId?: string }): Promise<{ solicitudes: any[] }> {
+  static async getSolicitudesDocumento(params?: { auditoriaId?: string }): Promise<{ solicitudes: unknown[] }> {
     let query = "";
     if (params?.auditoriaId) query = `?auditoriaId=${params.auditoriaId}`;
     const response = await this.fetch(`/documentos/solicitudes${query}`);

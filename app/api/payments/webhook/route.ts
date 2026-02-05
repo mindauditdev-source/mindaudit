@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db/prisma";
 import { EmailService } from "@/lib/email/email-service";
 import { CommissionService } from "@/services/commission.service";
 import { stripe } from "@/lib/stripe";
+import Stripe from "stripe";
 import { AuditoriaStatus, UserRole } from "@prisma/client";
 import { PaqueteHorasService } from "@/services/paquete-horas.service";
 
@@ -25,14 +26,15 @@ export async function POST(req: NextRequest) {
       signature, 
       process.env.STRIPE_WEBHOOK_SECRET!
     );
-  } catch (err: any) {
-    console.error(`❌ Webhook Error: ${err.message}`);
-    return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error(`❌ Webhook Error: ${message}`);
+    return NextResponse.json({ error: `Webhook Error: ${message}` }, { status: 400 });
   }
 
   try {
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as any;
+      const session = event.data.object as Stripe.Checkout.Session;
       const tipo = session.metadata?.tipo;
 
       console.log(`💳 Processing checkout.session.completed: ${session.id}, tipo: ${tipo}`);
@@ -47,9 +49,10 @@ export async function POST(req: NextRequest) {
           );
           console.log(`✅ SUCCESS: Credited ${compra.horas} hours to user ${compra.colaboradorId}`);
           return NextResponse.json({ received: true, type: "compra_horas" });
-        } catch (error: any) {
-          console.error("❌ Error confirming hour purchase:", error.message);
-          return NextResponse.json({ error: error.message }, { status: 500 });
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("❌ Error confirming hour purchase:", message);
+          return NextResponse.json({ error: message }, { status: 500 });
         }
       }
 
@@ -95,7 +98,7 @@ export async function POST(req: NextRequest) {
       const baseAmount = totalAmount / 1.21;
       const taxAmount = totalAmount - baseAmount;
 
-      const invoice = await prisma.invoice.create({
+      await prisma.invoice.create({
         data: {
           number: invoiceNumber,
           date: new Date(),

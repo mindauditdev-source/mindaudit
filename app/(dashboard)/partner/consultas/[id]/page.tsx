@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -50,7 +50,7 @@ interface ConsultaDetalle {
 
 const statusConfig: Record<
   ConsultaStatus,
-  { label: string; color: string; icon: any }
+  { label: string; color: string; icon: React.ElementType }
 > = {
   PENDIENTE: {
     label: "Pendiente",
@@ -100,7 +100,7 @@ export default function ConsultaDetallePage() {
     available: number;
   } | null>(null);
 
-  const fetchConsulta = async () => {
+  const fetchConsulta = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch(`/api/colaborador/consultas/${params.id}`);
@@ -118,13 +118,13 @@ export default function ConsultaDetallePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.id, router]);
 
   useEffect(() => {
     if (params.id) {
       fetchConsulta();
     }
-  }, [params.id]);
+  }, [params.id, fetchConsulta]);
 
   const handleAceptar = async () => {
     if (!consulta) return;
@@ -156,9 +156,10 @@ export default function ConsultaDetallePage() {
 
       toast.success("Consulta aceptada exitosamente");
       fetchConsulta();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const e = error as Error;
       console.error("Error aceptando consulta:", error);
-      toast.error(error.message || "Error al aceptar la consulta");
+      toast.error(e.message || "Error al aceptar la consulta");
     } finally {
       setActionLoading(false);
     }
