@@ -114,7 +114,7 @@ export function ContactContent() {
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Email</p>
-                    <p className="text-slate-700 font-semibold">info@mindaudit.com</p>
+                    <p className="text-slate-700 font-semibold">info@mindaudit.es</p>
                   </div>
                 </div>
 

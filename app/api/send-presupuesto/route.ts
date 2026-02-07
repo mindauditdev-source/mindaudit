@@ -45,8 +45,8 @@ export async function POST(req: NextRequest) {
 
     // 2. Enviar email usando Resend
     const { data, error } = await resend.emails.send({
-      from: process.env.CONTACT_EMAIL_FROM || 'MindAudit <noreply@mindaudit.com>',
-      to: process.env.CONTACT_EMAIL_TO || 'info@mindaudit.com',
+      from: process.env.CONTACT_EMAIL_FROM || 'MindAudit <noreply@mindaudit.es>',
+      to: process.env.CONTACT_EMAIL_TO || 'info@mindaudit.es',
       subject: `[Nuevo Presupuesto #${nuevoPresupuesto.id.substring(0,6).toUpperCase()}] ${tipoServicio} - ${razonSocial}`,
       html: `
         <!DOCTYPE html>

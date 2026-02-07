@@ -60,7 +60,7 @@ export class EmailService {
    * Notificación de Nueva Auditoría Solicitada (Para Admin)
    */
   static async notifyNewAudit(audit: AuditInfo, empresa: EmpresaInfo) {
-    const adminEmail = process.env.CONTACT_EMAIL_TO || 'admin@mindaudit.com';
+    const adminEmail = process.env.CONTACT_EMAIL_TO || 'admin@mindaudit.es';
     return this.sendEmail({
       to: adminEmail,
       subject: `🆕 Nueva Solicitud de Auditoría: ${empresa.companyName}`,
@@ -110,7 +110,7 @@ export class EmailService {
    * Notificación de Auditoría Aprobada/Pagada
    */
   static async notifyAuditApproved(audit: AuditInfo, empresa: EmpresaInfo, partnerEmail?: string | null) {
-    const recipients = [process.env.CONTACT_EMAIL_TO || 'admin@mindaudit.com'];
+    const recipients = [process.env.CONTACT_EMAIL_TO || 'admin@mindaudit.es'];
     if (partnerEmail) recipients.push(partnerEmail);
 
     return this.sendEmail({

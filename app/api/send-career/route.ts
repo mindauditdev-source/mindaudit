@@ -33,8 +33,8 @@ export async function POST(req: NextRequest) {
     const { data, error } = await resend.emails.send({
       from:
         process.env.CONTACT_EMAIL_FROM ||
-        "MindAudit Careers <noreply@mindaudit.com>",
-      to: process.env.CONTACT_EMAIL_TO || "info@mindaudit.com",
+        "MindAudit Careers <noreply@mindaudit.es>",
+      to: process.env.CONTACT_EMAIL_TO || "info@mindaudit.es",
       subject: `[Candidatura Web] ${puesto} - ${nombre}`,
       html: `
         <!DOCTYPE html>
