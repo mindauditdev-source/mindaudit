@@ -26,6 +26,11 @@ export function NotificationPopover() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -42,11 +47,23 @@ export function NotificationPopover() {
   }, []);
 
   useEffect(() => {
-    fetchNotifications();
-    // Poll every 60 seconds
-    const interval = setInterval(fetchNotifications, 60000);
-    return () => clearInterval(interval);
-  }, [fetchNotifications]);
+    if (mounted) {
+      fetchNotifications();
+      // Poll every 60 seconds
+      const interval = setInterval(fetchNotifications, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [fetchNotifications, mounted]);
+
+  // Prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-emerald-600 hover:bg-slate-100 rounded-full">
+        <Bell className="h-5 w-5" />
+        <span className="sr-only">Notificaciones</span>
+      </Button>
+    );
+  }
 
   const getIcon = (type: string) => {
     switch (type) {

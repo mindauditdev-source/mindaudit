@@ -24,6 +24,11 @@ const sidebarItems = [
     icon: LayoutDashboard,
   },
   {
+    title: "Mis Presupuestos",
+    href: "/partner/presupuestos",
+    icon: FileText,
+  },
+  {
     title: "Mis Empresas",
     href: "/partner/clientes",
     icon: Building2,

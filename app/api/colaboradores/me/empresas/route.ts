@@ -31,22 +31,22 @@ export async function GET(request: NextRequest) {
       include: {
         _count: {
           select: {
-            auditorias: true,
+            presupuestos: true,
             documentos: true,
           },
         },
-        auditorias: {
+        presupuestos: {
           select: {
             id: true,
             status: true,
-            tipoServicio: true,
+            tipoServicio_landing: true,
             presupuesto: true,
             createdAt: true,
           },
           orderBy: {
             createdAt: 'desc',
           },
-          take: 5, // Últimas 5 auditorías
+          take: 5, // Últimos 5 presupuestos
         },
       },
       orderBy: {
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     // Calcular estadísticas
     const totalEmpresas = empresas.length
     const empresasActivas = empresas.filter((e) => e.status === 'ACTIVE').length
-    const totalAuditorias = empresas.reduce((sum, e) => sum + e._count.auditorias, 0)
+    const totalPresupuestos = empresas.reduce((sum, e) => sum + e._count.presupuestos, 0)
 
     return successResponse({
       empresas: empresas.map((e) => ({
@@ -73,13 +73,13 @@ export async function GET(request: NextRequest) {
         fiscalYear: e.fiscalYear,
         createdAt: e.createdAt,
         stats: {
-          totalAuditorias: e._count.auditorias,
+          totalPresupuestos: e._count.presupuestos,
           totalDocumentos: e._count.documentos,
         },
-        recentAuditorias: e.auditorias.map((a) => ({
+        recentPresupuestos: e.presupuestos.map((a) => ({
           id: a.id,
           status: a.status,
-          tipoServicio: a.tipoServicio,
+          tipoServicio: a.tipoServicio_landing,
           presupuesto: a.presupuesto?.toNumber(),
           createdAt: a.createdAt,
         })),
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
       stats: {
         totalEmpresas,
         empresasActivas,
-        totalAuditorias,
+        totalPresupuestos,
       },
     })
   } catch (error: any) {

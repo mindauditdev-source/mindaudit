@@ -2,10 +2,11 @@ import { ColaboradorStatus } from "@prisma/client";
 
 export interface AdminStats {
   totalRevenue: number;
-  totalAudits: number;
+  totalPresupuestos: number;
   activeColaboradores: number;
   totalEmpresas: number;
-  pendingAudits: number;
+  pendingBudgets: number;
+  acceptedBudgets: number;
   commissionPaid: number;
   revenueByMonth: Array<{ month: string; amount: number }>;
   // Consultas
@@ -52,17 +53,14 @@ export const AdminApiService = {
   getStats: async (): Promise<AdminStats> => {
     const response = await apiFetch("/admin/stats");
     const s = response.data.stats;
-    const allStatuses = Object.keys(s.auditoriasPorEstado || {});
-    const pendingCount = allStatuses
-      .filter(status => status !== 'COMPLETADA' && status !== 'CANCELADA')
-      .reduce((acc, status) => acc + (s.auditoriasPorEstado[status] || 0), 0);
 
     return {
       totalRevenue: s.ingresosTotales || s.ingresosMes || 0,
-      totalAudits: s.totalAuditorias || 0,
+      totalPresupuestos: s.totalPresupuestos || 0,
       activeColaboradores: s.totalColaboradores || 0,
       totalEmpresas: s.totalEmpresas || 0,
-      pendingAudits: pendingCount,
+      pendingBudgets: s.presupuestosPorEstado?.PENDIENTE_PRESUPUESTAR || 0,
+      acceptedBudgets: s.presupuestosPorEstado?.ACEPTADO_PENDIENTE_FACTURAR || 0,
       commissionPaid: s.comisiones?.pagadas?.total || 0,
       revenueByMonth: [],
       // Consultas

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { prisma } from '@/lib/db/prisma';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -26,11 +27,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Enviar email usando Resend
+    // 1. Guardar en Base de Datos
+    const nuevoPresupuesto = await prisma.presupuesto.create({
+      data: {
+        razonSocial,
+        cif_landing: cif,
+        facturacion,
+        nombreContacto,
+        email,
+        telefono,
+        tipoServicio_landing: tipoServicio,
+        urgente: urgencia === 'urgente',
+        description: descripcion,
+        status: 'PENDIENTE_PRESUPUESTAR'
+      }
+    });
+
+    // 2. Enviar email usando Resend
     const { data, error } = await resend.emails.send({
       from: process.env.CONTACT_EMAIL_FROM || 'MindAudit <noreply@mindaudit.com>',
       to: process.env.CONTACT_EMAIL_TO || 'info@mindaudit.com',
-      subject: `[Presupuesto] ${tipoServicio} - ${razonSocial}`,
+      subject: `[Nuevo Presupuesto #${nuevoPresupuesto.id.substring(0,6).toUpperCase()}] ${tipoServicio} - ${razonSocial}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -57,6 +74,7 @@ export async function POST(req: NextRequest) {
               <div class="header">
                 <h1 style="margin: 0; font-size: 24px;">💼 Nueva Solicitud de Presupuesto</h1>
                 ${urgencia === 'urgente' ? '<span class="badge urgent">⚡ URGENTE</span>' : '<span class="badge">📋 Normal</span>'}
+                <div style="margin-top: 10px; font-size: 14px; opacity: 0.8;">ID Registro: ${nuevoPresupuesto.id}</div>
               </div>
               <div class="content">
                 
@@ -130,7 +148,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: true, messageId: data?.id },
+      { success: true, messageId: data?.id, budgetId: nuevoPresupuesto.id },
       { status: 200 }
     );
   } catch (error) {

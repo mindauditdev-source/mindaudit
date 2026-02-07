@@ -22,11 +22,11 @@ export async function GET() {
     if (user.role === 'EMPRESA') {
       if (!user.empresaId) return successResponse({ count: 0, items: [] });
 
-      // 1. Auditorías esperando pago
-      const pendingPayment = await prisma.auditoria.findMany({
+      // 1. Presupuestos esperando pago
+      const pendingPayment = await prisma.presupuesto.findMany({
         where: {
           empresaId: user.empresaId,
-          status: 'PENDIENTE_DE_PAGO'
+          status: 'A_PAGAR'
         },
         select: { id: true, fiscalYear: true, tipoServicio: true }
       });
@@ -44,10 +44,10 @@ export async function GET() {
       });
 
       // 2. Presupuestos recibidos
-      const budgetReceived = await prisma.auditoria.findMany({
+      const budgetReceived = await prisma.presupuesto.findMany({
         where: {
           empresaId: user.empresaId,
-          status: 'PRESUPUESTADA'
+          status: 'EN_CURSO'
         },
         select: { id: true, fiscalYear: true }
       });
@@ -86,7 +86,7 @@ export async function GET() {
       });
 
       // 4. Solicitudes de Reunión (Auditor/Admin)
-      const meetingRequests = await prisma.auditoria.findMany({
+      const meetingRequests = await prisma.presupuesto.findMany({
         where: {
           empresaId: user.empresaId,
           meetingStatus: 'PENDING',
@@ -108,7 +108,7 @@ export async function GET() {
       });
 
       // 5. Reuniones Agendadas (Recordatorio)
-      const scheduledMeetings = await prisma.auditoria.findMany({
+      const scheduledMeetings = await prisma.presupuesto.findMany({
          where: {
             empresaId: user.empresaId,
             meetingStatus: 'SCHEDULED',
@@ -138,7 +138,7 @@ export async function GET() {
       // ADMIN o COLABORADOR (AUDITOR/PARTNER)
       
       // Filtros básicos
-      const auditWhere: Prisma.AuditoriaWhereInput = {};
+      const auditWhere: Prisma.PresupuestoWhereInput = {};
       const docWhere: Prisma.SolicitudDocumentoWhereInput = {};
 
       if (user.role === 'COLABORADOR') {
@@ -165,13 +165,13 @@ export async function GET() {
           });
         });
 
-        // --- AUDITOR (si tiene colaboradorId): Auditorías y Documentos ---
+        // --- AUDITOR (si tiene colaboradorId): Presupuestos y Documentos ---
         if (user.colaboradorId) {
           auditWhere.colaboradorId = user.colaboradorId;
-          docWhere.auditoria = { colaboradorId: user.colaboradorId };
+          docWhere.presupuesto = { colaboradorId: user.colaboradorId };
         } else {
           // Si es COLABORADOR pero no tiene colaboradorId (perfil incompleto), 
-          // evitamos que vea auditorías de otros o que la query falle
+          // evitamos que vea presupuestos de otros o que la query falle
           auditWhere.id = 'none'; 
           docWhere.id = 'none';
         }
@@ -218,11 +218,10 @@ export async function GET() {
       }
 
       // 1. Nuevas Solicitudes (Falta Presupuesto)
-      // ... rest of existing code
-      const requestedAudits = await prisma.auditoria.findMany({
+      const requestedAudits = await prisma.presupuesto.findMany({
         where: {
           ...auditWhere,
-          status: 'SOLICITADA'
+          status: 'PENDIENTE_PRESUPUESTAR'
         },
         include: { empresa: { select: { companyName: true } } }
       });
@@ -240,10 +239,10 @@ export async function GET() {
       });
 
       // 2. Reuniones Solicitadas
-      const meetingAudits = await prisma.auditoria.findMany({
+      const meetingAudits = await prisma.presupuesto.findMany({
         where: {
           ...auditWhere,
-          status: 'REUNION_SOLICITADA'
+          meetingStatus: 'PENDING'
         },
         include: { empresa: { select: { companyName: true } } }
       });
@@ -265,29 +264,29 @@ export async function GET() {
         where: {
           ...docWhere,
           status: 'ENTREGADO'
-        },
-        include: { empresa: { select: { companyName: true } }, auditoria: true }
-      });
+         },
+         include: { empresa: { select: { companyName: true } }, presupuesto: true }
+       });
 
       submittedDocs.forEach(doc => {
         notifications.push({
           id: `review-${doc.id}`,
           type: 'DOC_REVIEW',
-          title: 'Documento Entregado',
-          message: `${doc.empresa.companyName} ha subido "${doc.title}".`,
-          link: `/auditor/auditorias/${doc.auditoriaId}`,
-          severity: 'MEDIUM',
+           title: 'Documento Entregado',
+           message: `${doc.empresa.companyName} ha subido "${doc.title}".`,
+           link: `/auditor/presupuestos/${doc.presupuestoId}`,
+           severity: 'MEDIUM',
           date: doc.updatedAt
         });
       });
 
-      // 4. Pagos Recibidos (Nuevo - Auditoría en Proceso)
-      const paidAudits = await prisma.auditoria.findMany({
+      // 4. Pagos Recibidos (Nuevo - Presupuesto Aceptado)
+      const paidAudits = await prisma.presupuesto.findMany({
         where: {
           ...auditWhere,
-          status: 'EN_PROCESO',
-          fechaInicio: {
-             // Notificar solo si se inició en los últimos 7 días, por ejemplo
+          status: 'ACEPTADO_PENDIENTE_FACTURAR',
+          updatedAt: {
+             // Notificar solo actualizaciones recientes
              gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
           }
         },

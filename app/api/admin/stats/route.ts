@@ -21,6 +21,16 @@ export async function GET() {
       // Total empresas
       prisma.empresa.count(),
 
+      // --- SISTEMA DE PRESUPUESTOS ---
+      prisma.presupuesto.count(),
+      
+      prisma.presupuesto.groupBy({
+        by: ['status'],
+        _count: {
+          _all: true
+        }
+      }),
+
       // --- SISTEMA DE CONSULTAS ---
       // Total consultas
       prisma.consulta.count(),
@@ -54,13 +64,21 @@ export async function GET() {
 
     const totalColaboradores = results[0] as number;
     const totalEmpresas = results[1] as number;
-    const totalConsultas = results[2] as number;
-    const consultasPendientes = results[3] as number;
-    const totalComprasHoras = results[4] as number;
-    const totalHorasVendidasAgg = results[5] as { _sum: { horas: number | null } };
+    const totalPresupuestos = results[2] as number;
+    const presupuestosStats = results[3] as any[];
+    const totalConsultas = results[4] as number;
+    const consultasPendientes = results[5] as number;
+    const totalComprasHoras = results[6] as number;
+    const totalHorasVendidasAgg = results[7] as { _sum: { horas: number | null } };
     const totalHorasVendidas = totalHorasVendidasAgg._sum.horas || 0;
-    const ingresosTotalesAgg = results[6] as { _sum: { precio: { toNumber: () => number } | null } };
+    const ingresosTotalesAgg = results[8] as { _sum: { precio: { toNumber: () => number } | null } };
     const ingresosTotales = ingresosTotalesAgg._sum.precio?.toNumber() || 0;
+
+    // Mapear presupuestos por estado
+    const presupuestosPorEstado = presupuestosStats.reduce((acc, curr) => {
+      acc[curr.status] = curr._count._all;
+      return acc;
+    }, {} as Record<string, number>);
 
     // Calcular ingresos del mes actual por venta de horas
     const now = new Date()
@@ -79,6 +97,8 @@ export async function GET() {
       stats: {
         totalColaboradores,
         totalEmpresas,
+        totalPresupuestos,
+        presupuestosPorEstado,
         totalConsultas,
         consultasPendientes,
         totalComprasHoras,

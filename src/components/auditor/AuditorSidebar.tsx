@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   MessageCircle,
   Package,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -28,19 +29,14 @@ const sidebarItems = [
     icon: Users,
   },
   {
-    title: "Directorio de Clientes",
-    href: "/auditor/clientes",
-    icon: Building2,
+    title: "Presupuestos",
+    href: "/auditor/presupuestos",
+    icon: FileText,
   },
   {
     title: "Gestión de Consultas",
     href: "/auditor/consultas",
     icon: MessageCircle,
-  },
-  {
-    title: "Paquetes y Categorías",
-    href: "/auditor/configuracion", // Mapping to existing configuracion or new one
-    icon: Package,
   },
   {
     title: "Finanzas",

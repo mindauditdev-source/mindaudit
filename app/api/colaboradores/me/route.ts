@@ -37,7 +37,7 @@ export async function GET() {
         _count: {
           select: {
             empresas: true,
-            auditorias: true,
+            presupuestos: true,
             comisiones: true,
           },
         },

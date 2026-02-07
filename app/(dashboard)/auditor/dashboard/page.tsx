@@ -38,7 +38,7 @@ export default function AuditorDashboardPage() {
   }
 
   const statCards = [
-    {
+     {
       title: "Volumen Negocio",
       value: formatCurrency(stats?.totalRevenue || 0),
       description: "Operaciones aprobadas",
@@ -49,9 +49,9 @@ export default function AuditorDashboardPage() {
       highlight: "from-emerald-500/10 to-transparent"
     },
     {
-      title: "Consultas",
-      value: stats?.totalConsultas || 0,
-      description: "Solicitudes totales",
+      title: "Solicitudes Landing",
+      value: stats?.pendingBudgets || 0,
+      description: "Pendientes presupuestar",
       icon: MessageCircle,
       color: "text-blue-600",
       bg: "bg-blue-50/50",
@@ -59,9 +59,9 @@ export default function AuditorDashboardPage() {
       highlight: "from-blue-500/10 to-transparent"
     },
     {
-      title: "Horas Vendidas",
-      value: `${stats?.totalHorasVendidas || 0}h`,
-      description: "Paquetes adquiridos",
+      title: "Consultas",
+      value: stats?.totalConsultas || 0,
+      description: "Solicitudes técnicas",
       icon: Package,
       color: "text-indigo-600",
       bg: "bg-indigo-50/50",
@@ -86,7 +86,7 @@ export default function AuditorDashboardPage() {
         <h1 className="text-4xl font-black tracking-tight text-slate-900">
            Dashboard <span className="text-blue-600">Admin</span>
         </h1>
-        <p className="text-slate-500 font-medium pb-2 border-b border-slate-100">Control de consultas, venta de horas y red de colaboradores.</p>
+        <p className="text-slate-500 font-medium pb-2 border-b border-slate-100">Control de presupuestos, consultas y red de colaboradores.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -116,7 +116,7 @@ export default function AuditorDashboardPage() {
         <div className="md:col-span-3 space-y-6">
            <Card className="border-none shadow-sm rounded-[32px] overflow-hidden bg-white">
               <CardHeader className="px-8 pt-8">
-                <CardTitle className="text-xl font-black text-slate-900">Gestión de Consultas</CardTitle>
+                <CardTitle className="text-xl font-black text-slate-900">Gestión de Presupuestos</CardTitle>
               </CardHeader>
               <CardContent className="p-8 space-y-5">
                  <div className="group flex items-center justify-between p-6 bg-slate-50/50 rounded-2xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/20 transition-all cursor-default overflow-hidden relative">
@@ -126,26 +126,26 @@ export default function AuditorDashboardPage() {
                        </div>
                        <div>
                           <p className="text-sm font-black text-slate-800 uppercase tracking-widest text-[10px]">Atención Requerida</p>
-                          <h4 className="text-lg font-bold text-slate-700">Consultas Pendientes</h4>
+                          <h4 className="text-lg font-bold text-slate-700">Landing Pendientes</h4>
                        </div>
                     </div>
                     <div className="text-right relative z-10">
-                       <span className="text-4xl font-black text-slate-900 tabular-nums">{stats?.consultasPendientes || 0}</span>
+                       <span className="text-4xl font-black text-slate-900 tabular-nums">{stats?.pendingBudgets || 0}</span>
                     </div>
                  </div>
 
-                 <div className="group flex items-center justify-between p-6 bg-slate-50/50 rounded-2xl border border-slate-100 hover:border-green-200 hover:bg-green-50/20 transition-all cursor-default">
+                 <div className="group flex items-center justify-between p-6 bg-slate-50/50 rounded-2xl border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/20 transition-all cursor-default">
                     <div className="flex items-center gap-5">
-                       <div className="p-3 bg-white shadow-sm border border-green-100 rounded-xl group-hover:rotate-12 transition-transform">
-                          <Package className="h-6 w-6 text-green-500" />
+                       <div className="p-3 bg-white shadow-sm border border-indigo-100 rounded-xl group-hover:rotate-12 transition-transform">
+                          <ClipboardList className="h-6 w-6 text-indigo-500" />
                        </div>
                        <div>
-                          <p className="text-sm font-black text-slate-800 uppercase tracking-widest text-[10px]">Ventas</p>
-                          <h4 className="text-lg font-bold text-slate-700">Paquetes Vendidos</h4>
+                          <p className="text-sm font-black text-slate-800 uppercase tracking-widest text-[10px]">Progreso</p>
+                          <h4 className="text-lg font-bold text-slate-700">Presupuestos Aceptados</h4>
                        </div>
                     </div>
                     <div className="text-right">
-                       <span className="text-3xl font-black text-slate-900 tabular-nums">{stats?.totalComprasHoras || 0}</span>
+                       <span className="text-3xl font-black text-slate-900 tabular-nums">{stats?.acceptedBudgets || 0}</span>
                     </div>
                  </div>
               </CardContent>
@@ -158,22 +158,22 @@ export default function AuditorDashboardPage() {
               <CardTitle className="text-xl font-black text-slate-900">Acción Inmediata</CardTitle>
             </CardHeader>
             <CardContent className="p-8 flex-1 flex items-center justify-center">
-               {stats?.consultasPendientes && stats.consultasPendientes > 0 ? (
+               {(stats?.pendingBudgets && stats.pendingBudgets > 0) ? (
                   <div className="flex flex-col items-center text-center space-y-6 animate-in fade-in zoom-in duration-700">
                      <div className="relative">
                         <div className="absolute inset-0 bg-blue-400 blur-2xl opacity-20 animate-pulse rounded-full" />
                         <div className="bg-blue-100 p-6 rounded-full relative border-4 border-white shadow-lg">
-                           <MessageCircle className="h-14 w-14 text-blue-600" />
+                           <Euro className="h-14 w-14 text-blue-600" />
                         </div>
                      </div>
                      <div className="space-y-2">
-                        <p className="font-black text-2xl text-slate-900">Consultas por Atender</p>
+                        <p className="font-black text-2xl text-slate-900">Presupuestos por Enviar</p>
                         <p className="text-sm text-slate-500 max-w-[280px] font-medium leading-relaxed">
-                           Hay <span className="text-blue-600 font-black">{stats.consultasPendientes} consultas</span> que necesitan ser cotizadas o atendidas para continuar el flujo.
+                           Hay <span className="text-blue-600 font-black">{stats.pendingBudgets} solicitudes</span> de la landing que necesitan valoración económica.
                         </p>
                      </div>
                      <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl shadow-xl shadow-blue-200" asChild>
-                        <Link href="/auditor/consultas">Ir a Gestión de Consultas</Link>
+                        <Link href="/auditor/presupuestos">Ir a Gestión de Presupuestos</Link>
                      </Button>
                   </div>
                ) : (
@@ -184,7 +184,7 @@ export default function AuditorDashboardPage() {
                      <div className="space-y-2">
                         <p className="font-black text-2xl text-slate-900">Todo al Día</p>
                         <p className="text-sm text-slate-500 max-w-[240px] font-medium leading-relaxed">
-                           No hay consultas pendientes de cotización o atención inmediata.
+                           No hay presupuestos pendientes de valoración inmediata.
                         </p>
                      </div>
                   </div>
@@ -196,6 +196,9 @@ export default function AuditorDashboardPage() {
     </div>
   );
 }
+
+// Add necessary imports if missing
+import { ClipboardList, Euro } from "lucide-react";
 
 function AdminDashboardSkeleton() {
   return (

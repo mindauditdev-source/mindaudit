@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         _count: {
           select: {
             empresas: true,
-            auditorias: true,
+            presupuestos: true,
             comisiones: true,
           },
         },
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
         user: c.user,
         stats: {
           totalEmpresas: c._count.empresas,
-          totalAuditorias: c._count.auditorias,
+          totalPresupuestos: c._count.presupuestos,
           totalComisiones: c._count.comisiones,
         },
       })),

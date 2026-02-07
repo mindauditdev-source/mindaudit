@@ -15,9 +15,8 @@ export async function GET(_req: NextRequest) {
     }
 
     const whereAudit: any = {
-      // For Income: Audits that are paid (EN_PROCESO, COMPLETADA, etc) or have a valid budget approved?
-      // Strict approach: status is EN_PROCESO or COMPLETADA for "Realized Income"
-      status: { in: ['EN_PROCESO', 'COMPLETADA'] }
+      // For Income: Presupuestos that are accepted and/or paid
+      status: { in: ['ACEPTADO_PENDIENTE_FACTURAR', 'A_PAGAR', 'PAGADO'] }
     };
 
     const whereCommission: any = {};
@@ -27,8 +26,8 @@ export async function GET(_req: NextRequest) {
        whereCommission.colaboradorId = user.colaboradorId;
     }
 
-    // 1. Calculate Total Income (Audits)
-    const incomeAgg = await prisma.auditoria.aggregate({
+    // 1. Calculate Total Income (Presupuestos)
+    const incomeAgg = await prisma.presupuesto.aggregate({
       where: whereAudit,
       _sum: {
         presupuesto: true
@@ -45,9 +44,9 @@ export async function GET(_req: NextRequest) {
     });
     const totalExpenses = expenseAgg._sum.montoComision?.toNumber() || 0;
 
-    // 3. Recent Transactions (Audits + Commissions mixed)
-    // Fetch last 10 audits (Income)
-    const recentAudits = await prisma.auditoria.findMany({
+    // 3. Recent Transactions (Presupuestos + Commissions mixed)
+    // Fetch last 10 presupuestos (Income)
+    const recentAudits = await prisma.presupuesto.findMany({
       where: whereAudit,
       orderBy: { updatedAt: 'desc' },
       take: 10,
@@ -69,10 +68,10 @@ export async function GET(_req: NextRequest) {
         date: a.updatedAt,
         type: 'INCOME',
         amount: a.presupuesto?.toNumber() || 0,
-        description: `Auditoría ${a.fiscalYear}`,
-        entity: a.empresa.companyName,
+        description: `Presupuesto ${a.tipoServicio_landing || a.fiscalYear || 'N/A'}`,
+        entity: a.empresa?.companyName || a.razonSocial || 'Cliente Landing',
         status: 'COMPLETED',
-        reference: `AUD-${a.id.substring(0,6).toUpperCase()}`
+        reference: `PRE-${a.id.substring(0,6).toUpperCase()}`
       })),
       ...recentCommissions.map(c => ({
         id: c.id,

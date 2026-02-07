@@ -53,7 +53,7 @@ model Colaborador {
   contractSignedAt   DateTime?
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
-  auditorias         Auditoria[]
+  presupuestos       Presupuesto[]
   user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   comisiones         Comision[]
   empresas           Empresa[]
@@ -86,7 +86,7 @@ model Empresa {
   notes         String?
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
-  auditorias    Auditoria[]
+  presupuestos  Presupuesto[]
   documentos    Documento[]
   colaborador   Colaborador?         @relation(fields: [colaboradorId], references: [id])
   user          User?                @relation(fields: [userId], references: [id])
@@ -101,15 +101,25 @@ model Empresa {
   @@map("empresas")
 }
 
-model Auditoria {
+model Presupuesto {
   id                     String               @id @default(cuid())
-  empresaId              String
+  empresaId              String?
   colaboradorId          String?
-  tipoServicio           TipoServicio
-  fiscalYear             Int
+  
+  // Datos para solicitudes desde Landing (sin empresa registrada)
+  razonSocial            String?
+  cif_landing            String?
+  facturacion            String?
+  nombreContacto         String?
+  email                  String?
+  telefono               String?
+  tipoServicio_landing   String?
+
+  tipoServicio           TipoServicio?
+  fiscalYear             Int?
   description            String?
   urgente                Boolean              @default(false)
-  status                 AuditoriaStatus      @default(SOLICITADA)
+  status                 PresupuestoStatus    @default(PENDIENTE_PRESUPUESTAR)
   presupuesto            Decimal?             @db.Decimal(12, 2)
   presupuestoNotas       String?
   presupuestoValidoHasta DateTime?
@@ -131,7 +141,7 @@ model Auditoria {
   createdAt              DateTime             @default(now())
   updatedAt              DateTime             @updatedAt
   colaborador            Colaborador?         @relation(fields: [colaboradorId], references: [id])
-  empresa                Empresa              @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  empresa                Empresa?             @relation(fields: [empresaId], references: [id], onDelete: Cascade)
   comisiones             Comision[]
   documentos             Documento[]
   solicitudes            SolicitudDocumento[]
@@ -140,15 +150,14 @@ model Auditoria {
   @@index([empresaId])
   @@index([colaboradorId])
   @@index([status])
-  @@index([tipoServicio])
   @@index([fechaSolicitud])
-  @@map("auditorias")
+  @@map("presupuestos")
 }
 
 model Comision {
   id             String         @id @default(cuid())
   colaboradorId  String
-  auditoriaId    String
+  presupuestoId  String
   montoBase      Decimal        @db.Decimal(12, 2)
   porcentaje     Decimal        @db.Decimal(5, 2)
   montoComision  Decimal        @db.Decimal(12, 2)
@@ -158,11 +167,11 @@ model Comision {
   notas          String?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
-  auditoria      Auditoria      @relation(fields: [auditoriaId], references: [id], onDelete: Cascade)
+  presupuesto    Presupuesto    @relation(fields: [presupuestoId], references: [id], onDelete: Cascade)
   colaborador    Colaborador    @relation(fields: [colaboradorId], references: [id], onDelete: Cascade)
 
   @@index([colaboradorId])
-  @@index([auditoriaId])
+  @@index([presupuestoId])
   @@index([status])
   @@index([fechaPago])
   @@map("comisiones")
@@ -189,39 +198,39 @@ model Documento {
   fileSize      Int
   tipoDocumento TipoDocumento
   empresaId     String?
-  auditoriaId   String?
+  presupuestoId String?
   description   String?
   tags          String[]
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
-  auditoria     Auditoria?          @relation(fields: [auditoriaId], references: [id], onDelete: Cascade)
+  presupuesto   Presupuesto?        @relation(fields: [presupuestoId], references: [id], onDelete: Cascade)
   empresa       Empresa?            @relation(fields: [empresaId], references: [id], onDelete: Cascade)
   solicitud     SolicitudDocumento? @relation("DocumentoSolicitud")
 
   @@index([uploadedBy])
   @@index([tipoDocumento])
   @@index([empresaId])
-  @@index([auditoriaId])
+  @@index([presupuestoId])
   @@map("documentos")
 }
 
 model SolicitudDocumento {
-  id          String          @id @default(cuid())
-  title       String
-  description String?
-  status      SolicitudStatus @default(PENDIENTE)
-  empresaId   String
-  auditoriaId String?
-  documentoId String?         @unique
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  feedback    String?
-  auditoria   Auditoria?      @relation(fields: [auditoriaId], references: [id], onDelete: Cascade)
-  documento   Documento?      @relation("DocumentoSolicitud", fields: [documentoId], references: [id])
-  empresa     Empresa         @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  id            String          @id @default(cuid())
+  title         String
+  description   String?
+  status        SolicitudStatus @default(PENDIENTE)
+  empresaId     String
+  presupuestoId String?
+  documentoId   String?         @unique
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  feedback      String?
+  presupuesto   Presupuesto?    @relation(fields: [presupuestoId], references: [id], onDelete: Cascade)
+  documento     Documento?      @relation("DocumentoSolicitud", fields: [documentoId], references: [id])
+  empresa       Empresa         @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
   @@index([empresaId])
-  @@index([auditoriaId])
+  @@index([presupuestoId])
   @@index([status])
   @@map("solicitudes_documentos")
 }
@@ -279,17 +288,13 @@ enum EmpresaOrigen {
   DIRECTA
 }
 
-enum AuditoriaStatus {
-  SOLICITADA
-  EN_REVISION         // Deprecated - use SOLICITADA
-  PRESUPUESTADA
-  REUNION_SOLICITADA
-  APROBADA            // Deprecated - use PENDIENTE_DE_PAGO
-  PENDIENTE_DE_PAGO
-  EN_PROCESO
-  COMPLETADA
-  CANCELADA
-  RECHAZADA
+enum PresupuestoStatus {
+  PENDIENTE_PRESUPUESTAR
+  EN_CURSO
+  ACEPTADO_PENDIENTE_FACTURAR
+  A_PAGAR
+  PAGADO
+  RECHAZADO
 }
 
 enum TipoServicio {
@@ -364,12 +369,12 @@ model Invoice {
   amount      Decimal       @db.Decimal(12, 2)
   tax         Decimal       @db.Decimal(12, 2)
   total       Decimal       @db.Decimal(12, 2)
-  status      InvoiceStatus @default(PAID) // Usually created upon payment success
-  empresaId   String
-  auditoriaId String?       @unique
+  status        InvoiceStatus @default(PAID) // Usually created upon payment success
+  empresaId     String
+  presupuestoId String?       @unique
 
-  empresa   Empresa    @relation(fields: [empresaId], references: [id])
-  auditoria Auditoria? @relation(fields: [auditoriaId], references: [id])
+  empresa     Empresa      @relation(fields: [empresaId], references: [id])
+  presupuesto Presupuesto? @relation(fields: [presupuestoId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
