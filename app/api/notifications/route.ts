@@ -70,7 +70,7 @@ export async function GET() {
           empresaId: user.empresaId,
           status: 'RECHAZADO'
         },
-        select: { id: true, title: true, auditoriaId: true }
+        select: { id: true, title: true, presupuestoId: true }
       });
 
       rejectedDocs.forEach(doc => {
@@ -79,7 +79,7 @@ export async function GET() {
           type: 'DOC_REJECTED',
           title: 'Documento Rechazado',
           message: `El documento "${doc.title}" requiere corrección.`,
-          link: `/empresa/auditorias/${doc.auditoriaId}`, // Asume que siempre tiene auditoriaId por ahora
+          link: `/empresa/auditorias/${doc.presupuestoId}`,
           severity: 'HIGH',
           date: new Date().toISOString()
         });
@@ -141,42 +141,6 @@ export async function GET() {
       const auditWhere: Prisma.PresupuestoWhereInput = {};
       const docWhere: Prisma.SolicitudDocumentoWhereInput = {};
 
-      if (user.role === 'COLABORADOR') {
-        // --- PARTNER: Consultas Cotizadas y Completadas (Usa user.id) ---
-        const partnerConsultas = await prisma.consulta.findMany({
-          where: {
-            colaboradorId: user.id,
-            status: { in: ['COTIZADA', 'COMPLETADA'] }
-          },
-          select: { id: true, titulo: true, respondidaAt: true, status: true, updatedAt: true }
-        });
-
-        partnerConsultas.forEach(c => {
-          notifications.push({
-            id: `cons-${c.status.toLowerCase()}-${c.id}`,
-            type: c.status === 'COTIZADA' ? 'CONSULTA_COTIZADA' : 'CONSULTA_COMPLETADA',
-            title: c.status === 'COTIZADA' ? 'Consulta Cotizada' : 'Consulta Finalizada',
-            message: c.status === 'COTIZADA' 
-              ? `Tu consulta "${c.titulo}" ya tiene presupuesto.`
-              : `La consulta "${c.titulo}" ha sido marcada como completada.`,
-            link: `/partner/consultas/${c.id}`,
-            severity: c.status === 'COTIZADA' ? 'HIGH' : 'MEDIUM',
-            date: c.status === 'COTIZADA' ? (c.respondidaAt || c.updatedAt) : c.updatedAt
-          });
-        });
-
-        // --- AUDITOR (si tiene colaboradorId): Presupuestos y Documentos ---
-        if (user.colaboradorId) {
-          auditWhere.colaboradorId = user.colaboradorId;
-          docWhere.presupuesto = { colaboradorId: user.colaboradorId };
-        } else {
-          // Si es COLABORADOR pero no tiene colaboradorId (perfil incompleto), 
-          // evitamos que vea presupuestos de otros o que la query falle
-          auditWhere.id = 'none'; 
-          docWhere.id = 'none';
-        }
-      }
-
       // --- AUDITOR (ADMIN): Nuevas, Aceptadas y Rechazadas ---
       if (user.role === 'ADMIN') {
         const adminConsultas = await prisma.consulta.findMany({
@@ -196,9 +160,9 @@ export async function GET() {
             title = 'Consulta Aceptada';
             message = `${c.colaborador.name} ha aceptado la cotización.`;
             severity = 'MEDIUM';
-            date = c.aceptadaAt || new Date();
+            date = c.aceptadaAt || c.updatedAt;
           } else if (c.status === 'RECHAZADA') {
-            type = 'CONSULTA_RECHAZADA'; // Note: Ensure this type exists in NotificationPopover.tsx
+            type = 'CONSULTA_RECHAZADA';
             title = 'Cotización Rechazada';
             message = `${c.colaborador.name} ha rechazado la cotización.`;
             severity = 'LOW';
@@ -213,6 +177,30 @@ export async function GET() {
             link: `/auditor/consultas/${c.id}`,
             severity,
             date
+          });
+        });
+      } else if (user.role === 'COLABORADOR') {
+         // --- PARTNER: Consultas Cotizadas (Usa user.id) ---
+         // Note: Partners are authenticated as COLABORADOR, not ADMIN
+         const partnerConsultas = await prisma.consulta.findMany({
+          where: {
+            colaboradorId: user.id,
+            status: { in: ['COTIZADA', 'COMPLETADA'] }
+          },
+          select: { id: true, titulo: true, respondidaAt: true, status: true, updatedAt: true }
+        });
+
+        partnerConsultas.forEach(c => {
+          notifications.push({
+            id: `cons-${c.status.toLowerCase()}-${c.id}`,
+            type: c.status === 'COTIZADA' ? 'CONSULTA_COTIZADA' : 'CONSULTA_COMPLETADA',
+            title: c.status === 'COTIZADA' ? 'Consulta Cotizada' : 'Consulta Finalizada',
+            message: c.status === 'COTIZADA' 
+              ? `Tu consulta "${c.titulo}" ya tiene presupuesto.`
+              : `La consulta "${c.titulo}" ha sido marcada como completada.`,
+            link: `/colaborador/consultas/${c.id}`,
+            severity: c.status === 'COTIZADA' ? 'HIGH' : 'MEDIUM',
+            date: c.status === 'COTIZADA' ? (c.respondidaAt || c.updatedAt) : c.updatedAt
           });
         });
       }
@@ -231,7 +219,7 @@ export async function GET() {
           id: `req-${audit.id}`,
           type: 'AUDIT_REQUESTED',
           title: 'Nueva Solicitud',
-          message: `${audit.empresa.companyName} ha solicitado una auditoría.`,
+          message: `${audit.empresa?.companyName || audit.razonSocial || 'Cliente'} ha solicitado una auditoría.`,
           link: `/auditor/auditorias/${audit.id}`,
           severity: 'HIGH',
           date: audit.createdAt
@@ -252,7 +240,7 @@ export async function GET() {
           id: `meet-${audit.id}`,
           type: 'MEETING_REQUESTED',
           title: 'Reunión Solicitada',
-          message: `${audit.empresa.companyName} quiere agendar una reunión.`,
+          message: `${audit.empresa?.companyName || audit.razonSocial || 'Cliente'} quiere agendar una reunión.`,
           link: `/auditor/auditorias/${audit.id}`,
           severity: 'MEDIUM',
           date: audit.updatedAt
@@ -273,7 +261,7 @@ export async function GET() {
           id: `review-${doc.id}`,
           type: 'DOC_REVIEW',
            title: 'Documento Entregado',
-           message: `${doc.empresa.companyName} ha subido "${doc.title}".`,
+           message: `${doc.empresa?.companyName || 'Cliente'} ha subido "${doc.title}".`,
            link: `/auditor/presupuestos/${doc.presupuestoId}`,
            severity: 'MEDIUM',
           date: doc.updatedAt
@@ -299,7 +287,7 @@ export async function GET() {
           id: `paid-${audit.id}`,
           type: 'PAYMENT_CONFIRMED',
           title: 'Pago Recibido',
-          message: `${audit.empresa.companyName} ha pagado. El expediente está en marcha.`,
+          message: `${audit.empresa?.companyName || audit.razonSocial || 'Cliente'} ha pagado. El expediente está en marcha.`,
           link: `/auditor/auditorias/${audit.id}`,
           severity: 'HIGH',
           date: audit.updatedAt

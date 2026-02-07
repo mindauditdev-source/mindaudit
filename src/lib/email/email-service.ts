@@ -38,7 +38,7 @@ export class EmailService {
       }
 
       const { data, error } = await resend.emails.send({
-        from: fromEmail,
+        from: "noreply@mindaudit.es",
         to,
         subject,
         html,
@@ -222,6 +222,70 @@ export class EmailService {
           <a href="${process.env.NEXTAUTH_URL}/empresa/auditorias/${audit.id}" style="background: #0c3a6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Ver Informe Final</a>
           <br/><br/>
           <p>Ha sido un placer trabajar contigo.</p>
+        </div>
+      `,
+    });
+  }
+  /**
+   * Notificación de Nueva Consulta (Para Admin)
+   */
+  static async notifyNewConsulta(consulta: { id: string; titulo: string; descripcion: string }, colaborador: { name: string; email: string }) {
+    const adminEmail = process.env.CONTACT_EMAIL_TO || 'admin@mindaudit.es';
+    return this.sendEmail({
+      to: adminEmail,
+      subject: `❓ Nueva Consulta: ${colaborador.name}`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2 style="color: #0c3a6b;">Nueva Consulta Recibida</h2>
+          <p>El colaborador <strong>${colaborador.name}</strong> ha enviado una nueva consulta:</p>
+          <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 15px 0;">
+            <p style="margin: 0 0 10px 0;"><strong>${consulta.titulo}</strong></p>
+            <p style="margin: 0; color: #64748b;">${consulta.descripcion}</p>
+          </div>
+          <p>Accede al panel para responder o cotizar.</p>
+          <a href="${process.env.NEXTAUTH_URL}/auditor/consultas/${consulta.id}" style="background: #0c3a6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Ver Consulta</a>
+        </div>
+      `,
+    });
+  }
+
+  /**
+   * Notificación de Consulta Cotizada (Para Colaborador)
+   */
+  static async notifyConsultaQuoted(consulta: { id: string; titulo: string; horasAsignadas: number; status: string }, colaborador: { name: string; email: string }) {
+    return this.sendEmail({
+      to: colaborador.email,
+      subject: `💬 Respuesta a tu Consulta: ${consulta.titulo}`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2 style="color: #0c3a6b;">¡Tu consulta ha sido respondida!</h2>
+          <p>Hola ${colaborador.name},</p>
+          <p>El equipo de auditoría ha revisado tu consulta <strong>"${consulta.titulo}"</strong> y ha estimado una dedicación de horas:</p>
+          <ul>
+            <li><strong>Horas Asignadas:</strong> ${consulta.horasAsignadas}h</li>
+            <li><strong>Estado:</strong> ${consulta.status}</li>
+          </ul>
+          <p>Por favor, accede a tu dashboard para aceptar la cotización y comenzar el trabajo.</p>
+          <a href="${process.env.NEXTAUTH_URL}/colaborador/consultas/${consulta.id}" style="background: #0c3a6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Ver Respuesta</a>
+        </div>
+      `,
+    });
+  }
+
+  /**
+   * Notificación de Consulta Completada (Para Colaborador)
+   */
+  static async notifyConsultaCompleted(consulta: { id: string; titulo: string }, colaborador: { name: string; email: string }) {
+    return this.sendEmail({
+      to: colaborador.email,
+      subject: `✅ Consulta Resuelta: ${consulta.titulo}`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2 style="color: #10b981;">Consulta Finalizada</h2>
+          <p>Hola ${colaborador.name},</p>
+          <p>Te informamos que la consulta <strong>"${consulta.titulo}"</strong> ha sido marcada como completada/resuelta por el auditor.</p>
+          <p>Gracias por tu colaboración.</p>
+          <a href="${process.env.NEXTAUTH_URL}/colaborador/consultas/${consulta.id}" style="background: #0c3a6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Ver Consulta</a>
         </div>
       `,
     });

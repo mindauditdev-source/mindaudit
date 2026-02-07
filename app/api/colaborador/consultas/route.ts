@@ -54,8 +54,20 @@ export async function POST(request: Request) {
       archivos: data.archivos,
     });
 
-    // TODO: Enviar notificación al auditor
-    // TODO: Enviar email al auditor
+    // 📧 Enviar notificación por email al admin
+    try {
+      const emailService = (await import('@/lib/email/email-service')).EmailService;
+      await emailService.notifyNewConsulta({
+        id: consulta.id,
+        titulo: consulta.titulo,
+        descripcion: consulta.descripcion,
+      }, {
+        name: (session.user as any).name || 'Colaborador',
+        email: (session.user as any).email,
+      });
+    } catch (emailError) {
+      console.error('Error enviando email de nueva consulta:', emailError);
+    }
 
     return NextResponse.json({ consulta }, { status: 201 });
   } catch (error: any) {

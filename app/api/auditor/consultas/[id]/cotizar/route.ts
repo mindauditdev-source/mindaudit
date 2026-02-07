@@ -38,8 +38,21 @@ export async function PATCH(
       data.horasCustom || null
     );
 
-    // TODO: Enviar notificación al colaborador
-    // TODO: Enviar email al colaborador
+    // 📧 Enviar notificación por email al colaborador
+    try {
+      const emailService = (await import('@/lib/email/email-service')).EmailService;
+      await emailService.notifyConsultaQuoted({
+        id: consulta.id,
+        titulo: consulta.titulo,
+        horasAsignadas: consulta.horasAsignadas || 0,
+        status: consulta.status,
+      }, {
+        name: consulta.colaborador.name,
+        email: consulta.colaborador.email,
+      });
+    } catch (emailError) {
+      console.error('Error enviando email de cotización:', emailError);
+    }
 
     return NextResponse.json(
       {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/auth-options";
 import { ConsultaService } from "@/services/consulta.service";
+import { prisma } from "@/lib/db/prisma";
 
 // PATCH /api/auditor/consultas/[id]/complete - Marcar como completada
 export async function PATCH(
@@ -25,8 +26,27 @@ export async function PATCH(
 
     const consulta = await ConsultaService.completarConsulta(id);
 
-    // TODO: Enviar notificación al colaborador
-    // TODO: Enviar email al colaborador
+    // 📧 Enviar notificación por email al colaborador
+    try {
+      const emailService = (await import('@/lib/email/email-service')).EmailService;
+      // Fetch collaborator info since completeConsulta might not return it
+      const consultaWithUser = await prisma.consulta.findUnique({
+        where: { id: consulta.id },
+        include: { colaborador: true }
+      });
+      
+      if (consultaWithUser) {
+        await emailService.notifyConsultaCompleted({
+          id: consulta.id,
+          titulo: consulta.titulo,
+        }, {
+          name: consultaWithUser.colaborador.name,
+          email: consultaWithUser.colaborador.email,
+        });
+      }
+    } catch (emailError) {
+      console.error('Error enviando email de finalización:', emailError);
+    }
 
     return NextResponse.json(
       {
