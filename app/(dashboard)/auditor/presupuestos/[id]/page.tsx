@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState, useCallback } from "react";
+import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,9 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Building2, Mail, Phone, Calendar, FileText, Euro, ArrowLeft } from "lucide-react";
+import { Building2, Mail, Phone, Calendar, Euro, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner"; // Use sonner consistently if possible, or fix hook
 
 interface Presupuesto {
   id: string;
@@ -39,8 +39,6 @@ interface Presupuesto {
 
 export default function PresupuestoDetailPage() {
   const params = useParams();
-  const router = useRouter();
-  const { toast } = useToast();
   const [presupuesto, setPresupuesto] = useState<Presupuesto | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -50,11 +48,7 @@ export default function PresupuestoDetailPage() {
   const [notas, setNotas] = useState("");
   const [nuevoEstado, setNuevoEstado] = useState("");
 
-  useEffect(() => {
-    loadPresupuesto();
-  }, [params.id]);
-
-  const loadPresupuesto = async () => {
+  const loadPresupuesto = useCallback(async () => {
     try {
       const res = await fetch(`/api/presupuestos/${params.id}`);
       const data = await res.json();
@@ -65,23 +59,19 @@ export default function PresupuestoDetailPage() {
       setNuevoEstado(p.status);
     } catch (error) {
       console.error("Error loading presupuesto:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo cargar el presupuesto",
-        variant: "destructive",
-      });
+      toast.error("No se pudo cargar el presupuesto");
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.id]);
+
+  useEffect(() => {
+    loadPresupuesto();
+  }, [loadPresupuesto]);
 
   const handleSubmit = async () => {
     if (!precio || isNaN(parseFloat(precio))) {
-      toast({
-        title: "Error",
-        description: "Debes ingresar un precio válido",
-        variant: "destructive",
-      });
+      toast.error("Debes ingresar un precio válido");
       return;
     }
 
@@ -101,19 +91,12 @@ export default function PresupuestoDetailPage() {
         throw new Error("Error al guardar");
       }
 
-      toast({
-        title: "Éxito",
-        description: "Presupuesto actualizado correctamente",
-      });
+      toast.success("Presupuesto actualizado correctamente");
 
       await loadPresupuesto();
     } catch (error) {
       console.error("Error saving:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo guardar el presupuesto",
-        variant: "destructive",
-      });
+      toast.error("No se pudo guardar el presupuesto");
     } finally {
       setSaving(false);
     }
@@ -286,7 +269,7 @@ export default function PresupuestoDetailPage() {
           </Card>
 
           {precio && parseFloat(precio) > 0 && (
-            <Card className="border-none shadow-sm rounded-[24px] bg-gradient-to-br from-green-50 to-emerald-50">
+            <Card className="border-none shadow-sm rounded-[24px] bg-linear-to-br from-green-50 to-emerald-50">
               <CardHeader>
                 <CardTitle className="text-lg">Comisión Estimada (10%)</CardTitle>
               </CardHeader>

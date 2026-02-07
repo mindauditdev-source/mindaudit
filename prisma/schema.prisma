@@ -27,6 +27,7 @@ model User {
   horasDisponibles Float         @default(0)
   consultas        Consulta[]    @relation("ConsultasColaborador")
   comprasHoras     CompraHoras[] @relation("ComprasHoras")
+  mensajesConsulta ConsultaMensaje[] @relation("MensajesUsuario")
 
   @@index([email])
   @@index([role])
@@ -425,10 +426,35 @@ model Consulta {
   respondidaAt      DateTime?
   aceptadaAt        DateTime?
   
+  mensajes          ConsultaMensaje[] @relation("ConsultaMensajes")
+  
   @@index([colaboradorId])
   @@index([status])
   @@index([createdAt])
   @@map("consultas")
+}
+
+model ConsultaMensaje {
+  id          String   @id @default(cuid())
+  consultaId  String
+  consulta    Consulta @relation("ConsultaMensajes", fields: [consultaId], references: [id], onDelete: Cascade)
+  
+  userId      String
+  user        User     @relation("MensajesUsuario", fields: [userId], references: [id], onDelete: Cascade)
+  
+  contenido   String?   @db.Text
+  
+  // Para adjuntar archivos en el chat
+  archivoUrl    String?
+  archivoNombre String?
+  archivoTipo   String?
+  archivoSize   Int?
+
+  createdAt   DateTime @default(now())
+  
+  @@index([consultaId])
+  @@index([userId])
+  @@map("consultas_mensajes")
 }
 
 model CategoriaConsulta {

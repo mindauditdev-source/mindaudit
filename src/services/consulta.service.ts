@@ -412,4 +412,139 @@ export class ConsultaService {
 
     return consulta;
   }
+
+  /**
+   * Obtener mensajes de una consulta
+   */
+  static async obtenerMensajes(consultaId: string) {
+    return await prisma.consultaMensaje.findMany({
+      where: { consultaId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+            image: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+  }
+
+  /**
+   * Enviar mensaje en una consulta (con soporte para archivos opcional)
+   */
+  static async enviarMensaje(
+    consultaId: string, 
+    userId: string, 
+    contenido: string,
+    archivo?: { url: string; nombre: string; tipo: string; size: number }
+  ) {
+    const mensaje = await prisma.consultaMensaje.create({
+      data: {
+        consultaId,
+        userId,
+        contenido,
+        archivoUrl: archivo?.url,
+        archivoNombre: archivo?.nombre,
+        archivoTipo: archivo?.tipo,
+        archivoSize: archivo?.size,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    // Actualizar updatedAt de la consulta para que suba en la lista
+    await prisma.consulta.update({
+      where: { id: consultaId },
+      data: { updatedAt: new Date() },
+    });
+
+    return mensaje;
+  }
+
+  /**
+   * Agendar reunión con recargo del 15% de horas
+   */
+  static async agendarReunion(
+    consultaId: string, 
+    userId: string, 
+    data: { meetingDate: string; meetingLink?: string; meetingStatus?: MeetingStatus }
+  ) {
+    // 1. Obtener la consulta y el colaborador
+    const consulta = await prisma.consulta.findFirst({
+      where: {
+        id: consultaId,
+        colaboradorId: userId,
+      },
+      include: {
+        colaborador: true,
+      }
+    });
+
+    if (!consulta) {
+      throw new Error("Consulta no encontrada");
+    }
+
+    if (consulta.status !== "ACEPTADA" && consulta.status !== "EN_PROCESO") {
+      throw new Error("Solo se pueden agendar reuniones para consultas aceptadas o en proceso");
+    }
+
+    // 2. Calcular recargo si es la primera vez que se agenda
+    // Usamos meetingStatus PENDING (default) para saber si es el primer agendamiento
+    const isFirstTimeScheduling = consulta.meetingStatus === "PENDING";
+    const horasTax = isFirstTimeScheduling ? (consulta.horasAsignadas || 0) * 0.15 : 0;
+    const horasDisponibles = consulta.colaborador.horasDisponibles;
+
+    if (isFirstTimeScheduling && horasDisponibles < horasTax) {
+      return {
+        success: false,
+        error: "HORAS_INSUFICIENTES",
+        horasRequeridas: horasTax,
+        horasDisponibles,
+      };
+    }
+
+    // 3. Ejecutar actualización en transacción
+    const updatedConsulta = await prisma.$transaction(async (tx) => {
+      if (isFirstTimeScheduling && horasTax > 0) {
+        await tx.user.update({
+          where: { id: userId },
+          data: {
+            horasDisponibles: {
+              decrement: horasTax,
+            }
+          }
+        });
+      }
+
+      return await tx.consulta.update({
+        where: { id: consultaId },
+        data: {
+          meetingStatus: data.meetingStatus || "SCHEDULED",
+          meetingDate: new Date(data.meetingDate),
+          meetingLink: data.meetingLink || undefined,
+          meetingRequestedBy: "COLABORADOR",
+        }
+      });
+    });
+
+    return {
+      success: true,
+      consulta: updatedConsulta,
+      horasDescontadas: horasTax,
+    };
+  }
 }

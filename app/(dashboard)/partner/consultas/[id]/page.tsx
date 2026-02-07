@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   Clock,
   CheckCircle,
@@ -18,12 +18,16 @@ import {
   AlertTriangle,
   Calendar,
   Video,
+  MessageSquare,
+  Info,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import type { ConsultaStatus, MeetingStatus } from "@prisma/client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { CalendlyWidget } from "@/components/shared/CalendlyWidget";
+import { ConsultationChat } from "@/components/partner/ConsultationChat";
+import { cn } from "@/lib/utils";
 
 interface ConsultaDetalle {
   id: string;
@@ -61,27 +65,27 @@ const statusConfig: Record<
 > = {
   PENDIENTE: {
     label: "Pendiente",
-    color: "bg-yellow-100 text-yellow-800 border-yellow-300",
+    color: "bg-yellow-50 text-yellow-700 border-yellow-200",
     icon: Clock,
   },
   COTIZADA: {
     label: "Cotizada",
-    color: "bg-blue-100 text-blue-800 border-blue-300",
+    color: "bg-blue-50 text-blue-700 border-blue-200",
     icon: AlertCircle,
   },
   ACEPTADA: {
     label: "Aceptada",
-    color: "bg-green-100 text-green-800 border-green-300",
+    color: "bg-emerald-50 text-emerald-700 border-emerald-200",
     icon: CheckCircle,
   },
   RECHAZADA: {
     label: "Rechazada",
-    color: "bg-red-100 text-red-800 border-red-300",
+    color: "bg-rose-50 text-rose-700 border-rose-200",
     icon: XCircle,
   },
   EN_PROCESO: {
     label: "En Proceso",
-    color: "bg-purple-100 text-purple-800 border-purple-300",
+    color: "bg-indigo-50 text-indigo-700 border-indigo-200",
     icon: Loader2,
   },
   COMPLETADA: {
@@ -91,7 +95,7 @@ const statusConfig: Record<
   },
   CANCELADA: {
     label: "Cancelada",
-    color: "bg-gray-100 text-gray-800 border-gray-300",
+    color: "bg-slate-100 text-slate-700 border-slate-200",
     icon: XCircle,
   },
 };
@@ -99,6 +103,7 @@ const statusConfig: Record<
 export default function ConsultaDetallePage() {
   const params = useParams();
   const router = useRouter();
+  const { data: session } = useSession();
   const [consulta, setConsulta] = useState<ConsultaDetalle | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -200,9 +205,7 @@ export default function ConsultaDetallePage() {
     }
   };
 
-  const handleMeetingScheduled = async (e: unknown) => {
-    console.log("Meeting scheduled event:", e);
-    
+  const handleMeetingScheduled = async () => {
     try {
       const res = await fetch(
         `/api/colaborador/consultas/${consulta?.id}/schedule`,
@@ -211,342 +214,350 @@ export default function ConsultaDetallePage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             meetingStatus: "SCHEDULED",
-            meetingDate: new Date().toISOString(), // In a real app we'd get this from the Calendly event
-            // meetingLink is NOT sent. Admin must provide it.
+            meetingDate: new Date().toISOString(),
           }),
         }
       );
 
+      const data = await res.json();
+
       if (!res.ok) {
-        throw new Error("Error al guardar la reunión");
+        if (data.error === "HORAS_INSUFICIENTES") {
+           setInsufficientHours({
+             required: data.horasRequeridas,
+             available: data.horasDisponibles,
+           });
+           toast.error("Horas insuficientes para agendar la reunión (recargo del 15% aplicado)");
+           setCalendlyModalOpen(false);
+           return;
+        }
+        throw new Error(data.message || data.error || "Error al guardar la reunión");
       }
 
       toast.success("Reunión agendada correctamente");
       setCalendlyModalOpen(false);
       fetchConsulta();
     } catch (error: unknown) {
-      const e = error as Error;
       console.error("Error scheduling meeting:", error);
-      toast.error(e.message || "Error al agendar la reunión");
+      const err = error as Error;
+      toast.error(err.message || "Error al agendar la reunión");
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      <div className="flex items-center justify-center min-h-[60vh] animate-in fade-in duration-500">
+        <div className="flex flex-col items-center gap-4">
+           <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+           <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Cargando Consulta...</p>
+        </div>
       </div>
     );
   }
 
-  if (!consulta) {
-    return null;
-  }
-
-  console.log("Consulta Status:", consulta.status);
-  console.log("Meeting Status:", consulta.meetingStatus);
-  console.log("Meeting Date:", consulta.meetingDate);
+  if (!consulta) return null;
 
   const StatusIcon = statusConfig[consulta.status].icon;
+  const currentUserId = session?.user?.id;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="mb-6">
-        <Link href="/partner/consultas">
-          <Button variant="ghost" className="mb-4">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver a Consultas
-          </Button>
-        </Link>
-
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold text-gray-900">
-                {consulta.titulo}
-              </h1>
-              {consulta.esUrgente && (
-                <Badge className="bg-red-100 text-red-800 border-red-300">
-                  Urgente
-                </Badge>
-              )}
-              {consulta.requiereVideo && (
-                <Badge className="bg-purple-100 text-purple-800 border-purple-300">
-                  Videollamada
-                </Badge>
-              )}
-            </div>
-            <p className="text-gray-600">
-              Creada el {new Date(consulta.createdAt).toLocaleDateString("es-ES", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </p>
+    <div className="p-6 max-w-[1600px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* Top Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div className="space-y-4">
+          <Link href="/partner/consultas">
+            <Button variant="ghost" className="hover:bg-slate-100 -ml-2 text-slate-500 font-bold group">
+              <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+              Volver a mi listado
+            </Button>
+          </Link>
+          
+          <div className="flex items-center gap-4">
+            <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+              {consulta.titulo}
+            </h1>
+            <Badge className={cn("px-4 py-1.5 text-sm font-black uppercase tracking-widest border shadow-xs", statusConfig[consulta.status].color)}>
+              <StatusIcon className="h-4 w-4 mr-2" />
+              {statusConfig[consulta.status].label}
+            </Badge>
           </div>
+        </div>
 
-          <Badge
-            className={`${
-              statusConfig[consulta.status].color
-            } flex items-center gap-2 px-4 py-2 text-base border`}
-          >
-            <StatusIcon className="h-5 w-5" />
-            {statusConfig[consulta.status].label}
-          </Badge>
+        <div className="flex items-center gap-3">
+          {consulta.esUrgente && (
+            <Badge className="bg-rose-100 text-rose-700 border-rose-200 px-3 py-1 font-bold">
+              <AlertTriangle className="h-3.5 w-3.5 mr-1" />
+              URGENTE
+            </Badge>
+          )}
+          {consulta.requiereVideo && (
+            <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200 px-3 py-1 font-bold">
+              <Video className="h-3.5 w-3.5 mr-1" />
+              VIDEOLLAMADA
+            </Badge>
+          )}
         </div>
       </div>
 
-      <div className="grid gap-6">
-        {/* Descripción */}
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-3">Descripción</h2>
-          <p className="text-gray-700 whitespace-pre-wrap">{consulta.descripcion}</p>
-        </Card>
-
-        {/* Respuesta del Auditor (si existe) */}
-        {consulta.status === "COTIZADA" && (
-          <Card className={`p-6 border-2 transition-all ${insufficientHours ? 'border-red-500 bg-red-50/30' : 'border-blue-200 bg-blue-50/50'}`}>
-            <div className="flex items-center gap-2 mb-4">
-              <AlertCircle className={`h-5 w-5 ${insufficientHours ? 'text-red-600' : 'text-blue-600'}`} />
-              <h2 className={`text-lg font-semibold ${insufficientHours ? 'text-red-900' : 'text-blue-900'}`}>
-                Cotización del Auditor
-              </h2>
-            </div>
-
-            {insufficientHours && (
-              <div className="mb-6 p-4 bg-red-100 border border-red-200 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 bg-red-200 rounded-full flex items-center justify-center shrink-0">
-                    <AlertTriangle className="h-6 w-6 text-red-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-red-900 leading-tight">Horas Insuficientes</p>
-                    <p className="text-xs text-red-700 mt-0.5">
-                      Necesitas <span className="font-bold">{insufficientHours.required}h</span> y solo dispones de <span className="font-bold">{insufficientHours.available}h</span>.
-                    </p>
-                  </div>
-                </div>
-                <Link href="/partner/paquetes-horas">
-                  <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white font-bold whitespace-nowrap">
-                    Comprar Paquete de Horas
-                  </Button>
-                </Link>
+      <div className="max-w-4xl mx-auto space-y-12 pb-20">
+        {/* Details & Action sections stacked */}
+        <div className="space-y-12">
+          
+          {/* Main Content Card */}
+          <Card className="border-slate-200 shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 px-8 py-6">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xl font-black text-slate-900 flex items-center gap-3">
+                  <div className="h-8 w-1.5 bg-blue-600 rounded-full" />
+                  Detalles de la Consulta
+                </CardTitle>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  ID: #{consulta.id.substring(0, 8)}
+                </span>
               </div>
-            )}
-
-            {consulta.categoria && (
-              <div className="mb-3">
-                <span className="text-sm font-medium text-gray-700">
-                  Categoría:
-                </span>{" "}
-                <Badge className="ml-2">{consulta.categoria.nombre}</Badge>
-              </div>
-            )}
-
-            <div className="mb-3">
-              <span className="text-sm font-medium text-gray-700">
-                Horas asignadas:
-              </span>{" "}
-              <span className="text-2xl font-bold text-blue-600 ml-2">
-                {consulta.horasAsignadas}
-              </span>
-            </div>
-
-            {consulta.feedback && (
-              <div className="mb-4">
-                <p className="text-gray-700 bg-white p-4 rounded-lg border">
-                  {consulta.feedback}
+            </CardHeader>
+            <CardContent className="p-8 space-y-8">
+              <div className="space-y-4">
+                <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <Info className="h-4 w-4" />
+                  Descripción del problema
+                </h3>
+                <p className="text-slate-700 text-lg leading-relaxed whitespace-pre-wrap font-medium">
+                  {consulta.descripcion}
                 </p>
               </div>
-            )}
 
-            <Separator className="my-4" />
-
-            <div className="flex gap-3">
-              <Button
-                onClick={handleAceptar}
-                disabled={actionLoading}
-                className={`flex-1 font-bold ${insufficientHours ? 'bg-slate-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
-              >
-                {actionLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Procesando...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Aceptar Cotización
-                  </>
-                )}
-              </Button>
-
-              <Button
-                onClick={handleRechazar}
-                disabled={actionLoading}
-                variant="outline"
-                className="border-red-300 text-red-700 hover:bg-red-50 flex-1 font-bold"
-              >
-                <XCircle className="h-4 w-4 mr-2" />
-                Rechazar
-              </Button>
-            </div>
-          </Card>
-        )}
-
-
-
-        {/* Meeting Scheduling Section */}
-        {(consulta.status === "ACEPTADA" ||
-          consulta.status === "EN_PROCESO" ||
-          consulta.status === "COMPLETADA") && (
-          <Card className="p-6 bg-linear-to-br from-green-50 to-blue-50 border-green-200">
-            <div className="flex items-center gap-2 mb-4">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              <h2 className="text-lg font-semibold text-green-900">
-                Consulta Aceptada
-              </h2>
-            </div>
-            <p className="text-gray-700 mb-2">
-              Esta consulta fue aceptada el{" "}
-              {consulta.aceptadaAt &&
-                new Date(consulta.aceptadaAt).toLocaleDateString("es-ES", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-            </p>
-            <p className="text-sm text-gray-600 mb-4">
-              Horas utilizadas: <strong>{consulta.horasAsignadas}</strong>
-            </p>
-
-            <Separator className="my-4" />
-
-            {/* Meeting Status Display */}
-            {consulta.meetingStatus === "SCHEDULED" ? (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-blue-600" />
-                  <h3 className="font-semibold text-blue-900">Reunión Agendada</h3>
-                </div>
-                <div className="bg-white p-4 rounded-xl border border-blue-200 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-gray-500" />
-                    <p className="text-sm text-gray-700">
-                      <span className="font-bold">Fecha:</span>{" "}
-                      {consulta.meetingDate ? new Date(consulta.meetingDate).toLocaleDateString("es-ES", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      }) : "Por confirmar"}
-                    </p>
-                  </div>
-                  
-                  {consulta.meetingLink && consulta.meetingLink !== process.env.NEXT_PUBLIC_CALENDLY_URL ? (
-                    <Button
-                      asChild
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold"
-                    >
+              {consulta.archivos.length > 0 && (
+                <div className="space-y-4 pt-4">
+                  <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest">Documentación adjunta</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {consulta.archivos.map((archivo) => (
                       <a
-                        href={consulta.meetingLink}
+                        key={archivo.id}
+                        href={archivo.url}
                         target="_blank"
                         rel="noopener noreferrer"
+                        className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all group"
                       >
-                        <Video className="h-4 w-4 mr-2" />
-                        Unirse a la Reunión
-                      </a>
-                    </Button>
-                  ) : (
-                    <div className="space-y-2">
-                        <Button
-                          disabled
-                          className="w-full bg-slate-100 text-slate-400 font-bold border border-slate-200"
-                        >
-                          <Video className="h-4 w-4 mr-2" />
-                          Entrar a la Reunión
-                        </Button>
-                        <div className="p-3 bg-blue-50 text-blue-800 text-sm rounded-lg flex items-start gap-2">
-                            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                            <p>Estamos generando el enlace de la reunión. Te notificaremos cuando el administrador lo haya configurado.</p>
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 bg-white rounded-xl shadow-xs flex items-center justify-center">
+                            <FileText className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div className="overflow-hidden">
+                            <p className="font-bold text-sm text-slate-900 truncate max-w-[150px]">{archivo.nombre}</p>
+                            <p className="text-[10px] text-slate-500 font-bold">{(archivo.size / 1024).toFixed(1)} KB</p>
+                          </div>
                         </div>
-                    </div>
-                  )}
+                        <Download className="h-4 w-4 text-slate-300 group-hover:text-blue-600 transition-colors" />
+                      </a>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-blue-600" />
-                  <h3 className="font-semibold text-blue-900">Agenda una Reunión</h3>
-                </div>
-                <p className="text-sm text-gray-600">
-                  Coordina con MindAudit para discutir los detalles de tu consulta.
-                </p>
-                <Button
-                  onClick={() => setCalendlyModalOpen(true)}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold"
-                >
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Agendar Reunión
-                </Button>
-              </div>
-            )}
+              )}
+            </CardContent>
           </Card>
-        )}
 
-        {/* Archivos Adjuntos */}
-        {consulta.archivos.length > 0 && (
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Archivos Adjuntos</h2>
-            <div className="space-y-2">
-              {consulta.archivos.map((archivo) => (
-                <a
-                  key={archivo.id}
-                  href={archivo.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-blue-600" />
+          {/* Action Sections (Quotation, Scheduling, etc.) */}
+          <div className="space-y-12">
+            
+            {/* AUDITOR QUOTATION (IF COTIZADA) */}
+            {consulta.status === "COTIZADA" && (
+              <Card className={cn("rounded-3xl border-2 overflow-hidden animate-in zoom-in-95 duration-500 shadow-2xl", insufficientHours ? 'border-rose-500' : 'border-blue-600')}>
+                <div className={cn("p-8 space-y-6", insufficientHours ? 'bg-rose-50/50' : 'bg-blue-50/30')}>
+                  <div className="flex items-center gap-4">
+                    <div className={cn("h-12 w-12 rounded-2xl flex items-center justify-center shadow-lg", insufficientHours ? 'bg-rose-500 shadow-rose-200' : 'bg-blue-600 shadow-blue-200')}>
+                      <AlertCircle className="h-6 w-6 text-white" />
+                    </div>
                     <div>
-                      <p className="font-medium">{archivo.nombre}</p>
-                      <p className="text-sm text-gray-500">
-                        {(archivo.size / 1024).toFixed(2)} KB
-                      </p>
+                      <h2 className="text-2xl font-black text-slate-900 leading-tight">Propuesta del Auditor</h2>
+                      <p className="text-slate-500 text-sm font-medium">Revisa las horas estimadas para resolver tu consulta.</p>
                     </div>
                   </div>
-                  <Download className="h-5 w-5 text-gray-400" />
-                </a>
-              ))}
-            </div>
-          </Card>
-        )}
+
+                  {insufficientHours && (
+                    <div className="p-5 bg-rose-100/80 border border-rose-200 rounded-2xl flex flex-col md:flex-row items-center gap-4">
+                      <AlertTriangle className="h-10 w-10 text-rose-600 shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-rose-900 font-black uppercase text-xs tracking-widest mb-1">Saldo insuficiente</p>
+                        <p className="text-rose-700 text-sm font-bold">
+                          Necesitas <span className="text-rose-900 font-black">{insufficientHours.required}h</span> y dispones de <span className="text-rose-900 font-black">{insufficientHours.available}h</span>.
+                        </p>
+                      </div>
+                      <Link href="/partner/paquetes-horas">
+                        <Button className="bg-rose-600 hover:bg-rose-700 text-white font-black px-6 rounded-xl shadow-lg shadow-rose-200">
+                          RECARGAR HORAS
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     {consulta.categoria && (
+                        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs">
+                           <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Categoría asignada</p>
+                           <p className="text-xl font-bold text-slate-900">{consulta.categoria.nombre}</p>
+                        </div>
+                     )}
+                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs">
+                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Inversión en horas</p>
+                        <p className="text-3xl font-black text-blue-600">{consulta.horasAsignadas}<span className="text-sm ml-1 text-slate-400">h</span></p>
+                     </div>
+                  </div>
+
+                  {consulta.feedback && (
+                    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs">
+                       <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Observaciones del auditor</p>
+                       <p className="text-slate-600 font-medium italic">&quot;{consulta.feedback}&quot;</p>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                    <Button
+                      onClick={handleAceptar}
+                      disabled={actionLoading || !!insufficientHours}
+                      className={cn(
+                        "flex-1 h-16 text-lg font-black rounded-2xl shadow-xl transition-all active:scale-95",
+                        insufficientHours 
+                          ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' 
+                          : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200'
+                      )}
+                    >
+                      {actionLoading ? <Loader2 className="animate-spin" /> : "ACEPTAR COTIZACIÓN"}
+                    </Button>
+                    <Button
+                      onClick={handleRechazar}
+                      disabled={actionLoading}
+                      variant="outline"
+                      className="h-16 px-8 text-rose-600 border-2 border-rose-100 bg-white hover:bg-rose-50 hover:border-rose-200 font-black rounded-2xl"
+                    >
+                      {actionLoading ? <Loader2 className="animate-spin" /> : "RECHAZAR"}
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            )}
+
+            {/* MEETING SCHEDULING (IF ACEPTADA) */}
+            {(consulta.status === "ACEPTADA" || consulta.status === "EN_PROCESO" || consulta.status === "COMPLETADA") && (
+              <div className="space-y-12">
+                <Card className="rounded-3xl border-slate-200 shadow-lg overflow-hidden border-t-4 border-t-emerald-500">
+                  <div className="p-8 space-y-6">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="h-12 w-12 bg-emerald-100 rounded-2xl flex items-center justify-center border border-emerald-200">
+                          <Calendar className="h-6 w-6 text-emerald-600" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-black text-slate-900 tracking-tight">Agenda de Reunión</h3>
+                          <p className="text-slate-500 text-sm font-medium">Gestiona tus encuentros con el equipo técnico.</p>
+                          <p className="text-[10px] font-black text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-100 uppercase tracking-widest mt-2 inline-block">
+                            +15% horas por sesión agendada
+                          </p>
+                        </div>
+                      </div>
+                      {consulta.meetingStatus === "SCHEDULED" && (
+                        <Badge className="bg-blue-100 text-blue-700 border-blue-200 font-black uppercase text-[10px] tracking-widest px-3">
+                          AGENDADA
+                        </Badge>
+                      )}
+                    </div>
+
+                    {consulta.meetingStatus === "SCHEDULED" ? (
+                      <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 space-y-6">
+                        <div className="flex flex-col md:flex-row gap-6 md:items-center justify-between">
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3">
+                              <Clock className="h-4 w-4 text-blue-600" />
+                              <p className="text-lg font-black text-slate-800">
+                                  {consulta.meetingDate ? new Date(consulta.meetingDate).toLocaleDateString("es-ES", {
+                                    day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit",
+                                  }) : "Por confirmar"}
+                              </p>
+                            </div>
+                          </div>
+
+                          {consulta.meetingLink ? (
+                            <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white font-black px-8 h-14 rounded-2xl shadow-xl shadow-blue-200">
+                              <a href={consulta.meetingLink} target="_blank" rel="noopener noreferrer">
+                                <Video className="h-5 w-5 mr-3" />
+                                UNIRSE AHORA
+                              </a>
+                            </Button>
+                          ) : (
+                            <div className="p-4 bg-white rounded-2xl border border-blue-100 flex items-start gap-4 max-w-sm shadow-xs">
+                              <div className="h-8 w-8 bg-blue-50 rounded-full flex items-center justify-center shrink-0">
+                                  <MessageSquare className="h-4 w-4 text-blue-600" />
+                              </div>
+                              <p className="text-xs text-blue-800 font-bold leading-relaxed">
+                                  Estamos generando el enlace de la reunión. Te notificaremos pronto.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col md:flex-row items-center gap-8 justify-between bg-emerald-600 p-8 rounded-3xl shadow-2xl shadow-emerald-200">
+                        <div className="space-y-2">
+                          <h4 className="text-white text-xl font-black tracking-tight">¿Prefieres discutir esto por video?</h4>
+                          <p className="text-emerald-50 text-sm font-medium">Selecciona el horario que mejor te convenga con nuestro equipo.</p>
+                        </div>
+                        <Button
+                          onClick={() => setCalendlyModalOpen(true)}
+                          className="bg-white hover:bg-emerald-50 text-emerald-700 font-black h-16 px-10 rounded-2xl shadow-lg transition-all active:scale-95 text-lg"
+                        >
+                          <Calendar className="h-5 w-5 mr-3" />
+                          AGENDAR AHORA
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+
+                {/* Chat Section: Now in the center and conditional */}
+                <div className="space-y-6 animate-in slide-in-from-bottom-8 duration-1000">
+                  <div className="flex items-center justify-center gap-3">
+                    <MessageSquare className="h-6 w-6 text-blue-600" />
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Canal de Comunicación Directa</h2>
+                  </div>
+                  <ConsultationChat 
+                    currentUserId={currentUserId || ""} 
+                    apiEndpoint={`/api/colaborador/consultas/${consulta.id}/messages`}
+                  />
+                  
+                  {/* Info Tip */}
+                  <div className="p-5 bg-blue-50 rounded-2xl border border-blue-100 flex items-start gap-3 max-w-2xl mx-auto">
+                    <Info className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+                    <p className="text-xs text-blue-800 font-bold leading-relaxed text-center w-full">
+                        Usa este canal para resolver dudas rápidas, enviar aclaraciones o coordinar entregas sin necesidad de videollamadas.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Calendly Modal */}
       <Dialog open={calendlyModalOpen} onOpenChange={setCalendlyModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
-          <DialogHeader>
-            <DialogTitle>Agendar Reunión con MindAudit</DialogTitle>
-          </DialogHeader>
-          <div className="mt-4">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto p-0 rounded-3xl border-none">
+          <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+            <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Agendar Sesión Técnica</h2>
+          </div>
+          <div className="h-[70vh] w-full bg-white">
             {process.env.NEXT_PUBLIC_CALENDLY_URL ? (
               <CalendlyWidget
                 url={process.env.NEXT_PUBLIC_CALENDLY_URL}
                 onEventScheduled={handleMeetingScheduled}
               />
             ) : (
-              <div className="p-10 border-2 border-dashed border-slate-200 rounded-3xl text-center">
-                <Calendar className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-500 font-bold">
-                  El sistema de agenda no está configurado.
+              <div className="h-full flex flex-col items-center justify-center p-20 text-center">
+                <Calendar className="h-20 w-20 text-slate-200 mb-6" />
+                <p className="text-slate-500 text-xl font-black max-w-sm mx-auto leading-tight">
+                  Configuración de Calendly no encontrada.
                 </p>
-                <p className="text-xs text-slate-400">
-                  Contacta con soporte para agendar manualmente.
+                <p className="text-sm text-slate-400 mt-2 font-medium">
+                  Contacta a soporte técnico para asistencia manual.
                 </p>
               </div>
             )}

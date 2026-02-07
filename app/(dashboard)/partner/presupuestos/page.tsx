@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Euro, Calendar, Building2, TrendingUp } from "lucide-react";
-import Link from "next/link";
 
 interface Presupuesto {
   id: string;
@@ -25,7 +24,7 @@ interface Presupuesto {
 export default function PartnerPresupuestosPage() {
   const [presupuestos, setPresupuestos] = useState<Presupuesto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "active" | "completed">("active");
+  const [filter] = useState<"all" | "active" | "completed">("active");
 
   useEffect(() => {
     loadPresupuestos();
@@ -107,7 +106,7 @@ export default function PartnerPresupuestosPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm rounded-[24px] bg-gradient-to-br from-green-50 to-emerald-50">
+        <Card className="border-none shadow-sm rounded-[24px] bg-linear-to-br from-green-50 to-emerald-50">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-slate-600">Comisiones Pagadas</CardTitle>
           </CardHeader>
@@ -119,7 +118,7 @@ export default function PartnerPresupuestosPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm rounded-[24px] bg-gradient-to-br from-amber-50 to-yellow-50">
+        <Card className="border-none shadow-sm rounded-[24px] bg-linear-to-br from-amber-50 to-yellow-50">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-slate-600">Comisiones Pendientes</CardTitle>
           </CardHeader>

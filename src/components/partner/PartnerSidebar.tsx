@@ -8,9 +8,7 @@ import {
   LayoutDashboard,
   Building2,
   FileText,
-  PieChart,
   LogOut,
-  Users,
   Briefcase,
   MessageCircle,
   Clock,
@@ -82,7 +80,7 @@ export function PartnerSidebar() {
               >
                 <item.icon
                   className={cn(
-                    "mr-3 h-5 w-5 flex-shrink-0 transition-colors",
+                    "mr-3 h-5 w-5 shrink-0 transition-colors",
                     isActive ? "text-white" : "text-blue-300 group-hover:text-white"
                   )}
                   aria-hidden="true"
