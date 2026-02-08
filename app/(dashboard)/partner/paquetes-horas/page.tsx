@@ -196,7 +196,7 @@ function PaquetesHorasContent() {
               Tus Horas Disponibles
             </p>
             <p className="text-5xl font-extrabold text-blue-600 tracking-tight">
-              {horasDisponibles}
+              {horasDisponibles?.toFixed(2)}
             </p>
           </div>
           <div className="h-20 w-20 bg-blue-100 rounded-2xl flex items-center justify-center rotate-3 transition-transform hover:rotate-0">
