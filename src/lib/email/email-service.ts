@@ -229,19 +229,41 @@ export class EmailService {
   /**
    * Notificación de Nueva Consulta (Para Admin)
    */
-  static async notifyNewConsulta(consulta: { id: string; titulo: string; descripcion: string }, colaborador: { name: string; email: string }) {
+  static async notifyNewConsulta(
+    consulta: { id: string; titulo: string; descripcion: string; esUrgente: boolean }, 
+    colaborador: { name: string; email: string }
+  ) {
     const adminEmail = process.env.CONTACT_EMAIL_TO || 'admin@mindaudit.es';
+    
+    const subject = consulta.esUrgente 
+      ? `🚨 URGENTE - Nueva Consulta: ${colaborador.name}`
+      : `❓ Nueva Consulta: ${colaborador.name}`;
+    
+    const urgentBadge = consulta.esUrgente
+      ? `<div style="background: #dc2626; color: white; padding: 8px 16px; border-radius: 6px; display: inline-block; font-weight: bold; margin-bottom: 15px;">
+           🚨 CONSULTA URGENTE - PRIORIDAD ALTA
+         </div>`
+      : '';
+    
     return this.sendEmail({
       to: adminEmail,
-      subject: `❓ Nueva Consulta: ${colaborador.name}`,
+      subject,
       html: `
         <div style="font-family: sans-serif; padding: 20px;">
           <h2 style="color: #0c3a6b;">Nueva Consulta Recibida</h2>
+          ${urgentBadge}
           <p>El colaborador <strong>${colaborador.name}</strong> ha enviado una nueva consulta:</p>
           <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 15px 0;">
             <p style="margin: 0 0 10px 0;"><strong>${consulta.titulo}</strong></p>
             <p style="margin: 0; color: #64748b;">${consulta.descripcion}</p>
           </div>
+          ${consulta.esUrgente ? `
+            <div style="background: #fef2f2; border-left: 4px solid #dc2626; padding: 12px; margin: 15px 0;">
+              <p style="margin: 0; color: #991b1b; font-weight: 600;">
+                ⚠️ Al enviar la cotización, será aceptada automáticamente y se descontarán las horas del balance del partner.
+              </p>
+            </div>
+          ` : ''}
           <p>Accede al panel para responder o cotizar.</p>
           <a href="${process.env.NEXTAUTH_URL}/auditor/consultas/${consulta.id}" style="background: #0c3a6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Ver Consulta</a>
         </div>
@@ -286,6 +308,46 @@ export class EmailService {
           <p>Te informamos que la consulta <strong>"${consulta.titulo}"</strong> ha sido marcada como completada/resuelta por el auditor.</p>
           <p>Gracias por tu colaboración.</p>
           <a href="${process.env.NEXTAUTH_URL}/colaborador/consultas/${consulta.id}" style="background: #0c3a6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Ver Consulta</a>
+        </div>
+      `,
+    });
+  }
+
+  /**
+   * Notificación de Consulta Urgente con Horas Insuficientes (Para Admin)
+   */
+  static async notifyUrgentQuoteWithInsufficientHours(
+    consulta: { id: string; titulo: string; horasAsignadas: number },
+    colaborador: { name: string; email: string; horasDisponibles: number },
+    horasExcedidas: number
+  ) {
+    const adminEmail = process.env.CONTACT_EMAIL_TO || 'admin@mindaudit.es';
+    
+    return this.sendEmail({
+      to: adminEmail,
+      subject: `⚠️ Consulta Urgente - Horas Insuficientes: ${colaborador.name}`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2 style="color: #dc2626;">⚠️ Advertencia: Horas Insuficientes</h2>
+          <p>La consulta urgente "<strong>${consulta.titulo}</strong>" ha sido auto-aceptada, pero el partner no tenía suficientes horas disponibles.</p>
+          
+          <div style="background: #fef2f2; border: 2px solid #dc2626; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #991b1b;">Detalles del Balance</h3>
+            <ul style="margin: 10px 0;">
+              <li><strong>Partner:</strong> ${colaborador.name} (${colaborador.email})</li>
+              <li><strong>Horas Cotizadas:</strong> ${consulta.horasAsignadas}h</li>
+              <li><strong>Horas Disponibles:</strong> ${colaborador.horasDisponibles}h</li>
+              <li><strong>Horas Excedidas:</strong> <span style="color: #dc2626; font-weight: bold;">${horasExcedidas}h</span></li>
+            </ul>
+          </div>
+          
+          <p>Se han descontado <strong>todas las horas disponibles</strong> del partner (${colaborador.horasDisponibles}h). El balance del partner ahora es <strong>0 horas</strong>.</p>
+          
+          <p style="background: #fef9c3; border-left: 4px solid #eab308; padding: 12px; margin: 15px 0;">
+            <strong>Acción requerida:</strong> Debes coordinar con el partner para resolver las ${horasExcedidas}h faltantes (compra adicional, ajuste de cotización, etc.).
+          </p>
+          
+          <a href="${process.env.NEXTAUTH_URL}/auditor/consultas/${consulta.id}" style="background: #0c3a6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Ver Consulta</a>
         </div>
       `,
     });

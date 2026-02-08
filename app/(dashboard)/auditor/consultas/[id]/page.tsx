@@ -32,7 +32,6 @@ interface Consulta {
   titulo: string;
   descripcion: string;
   esUrgente: boolean;
-  requiereVideo: boolean;
   status: ConsultaStatus;
   horasAsignadas: number | null;
   horasCustom: number | null;

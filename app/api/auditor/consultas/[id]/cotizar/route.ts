@@ -32,32 +32,71 @@ export async function PATCH(
       );
     }
 
-    const consulta = await ConsultaService.cotizarConsulta(
+    const result = await ConsultaService.cotizarConsulta(
       id,
       data.categoriaId || null,
       data.horasCustom || null
     );
 
-    // 📧 Enviar notificación por email al colaborador
+    const { consulta, autoAccepted, horasDescontadas, horasExcedidas } = result;
+
+    // 📧 Enviar notificaciones por email
     try {
       const emailService = (await import('@/lib/email/email-service')).EmailService;
-      await emailService.notifyConsultaQuoted({
-        id: consulta.id,
-        titulo: consulta.titulo,
-        horasAsignadas: consulta.horasAsignadas || 0,
-        status: consulta.status,
-      }, {
-        name: consulta.colaborador.name,
-        email: consulta.colaborador.email,
-      });
+      
+      if (autoAccepted) {
+        // Email diferente para consultas urgentes auto-aceptadas
+        await emailService.notifyConsultaQuoted({
+          id: consulta.id,
+          titulo: consulta.titulo,
+          horasAsignadas: consulta.horasAsignadas || 0,
+          status: 'ACEPTADA (Auto-aceptada por urgencia)',
+        }, {
+          name: consulta.colaborador.name,
+          email: consulta.colaborador.email,
+        });
+        
+        // Si hubo horas excedidas, notificar al admin
+        if (horasExcedidas > 0) {
+          await emailService.notifyUrgentQuoteWithInsufficientHours(
+            {
+              id: consulta.id,
+              titulo: consulta.titulo,
+              horasAsignadas: consulta.horasAsignadas || 0,
+            },
+            {
+              name: consulta.colaborador.name,
+              email: consulta.colaborador.email,
+              horasDisponibles: horasDescontadas,
+            },
+            horasExcedidas
+          );
+        }
+      } else {
+        // Email normal para consultas no urgentes
+        await emailService.notifyConsultaQuoted({
+          id: consulta.id,
+          titulo: consulta.titulo,
+          horasAsignadas: consulta.horasAsignadas || 0,
+          status: consulta.status,
+        }, {
+          name: consulta.colaborador.name,
+          email: consulta.colaborador.email,
+        });
+      }
     } catch (emailError) {
-      console.error('Error enviando email de cotización:', emailError);
+      console.error('Error enviando emails de cotización:', emailError);
     }
 
     return NextResponse.json(
       {
-        message: "Consulta cotizada exitosamente",
+        message: autoAccepted 
+          ? "Consulta urgente cotizada y auto-aceptada exitosamente"
+          : "Consulta cotizada exitosamente",
         consulta,
+        autoAccepted,
+        horasDescontadas,
+        horasExcedidas,
       },
       { status: 200 }
     );

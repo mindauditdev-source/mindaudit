@@ -50,7 +50,6 @@ export async function POST(request: Request) {
       titulo: data.titulo,
       descripcion: data.descripcion,
       esUrgente: data.esUrgente,
-      requiereVideo: data.requiereVideo,
       archivos: data.archivos,
     });
 
@@ -61,6 +60,7 @@ export async function POST(request: Request) {
         id: consulta.id,
         titulo: consulta.titulo,
         descripcion: consulta.descripcion,
+        esUrgente: consulta.esUrgente,
       }, {
         name: (session.user as any).name || 'Colaborador',
         email: (session.user as any).email,

@@ -27,7 +27,6 @@ interface Consulta {
   titulo: string;
   descripcion: string;
   esUrgente: boolean;
-  requiereVideo: boolean;
   status: ConsultaStatus;
   horasAsignadas: number | null;
   categoria: {
@@ -282,11 +281,6 @@ export default function AuditorConsultasPage() {
                         {consulta.esUrgente && (
                           <span className="bg-red-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-[2px] tracking-tighter uppercase shrink-0">
                             URGENTE
-                          </span>
-                        )}
-                        {consulta.requiereVideo && (
-                          <span className="bg-indigo-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-[2px] tracking-tighter uppercase shrink-0">
-                            VIDEO
                           </span>
                         )}
                       </div>

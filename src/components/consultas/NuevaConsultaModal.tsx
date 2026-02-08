@@ -13,7 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Upload, X, Loader2, FileText } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Upload, X, Loader2, FileText, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 interface NuevaConsultaModalProps {
@@ -40,7 +41,6 @@ export function NuevaConsultaModal({
     titulo: "",
     descripcion: "",
     esUrgente: false,
-    requiereVideo: false,
   });
   const [archivos, setArchivos] = useState<ArchivoSubido[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -123,7 +123,6 @@ export function NuevaConsultaModal({
         titulo: "",
         descripcion: "",
         esUrgente: false,
-        requiereVideo: false,
       });
       setArchivos([]);
       setSelectedFiles([]);
@@ -200,18 +199,29 @@ export function NuevaConsultaModal({
               </Label>
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="video"
-                checked={formData.requiereVideo}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, requiereVideo: checked as boolean })
-                }
-              />
-              <Label htmlFor="video" className="cursor-pointer font-normal">
-                Requiere videollamada
-              </Label>
-            </div>
+            {/* Disclaimer para consultas urgentes */}
+            {formData.esUrgente && (
+              <Alert className="border-orange-200 bg-orange-50">
+                <AlertTriangle className="h-4 w-4 text-orange-600" />
+                <AlertTitle className="text-orange-900 font-bold">
+                  Consulta Urgente - Importante
+                </AlertTitle>
+                <AlertDescription className="text-orange-800">
+                  <ul className="list-disc pl-4 space-y-1.5 text-sm mt-2">
+                    <li>
+                      <strong>Aceptación Automática:</strong> La cotización del
+                      auditor será aceptada automáticamente sin requerir tu
+                      aprobación.
+                    </li>
+                    <li>
+                      <strong>Horas del Paquete:</strong> Si la cotización excede
+                      tus horas disponibles, se descontarán todas tus horas y
+                      deberás coordinar con el admin para resolver la diferencia.
+                    </li>
+                  </ul>
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
 
           {/* Upload de Archivos */}

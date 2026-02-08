@@ -6,7 +6,6 @@ export interface CreateConsultaData {
   titulo: string;
   descripcion: string;
   esUrgente?: boolean;
-  requiereVideo?: boolean;
   archivos?: Array<{
     nombre: string;
     url: string;
@@ -20,7 +19,6 @@ export interface ConsultaListItem {
   titulo: string;
   descripcion: string;
   esUrgente: boolean;
-  requiereVideo: boolean;
   status: ConsultaStatus;
   horasAsignadas: number | null;
   categoria: {
@@ -71,7 +69,6 @@ export class ConsultaService {
         titulo: data.titulo,
         descripcion: data.descripcion,
         esUrgente: data.esUrgente ?? false,
-        requiereVideo: data.requiereVideo ?? false,
         colaboradorId,
         archivos: data.archivos
           ? {
@@ -109,7 +106,6 @@ export class ConsultaService {
         titulo: true,
         descripcion: true,
         esUrgente: true,
-        requiereVideo: true,
         status: true,
         horasAsignadas: true,
         categoria: {
@@ -162,7 +158,6 @@ export class ConsultaService {
         titulo: true,
         descripcion: true,
         esUrgente: true,
-        requiereVideo: true,
         status: true,
         horasAsignadas: true,
         horasCustom: true,
@@ -312,7 +307,6 @@ export class ConsultaService {
         titulo: true,
         descripcion: true,
         esUrgente: true,
-        requiereVideo: true,
         status: true,
         horasAsignadas: true,
         categoria: {
@@ -346,6 +340,7 @@ export class ConsultaService {
 
   /**
    * Cotizar consulta (Auditor asigna horas)
+   * Si la consulta es URGENTE, se auto-acepta automáticamente
    */
   static async cotizarConsulta(
     consultaId: string,
@@ -371,7 +366,8 @@ export class ConsultaService {
       throw new Error("Debe proporcionar categoría o horas custom");
     }
 
-    const consulta = await prisma.consulta.update({
+    // Actualizar consulta a COTIZADA
+    let consulta = await prisma.consulta.update({
       where: {
         id: consultaId,
       },
@@ -389,12 +385,70 @@ export class ConsultaService {
             id: true,
             name: true,
             email: true,
+            horasDisponibles: true,
           },
         },
       },
     });
 
-    return consulta;
+    // ✨ NUEVA LÓGICA: Auto-aceptación para consultas urgentes
+    let autoAccepted = false;
+    let horasDescontadas = 0;
+    let horasExcedidas = 0;
+
+    if (consulta.esUrgente) {
+      const horasDisponibles = consulta.colaborador.horasDisponibles;
+      const horasRequeridas = horasAsignadas;
+
+      if (horasDisponibles < horasRequeridas) {
+        horasExcedidas = horasRequeridas - horasDisponibles;
+        horasDescontadas = horasDisponibles; // Descontar todo lo disponible
+      } else {
+        horasDescontadas = horasRequeridas;
+      }
+
+      // Ejecutar auto-aceptación en transacción
+      consulta = await prisma.$transaction(async (tx) => {
+        // Descontar horas
+        await tx.user.update({
+          where: { id: consulta.colaboradorId },
+          data: {
+            horasDisponibles: {
+              decrement: horasDescontadas,
+            },
+          },
+        });
+
+        // Actualizar consulta a ACEPTADA
+        return await tx.consulta.update({
+          where: { id: consultaId },
+          data: {
+            status: "ACEPTADA",
+            aceptadaAt: new Date(),
+          },
+          include: {
+            categoria: true,
+            colaborador: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                horasDisponibles: true,
+              },
+            },
+          },
+        });
+      });
+
+      autoAccepted = true;
+    }
+
+    return {
+      consulta,
+      autoAccepted,
+      horasDescontadas,
+      horasExcedidas,
+    };
   }
 
   /**

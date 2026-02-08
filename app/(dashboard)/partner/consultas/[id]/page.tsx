@@ -34,7 +34,6 @@ interface ConsultaDetalle {
   titulo: string;
   descripcion: string;
   esUrgente: boolean;
-  requiereVideo: boolean;
   status: ConsultaStatus;
   horasAsignadas: number | null;
   horasCustom: number | null;
@@ -292,12 +291,6 @@ export default function ConsultaDetallePage() {
             <Badge className="bg-rose-100 text-rose-700 border-rose-200 px-3 py-1 font-bold">
               <AlertTriangle className="h-3.5 w-3.5 mr-1" />
               URGENTE
-            </Badge>
-          )}
-          {consulta.requiereVideo && (
-            <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200 px-3 py-1 font-bold">
-              <Video className="h-3.5 w-3.5 mr-1" />
-              VIDEOLLAMADA
             </Badge>
           )}
         </div>
