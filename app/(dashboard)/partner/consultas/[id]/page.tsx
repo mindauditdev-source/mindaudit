@@ -264,7 +264,7 @@ export default function ConsultaDetallePage() {
     <div className="p-6 max-w-[1600px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Top Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-        <div className="space-y-4">
+        <div className="w-full flex justify-between items-center">
           <Link href="/partner/consultas">
             <Button variant="ghost" className="hover:bg-slate-100 -ml-2 text-slate-500 font-bold group">
               <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
@@ -272,15 +272,19 @@ export default function ConsultaDetallePage() {
             </Button>
           </Link>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <h1 className="text-4xl font-black text-slate-900 tracking-tight">
               {consulta.titulo}
             </h1>
+           
             <Badge className={cn("px-4 py-1.5 text-sm font-black uppercase tracking-widest border shadow-xs", statusConfig[consulta.status].color)}>
               <StatusIcon className="h-4 w-4 mr-2" />
               {statusConfig[consulta.status].label}
             </Badge>
           </div>
+           <span className="text-lg font-extrabold text-gray-800 uppercase tracking-widest">
+              ID: #{consulta.id.substring(0, 8)}
+            </span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -311,9 +315,6 @@ export default function ConsultaDetallePage() {
                   <div className="h-8 w-1.5 bg-blue-600 rounded-full" />
                   Detalles de la Consulta
                 </CardTitle>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                  ID: #{consulta.id.substring(0, 8)}
-                </span>
               </div>
             </CardHeader>
             <CardContent className="p-8 space-y-8">
