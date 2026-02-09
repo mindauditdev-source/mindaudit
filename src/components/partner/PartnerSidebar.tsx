@@ -12,6 +12,7 @@ import {
   Briefcase,
   MessageCircle,
   Clock,
+  ReceiptEuro,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -22,20 +23,10 @@ const sidebarItems = [
     icon: LayoutDashboard,
   },
   {
-    title: "Mis Presupuestos",
-    href: "/partner/presupuestos",
-    icon: FileText,
-  },
-  {
     title: "Mis Empresas",
     href: "/partner/clientes",
     icon: Building2,
   },
-  // {
-  //   title: "Mis Auditorías",
-  //   href: "/partner/auditorias",
-  //   icon: FileText,
-  // },
   {
     title: "Mis Consultas",
     href: "/partner/consultas",
@@ -46,11 +37,16 @@ const sidebarItems = [
     href: "/partner/paquetes-horas",
     icon: Clock,
   },
-  // {
-  //   title: "Comisiones",
-  //   href: "/partner/facturas", // Using facturas for now based on folder structure
-  //   icon: PieChart,
-  // },
+  {
+    title: "Facturación",
+    href: "/partner/facturacion",
+    icon: ReceiptEuro, // Need to import this
+  },
+  {
+    title: "Mis Comisiones",
+    href: "/partner/comisiones",
+    icon: FileText,
+  },
 ];
 
 export function PartnerSidebar() {

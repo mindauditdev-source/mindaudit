@@ -44,7 +44,7 @@ export default function PartnerCommissionsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Comisiones y Facturas</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Mis Comisiones</h1>
         <p className="text-slate-500 mt-1">
           Seguimiento de tus ingresos por empresas referidas.
         </p>
