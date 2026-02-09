@@ -26,7 +26,7 @@ export async function PATCH(
     
     const solicitud = await prisma.solicitudDocumento.findUnique({
       where: { id },
-      include: { empresa: true, auditoria: true }
+      include: { empresa: true }
     });
     
     if (!solicitud) {

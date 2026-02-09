@@ -45,20 +45,8 @@ export async function GET(
         },
         _count: {
           select: {
-            auditorias: true,
             documentos: true,
           },
-        },
-        auditorias: {
-          orderBy: { createdAt: 'desc' },
-          take: 5, // Traer las últimas 5 auditorías para mostrar en el dashboard/detalle
-          select: {
-             id: true,
-             tipoServicio: true,
-             fiscalYear: true,
-             status: true,
-             createdAt: true,
-          }
         }
       },
     });
@@ -89,7 +77,6 @@ export async function GET(
       empresa: {
         ...empresa,
         stats: {
-          totalAuditorias: empresa._count.auditorias,
           totalDocumentos: empresa._count.documentos,
         }
       },

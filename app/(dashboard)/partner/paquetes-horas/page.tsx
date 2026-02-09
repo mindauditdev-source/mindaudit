@@ -144,10 +144,10 @@ function PaquetesHorasContent() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Paquetes de Horas
+          Iguala de Consultas
         </h1>
         <p className="text-gray-600">
-          Compra horas para realizar consultas con el auditor
+          Suscríbete a un plan de consultas para recibir asesoría experta
         </p>
       </div>
 
@@ -306,6 +306,11 @@ function PaquetesHorasContent() {
               </Card>
             );
           })}
+        </div>
+        <div className="mt-8 p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 text-center">
+          <p>
+            * Los precios mostrados no incluyen IVA (21%). El impuesto correspondiente se añadirá durante el proceso de pago y se emitirá la factura correspondiente de forma automática.
+          </p>
         </div>
       </div>
 

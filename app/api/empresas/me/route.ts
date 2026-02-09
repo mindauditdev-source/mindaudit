@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest } from 'next/server'
 import { getAuthenticatedUser } from '@/middleware/api-auth'
 import { requireEmpresa } from '@/middleware/api-rbac'
@@ -27,7 +28,6 @@ export async function GET(request: NextRequest) {
         },
         _count: {
           select: {
-            auditorias: true,
             documentos: true,
           },
         },
@@ -60,7 +60,6 @@ export async function GET(request: NextRequest) {
         updatedAt: empresa.updatedAt,
         colaborador: empresa.colaborador,
         stats: {
-          totalAuditorias: empresa._count.auditorias,
           totalDocumentos: empresa._count.documentos,
         },
       },

@@ -54,10 +54,26 @@ export async function POST(request: Request) {
               description: `${paqueteSeleccionado.horas} horas de consultoría${descuento > 0 ? ` (Incluye ${descuento}% de descuento)` : ''}`,
             },
             unit_amount: Math.round(precioFinal * 100),
+            tax_behavior: "exclusive", // El precio es sin IVA
           },
           quantity: 1,
+          // Añadimos el IVA como un item dinámico si no tenemos Tax Rate ID de Stripe
+          // Para una implementación real en producción, se recomienda crear un Tax Rate en el Dashboard de Stripe
+          // y usar su ID aquí. Por ahora, lo manejamos mediante tax_id_collection si es posible
+          // o simplemente con automatic_tax si está configurado en la cuenta de Stripe.
+          // Usamos el ID del Tax Rate creado si no está en el ENV
+          tax_rates: [process.env.STRIPE_TAX_RATE_ID || 'txr_1Sz3E91kgxkDUUNxPCd7zZE6'],
         },
       ],
+      tax_id_collection: {
+        enabled: true, // Recopilar CIF/NIF para la factura
+      },
+      invoice_creation: {
+        enabled: true, // Habilitar la creación de factura
+      },
+      automatic_tax: {
+        enabled: false, // Deshabilitado para usar tax_rates fijos (evita error de conflicto)
+      },
       success_url: `${process.env.NEXTAUTH_URL}/partner/paquetes-horas?success=true`,
       cancel_url: `${process.env.NEXTAUTH_URL}/partner/paquetes-horas?canceled=true`,
       metadata: {

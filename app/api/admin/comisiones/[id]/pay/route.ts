@@ -2,8 +2,8 @@ import { NextRequest } from 'next/server'
 import { getAuthenticatedUser } from '@/middleware/api-auth'
 import { requireAdmin } from '@/middleware/api-rbac'
 import { successResponse, serverErrorResponse, validationErrorResponse } from '@/lib/api-response'
-import { CommissionService } from '@/services/commission.service'
 import { z } from 'zod'
+import prisma from '@/lib/db/prisma'
 
 // Schema de validación
 const payCommissionSchema = z.object({
@@ -30,35 +30,15 @@ export async function PATCH(
     const validatedData = payCommissionSchema.parse(body)
 
     // Marcar comisión como pagada
-    const comision = await CommissionService.markAsPaid(
-      id,
-      validatedData.referenciaPago,
-      validatedData.notas
-    )
-
-    // 📧 Enviar notificación por email al colaborador
-    try {
-      const emailService = (await import('@/lib/email/email-service')).EmailService;
-      await emailService.notifyCommissionPaid(
-        {
-          montoComision: comision.montoComision.toNumber(),
-          referenciaPago: comision.referenciaPago || 'N/A',
-          auditoria: {
-            empresa: {
-              companyName: comision.auditoria.empresa.companyName,
-            },
-          },
-        },
-        {
-          user: {
-            name: comision.colaborador.user.name,
-            email: comision.colaborador.user.email,
-          },
-        }
-      );
-    } catch (emailError) {
-      console.error('Error enviando email de comisión:', emailError);
-    }
+    const comision = await prisma.comision.update({
+      where: { id },
+      data: {
+        status: 'PAGADA',
+        fechaPago: new Date(),
+        referenciaPago: validatedData.referenciaPago,
+        notas: validatedData.notas,
+      },
+    })
 
     return successResponse(
       {
@@ -68,9 +48,7 @@ export async function PATCH(
           status: comision.status,
           fechaPago: comision.fechaPago,
           referenciaPago: comision.referenciaPago,
-          colaborador: {
-            companyName: comision.colaborador.companyName,
-          },
+          notas: comision.notas,
         },
       },
       'Comisión marcada como pagada exitosamente'

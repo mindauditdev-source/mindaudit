@@ -42,7 +42,7 @@ const sidebarItems = [
     icon: MessageCircle,
   },
   {
-    title: "Paquetes de Horas",
+    title: "Iguala de Consultas",
     href: "/partner/paquetes-horas",
     icon: Clock,
   },

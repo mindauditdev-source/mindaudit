@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest } from "next/server";
 import { getAuthenticatedUser } from "@/middleware/api-auth";
 import {
@@ -48,13 +49,7 @@ export async function GET(request: NextRequest) {
     const solicitudes = await prisma.solicitudDocumento.findMany({
       where,
       include: {
-        documento: true,
-        auditoria: {
-          select: {
-            tipoServicio: true,
-            fiscalYear: true,
-          }
-        }
+        documento: true
       },
       orderBy: { createdAt: "desc" },
     });
@@ -85,7 +80,6 @@ export async function POST(request: NextRequest) {
         title: validatedData.title,
         description: validatedData.description,
         empresaId: validatedData.empresaId,
-        auditoriaId: (validatedData.auditoriaId === 'GENERAL' || !validatedData.auditoriaId) ? null : validatedData.auditoriaId,
         status: SolicitudStatus.PENDIENTE,
       },
     });

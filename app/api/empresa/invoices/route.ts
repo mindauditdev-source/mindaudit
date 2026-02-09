@@ -18,15 +18,7 @@ export async function GET(req: NextRequest) {
 
     // 1. Fetch real invoices
     const realInvoices = await prisma.invoice.findMany({
-       where: { empresaId: empresa.id },
-       include: {
-          auditoria: {
-             select: {
-                fiscalYear: true,
-                tipoServicio: true
-             }
-          }
-       }
+       where: { empresaId: empresa.id }
     });
 
     // 4. Combine and Sort (Just real invoices now)

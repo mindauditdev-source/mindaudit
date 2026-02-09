@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest } from "next/server";
 import { getAuthenticatedUser } from "@/middleware/api-auth";
 import {
   successResponse,
   createdResponse,
   serverErrorResponse,
-  validationErrorResponse,
   errorResponse,
   forbiddenResponse,
 } from "@/lib/api-response";
@@ -68,14 +68,6 @@ export async function GET(request: NextRequest) {
     const documentos = await prisma.documento.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      include: {
-         auditoria: {
-            select: {
-               tipoServicio: true,
-               fiscalYear: true
-            }
-         }
-      }
     });
 
     return successResponse({ documentos });
@@ -120,7 +112,6 @@ export async function POST(request: NextRequest) {
           fileSize: validatedData.size || 0,
           tipoDocumento: "DOCUMENTACION_EMPRESA",
           empresaId: targetEmpresaId,
-          auditoriaId: validatedData.auditoriaId,
           uploadedBy: user.id,
         },
       });

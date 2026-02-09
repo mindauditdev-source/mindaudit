@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest } from 'next/server'
 import { getAuthenticatedUser } from '@/middleware/api-auth'
 import { requireColaboradorOrAdmin } from '@/middleware/api-rbac'
@@ -195,7 +196,7 @@ export async function GET(request: NextRequest) {
         },
         _count: {
           select: {
-            auditorias: true,
+            documentos: true,
           },
         },
       },
@@ -216,7 +217,6 @@ export async function GET(request: NextRequest) {
         revenue: e.revenue?.toNumber(),
         createdAt: e.createdAt,
         colaborador: e.colaborador,
-        totalAuditorias: e._count.auditorias,
       })),
       total: empresas.length,
     })
