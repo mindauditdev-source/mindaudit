@@ -425,6 +425,13 @@ model Consulta {
   updatedAt         DateTime            @updatedAt
   respondidaAt      DateTime?
   aceptadaAt        DateTime?
+  completadaAt      DateTime?
+
+  // Reopening Fields
+  reabiertaAt       DateTime?
+  reabiertaPor      String?
+  razonReapertura   String?           @db.Text
+  vecesReabierta    Int               @default(0)
   
   mensajes          ConsultaMensaje[] @relation("ConsultaMensajes")
   

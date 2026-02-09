@@ -54,6 +54,11 @@ export interface ConsultaDetalle extends Omit<ConsultaListItem, 'archivos'> {
   meetingStatus?: MeetingStatus;
   meetingDate?: Date | null;
   meetingLink?: string | null;
+  completadaAt: string | null;
+  reabiertaAt: string | null;
+  reabiertaPor: string | null;
+  razonReapertura: string | null;
+  vecesReabierta: number;
 }
 
 export class ConsultaService {
@@ -183,11 +188,27 @@ export class ConsultaService {
             id: true,
             name: true,
             email: true,
+            horasDisponibles: true, // Added for partner view logic
           },
         },
         createdAt: true,
         respondidaAt: true,
         aceptadaAt: true,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        completadaAt: true,      // NEW
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        reabiertaAt: true,       // NEW
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        reabiertaPor: true,      // NEW
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        razonReapertura: true,   // NEW
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        vecesReabierta: true,    // NEW
         meetingStatus: true,
         meetingDate: true,
         meetingLink: true,
@@ -195,13 +216,19 @@ export class ConsultaService {
     });
 
     if (!consulta) return null;
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const c = consulta as any;
 
     return {
       ...consulta,
       createdAt: consulta.createdAt.toISOString(),
       respondidaAt: consulta.respondidaAt?.toISOString() || null,
       aceptadaAt: consulta.aceptadaAt?.toISOString() || null,
-      archivos: consulta.archivos.map(a => ({
+      completadaAt: c.completadaAt?.toISOString() || null,
+      reabiertaAt: c.reabiertaAt?.toISOString() || null,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      archivos: (c.archivos || []).map((a: any) => ({
         ...a,
         createdAt: a.createdAt.toISOString(),
       })),
@@ -461,6 +488,9 @@ export class ConsultaService {
       },
       data: {
         status: "COMPLETADA",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - Prisma types out of sync
+        completadaAt: new Date(),
       },
     });
 
@@ -599,6 +629,94 @@ export class ConsultaService {
       success: true,
       consulta: updatedConsulta,
       horasDescontadas: horasTax,
+    };
+  }
+
+  /**
+   * Reabrir consulta completada
+   * Permite a partner o admin reabrir una consulta COMPLETADA
+   * Solo dentro de 7 días desde que se completó
+   */
+  static async reabrirConsulta(
+    consultaId: string,
+    userId: string,
+    razon: string
+  ) {
+    // 1. Obtener consulta actual
+    const consulta = await prisma.consulta.findUnique({
+      where: { id: consultaId },
+      include: {
+        colaborador: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!consulta) {
+      throw new Error("Consulta no encontrada");
+    }
+
+    // 2. Validar que esté COMPLETADA
+    if (consulta.status !== "COMPLETADA") {
+      throw new Error("Solo se pueden reabrir consultas completadas");
+    }
+
+    // 3. Validar ventana de 7 días
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const c = consulta as any;
+    if (!c.completadaAt) {
+      throw new Error("No se puede determinar la fecha de completado");
+    }
+
+    const ahora = new Date();
+    const diasDesdeCompletado = Math.floor(
+      (ahora.getTime() - new Date(c.completadaAt).getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (diasDesdeCompletado > 7) {
+      throw new Error(
+        "No se puede reabrir. Han pasado más de 7 días desde que se completó la consulta"
+      );
+    }
+
+    // 4. Actualizar consulta
+    const consultaReabierta = await prisma.consulta.update({
+      where: { id: consultaId },
+      data: {
+        status: "EN_PROCESO",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        reabiertaAt: new Date(),
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        reabiertaPor: userId,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        razonReapertura: razon,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        vecesReabierta: {
+          increment: 1,
+        },
+      },
+      include: {
+        colaborador: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return {
+      consulta: consultaReabierta,
+      reabiertaPorPartner: userId === consulta.colaboradorId,
     };
   }
 }

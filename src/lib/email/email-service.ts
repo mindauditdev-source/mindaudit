@@ -352,4 +352,62 @@ export class EmailService {
       `,
     });
   }
+
+  /**
+   * Notificación de Consulta Reabierta
+   */
+  static async notifyConsultaReabierta(
+    consulta: { id: string; titulo: string; razonReapertura: string },
+    reabiertaPor: { name: string; email: string; esAdmin: boolean },
+    destinatario: { name: string; email: string }
+  ) {
+    const subject = `🔄 Consulta Reabierta: ${consulta.titulo}`;
+    
+    const quienReabrio = reabiertaPor.esAdmin ? "el equipo de auditoría" : "el partner";
+    const rolDestinatario = reabiertaPor.esAdmin ? "partner" : "auditor";
+    
+    const html = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
+        <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <h2 style="color: #0c3a6b; margin: 0 0 24px 0; font-size: 24px; font-weight: 700;">
+            Consulta Reabierta
+          </h2>
+          
+          <div style="background: #fef2f2; border-left: 4px solid #dc2626; padding: 16px; margin: 20px 0; border-radius: 4px;">
+            <p style="margin: 0; color: #991b1b; font-weight: 600; font-size: 15px;">
+              La consulta "${consulta.titulo}" ha sido reabierta por ${quienReabrio}.
+            </p>
+          </div>
+          
+          <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0;">
+            <p style="margin: 0 0 12px 0; font-weight: 600; color: #334155; font-size: 14px;">
+              📝 Motivo de reapertura:
+            </p>
+            <p style="margin: 0; color: #64748b; font-size: 14px; line-height: 1.6; font-style: italic;">
+              "${consulta.razonReapertura}"
+            </p>
+          </div>
+          
+          <p style="color: #475569; font-size: 15px; line-height: 1.6; margin: 20px 0;">
+            La consulta ha vuelto a estado <strong style="color: #7c3aed;">EN PROCESO</strong>. Por favor, revisa los detalles y continúa con el trabajo.
+          </p>
+          
+          <div style="margin: 32px 0;">
+            <a href="${process.env.NEXTAUTH_URL}/${rolDestinatario}/consultas/${consulta.id}" 
+               style="display: inline-block; background: #0c3a6b; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px;">
+              Ver Consulta
+            </a>
+          </div>
+          
+          <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
+            <p style="color: #94a3b8; font-size: 13px; margin: 0;">
+              Este es un mensaje automático de MindAudit. Por favor, no respondas a este correo.
+            </p>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    return this.sendEmail({ to: destinatario.email, subject, html });
+  }
 }

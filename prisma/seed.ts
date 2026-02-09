@@ -11,7 +11,6 @@ async function main() {
   await prisma.auditLog.deleteMany()
   await prisma.documento.deleteMany()
   await prisma.comision.deleteMany()
-  await prisma.auditoria.deleteMany()
   
   // Cleanup consultation system
   await prisma.archivoConsulta.deleteMany()

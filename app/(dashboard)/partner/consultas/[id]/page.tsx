@@ -20,11 +20,14 @@ import {
   Video,
   MessageSquare,
   Info,
+  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import type { ConsultaStatus, MeetingStatus } from "@prisma/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { CalendlyWidget } from "@/components/shared/CalendlyWidget";
 import { ConsultationChat } from "@/components/partner/ConsultationChat";
 import { cn } from "@/lib/utils";
@@ -53,6 +56,10 @@ interface ConsultaDetalle {
   meetingStatus: MeetingStatus | null;
   meetingDate: string | null;
   meetingLink: string | null;
+  completadaAt: string | null;
+  reabiertaAt: string | null;
+  razonReapertura: string | null;
+  vecesReabierta: number;
   createdAt: string;
   respondidaAt: string | null;
   aceptadaAt: string | null;
@@ -99,6 +106,19 @@ const statusConfig: Record<
   },
 };
 
+// Helper para validar ventana de 7 días
+const canReopen = (completadaAt: string | null): boolean => {
+  if (!completadaAt) return false;
+  
+  const ahora = new Date();
+  const fechaCompletado = new Date(completadaAt);
+  const diasDesdeCompletado = Math.floor(
+    (ahora.getTime() - fechaCompletado.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  
+  return diasDesdeCompletado <= 7;
+};
+
 export default function ConsultaDetallePage() {
   const params = useParams();
   const router = useRouter();
@@ -111,6 +131,9 @@ export default function ConsultaDetallePage() {
     available: number;
   } | null>(null);
   const [calendlyModalOpen, setCalendlyModalOpen] = useState(false);
+  const [reopenModalOpen, setReopenModalOpen] = useState(false);
+  const [reopenReason, setReopenReason] = useState("");
+  const [reopening, setReopening] = useState(false);
 
   const fetchConsulta = useCallback(async () => {
     try {
@@ -240,6 +263,38 @@ export default function ConsultaDetallePage() {
       console.error("Error scheduling meeting:", error);
       const err = error as Error;
       toast.error(err.message || "Error al agendar la reunión");
+    }
+  };
+
+  const handleReopen = async () => {
+    if (!reopenReason.trim() || reopenReason.length < 10) {
+      toast.error("Debes proporcionar una razón (mínimo 10 caracteres)");
+      return;
+    }
+
+    setReopening(true);
+    try {
+      const res = await fetch(`/api/colaborador/consultas/${consulta?.id}/reopen`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ razon: reopenReason }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Error al reabrir consulta");
+      }
+
+      toast.success("Consulta reabierta exitosamente");
+      setReopenModalOpen(false);
+      setReopenReason("");
+      fetchConsulta();
+    } catch (error: unknown) {
+      const e = error as Error;
+      toast.error(e.message || "Error al reabrir consulta");
+    } finally {
+      setReopening(false);
     }
   };
 
@@ -526,11 +581,115 @@ export default function ConsultaDetallePage() {
                     </p>
                   </div>
                 </div>
+
+                {/* Reopen Button - Only if COMPLETADA and within 7 days */}
+                {consulta.status === "COMPLETADA" && canReopen(consulta.completadaAt) && (
+                  <Card className="rounded-3xl border-amber-200 shadow-lg overflow-hidden border-t-4 border-t-amber-500 animate-in slide-in-from-bottom-8 duration-1000">
+                    <div className="p-8 space-y-6 bg-amber-50/30">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                          <div className="h-12 w-12 bg-amber-100 rounded-2xl flex items-center justify-center border border-amber-200">
+                            <AlertCircle className="h-6 w-6 text-amber-600" />
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                              ¿No quedaste conforme?
+                            </h3>
+                            <p className="text-slate-500 text-sm font-medium">
+                              Puedes reabrir esta consulta para continuar trabajando en ella.
+                            </p>
+                            {consulta.completadaAt && (
+                              <p className="text-xs text-amber-600 font-bold mt-1">
+                                Disponible por {7 - Math.floor((new Date().getTime() - new Date(consulta.completadaAt).getTime()) / (1000 * 60 * 60 * 24))} días más
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={() => setReopenModalOpen(true)}
+                        className="w-full bg-amber-600 hover:bg-amber-700 text-white font-black h-14 px-10 rounded-2xl shadow-lg"
+                      >
+                        <RefreshCw className="h-5 w-5 mr-3" />
+                        REABRIR CONSULTA
+                      </Button>
+                    </div>
+                  </Card>
+                )}
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Reopen Modal */}
+      <Dialog open={reopenModalOpen} onOpenChange={setReopenModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black text-slate-900">
+              Reabrir Consulta
+            </DialogTitle>
+            <DialogDescription className="text-slate-600">
+              Por favor, indica el motivo por el cual deseas reabrir esta consulta.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-700">
+                Razón de reapertura <span className="text-red-500">*</span>
+              </label>
+              <Textarea
+                placeholder="Explica por qué necesitas reabrir esta consulta (mínimo 10 caracteres)..."
+                value={reopenReason}
+                onChange={(e) => setReopenReason(e.target.value)}
+                rows={4}
+                className="resize-none"
+              />
+              <p className="text-xs text-slate-500">
+                {reopenReason.length}/10 caracteres mínimos
+              </p>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800">
+                <strong>Nota:</strong> La consulta volverá a estado &quot;EN PROCESO&quot; y no se descontarán horas adicionales.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setReopenModalOpen(false);
+                setReopenReason("");
+              }}
+              disabled={reopening}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleReopen}
+              disabled={reopening || reopenReason.length < 10}
+              className="bg-amber-600 hover:bg-amber-700"
+            >
+              {reopening ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Reabriendo...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Reabrir Consulta
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Calendly Modal */}
       <Dialog open={calendlyModalOpen} onOpenChange={setCalendlyModalOpen}>

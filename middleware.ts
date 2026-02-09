@@ -25,7 +25,7 @@ export async function middleware(req: NextRequest) {
   // Verificar si es una ruta pública
   const isPublicPath = publicPaths.some((publicPath) => path === publicPath || path.startsWith(`${publicPath}/`))
 
-  console.log("token", token);
+
   
   if (isPublicPath) {
     // Si el usuario ya está autenticado y trata de acceder a login o register, redirigir al dashboard
