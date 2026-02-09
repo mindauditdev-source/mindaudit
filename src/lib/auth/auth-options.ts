@@ -88,9 +88,10 @@ export const authOptions: NextAuthOptions = {
             colaborador: result.user.colaborador,
             empresa: result.user.empresa,
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Error en authorize:', error)
-          throw new Error(error.message || 'Error al iniciar sesión')
+          const message = error instanceof Error ? error.message : 'Error al iniciar sesión'
+          throw new Error(message)
         }
       },
     }),

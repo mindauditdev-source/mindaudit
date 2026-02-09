@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState, use, useRef } from "react";
+import { useEffect, useState, use, useRef, useCallback } from "react";
 import { 
-  Building2,
   ArrowLeft,
   ClipboardList,
   Loader2,
@@ -27,7 +26,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AdminApiService } from "@/services/admin-api.service";
+import { AdminApiService, Auditoria, SolicitudDocumento } from "@/services/admin-api.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
@@ -47,7 +46,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function AuditorAuditDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const [auditoria, setAuditoria] = useState<any>(null);
+  const [auditoria, setAuditoria] = useState<Auditoria | null>(null);
   const [loading, setLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -56,7 +55,7 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
   const [isDocDialogOpen, setIsDocDialogOpen] = useState(false);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<SolicitudDocumento | null>(null);
   const [reviewStatus, setReviewStatus] = useState<"APROBADO" | "RECHAZADO">("APROBADO");
   const [reviewFeedback, setReviewFeedback] = useState("");
   const [cancelReason, setCancelReason] = useState("");
@@ -68,14 +67,25 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
   // Data for actions
   const [budgetData, setBudgetData] = useState({ amount: "", notes: "" });
   const [docReqData, setDocReqData] = useState({ title: "", description: "" });
-  const [docRequests, setDocRequests] = useState<any[]>([]);
+  const [docRequests, setDocRequests] = useState<SolicitudDocumento[]>([]);
   const [loadingDocs, setLoadingDocs] = useState(false);
 
-  useEffect(() => {
-    loadAuditoria();
+  const loadDocRequests = useCallback(async (empresaId: string) => {
+    try {
+      setLoadingDocs(true);
+      const res = await AdminApiService.getSolicitudesByEmpresa(empresaId);
+      const filtered = res.solicitudes?.filter((s: SolicitudDocumento) => 
+        !s.auditoriaId || s.auditoriaId === id
+      ) || [];
+      setDocRequests(filtered);
+    } catch (err: unknown) {
+      console.error("Error loading docs:", err);
+    } finally {
+      setLoadingDocs(false);
+    }
   }, [id]);
 
-  const loadAuditoria = async () => {
+  const loadAuditoria = useCallback(async () => {
     try {
       setLoading(true);
       const data = await AdminApiService.getAuditoriaById(id);
@@ -88,24 +98,14 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, loadDocRequests]);
 
-  const loadDocRequests = async (empresaId: string) => {
-    try {
-      setLoadingDocs(true);
-      const res = await AdminApiService.getSolicitudesByEmpresa(empresaId);
-      const filtered = res.solicitudes?.filter((s: any) => 
-        !s.auditoriaId || s.auditoriaId === id
-      ) || [];
-      setDocRequests(filtered);
-    } catch (err: unknown) {
-      console.error("Error loading docs:", err);
-    } finally {
-      setLoadingDocs(false);
-    }
-  };
+  useEffect(() => {
+    loadAuditoria();
+  }, [id, loadAuditoria]);
 
   const handleOpenBudget = () => {
+    if (!auditoria) return;
     setBudgetData({
       amount: auditoria.presupuesto?.toString() || "",
       notes: auditoria.presupuestoNotas || ""
@@ -139,12 +139,12 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
       await AdminApiService.requestDocument({
         title: docReqData.title,
         description: docReqData.description,
-        empresaId: auditoria.empresaId,
+        empresaId: auditoria?.empresaId || "",
         auditoriaId: id
       });
       setIsDocDialogOpen(false);
       setDocReqData({ title: "", description: "" });
-      loadDocRequests(auditoria.empresaId);
+      if (auditoria) loadDocRequests(auditoria.empresaId);
       alert("Documento solicitado");
     } catch (err: unknown) {
       console.error(err);
@@ -154,7 +154,7 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
     }
   };
 
-  const handleOpenReview = (request: any, status: "APROBADO" | "RECHAZADO") => {
+  const handleOpenReview = (request: SolicitudDocumento, status: "APROBADO" | "RECHAZADO") => {
     setSelectedRequest(request);
     setReviewStatus(status);
     setReviewFeedback("");
@@ -170,7 +170,7 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
         feedback: reviewFeedback
       });
       setIsReviewDialogOpen(false);
-      loadDocRequests(auditoria.empresaId);
+      if (auditoria) loadDocRequests(auditoria.empresaId);
       alert(`Documento ${reviewStatus.toLowerCase()} correctamente.`);
     } catch (err: unknown) {
       console.error(err);
@@ -180,7 +180,7 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
     }
   };
 
-  const handleCancelSolicitud = (request: any) => {
+  const handleCancelSolicitud = (request: SolicitudDocumento) => {
     setSelectedRequest(request);
     setCancelReason("");
     setIsCancelDialogOpen(true);
@@ -192,7 +192,7 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
       setSubmitting(true);
       await AdminApiService.cancelSolicitudDocumento(selectedRequest.id, cancelReason);
       setIsCancelDialogOpen(false);
-      loadDocRequests(auditoria.empresaId);
+      if (auditoria) loadDocRequests(auditoria.empresaId);
       alert("Solicitud cancelada correctamente.");
     } catch (err: unknown) {
       console.error(err);
@@ -248,7 +248,7 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
         size: file.size,
         type: file.type,
         auditoriaId: id,
-        empresaId: auditoria.empresaId
+        empresaId: auditoria?.empresaId
       });
       alert("Documento subido correctamente");
       loadAuditoria();
@@ -268,7 +268,7 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
           });
           loadAuditoria();
           alert("Solicitud enviada al cliente.");
-      } catch (err) {
+      } catch (err: unknown) {
           console.error(err);
           alert("Error al solicitar reunión");
       }
@@ -284,7 +284,7 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
           loadAuditoria();
           setIsMeetingLinkOpen(false);
           alert("Enlace actualizado correctamente");
-      } catch (err) {
+      } catch (err: unknown) {
           console.error(err);
           alert("Error al guardar enlace");
       } finally {
@@ -293,7 +293,7 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
   };
 
   const openMeetingLinkDialog = () => {
-      setMeetingLinkData(auditoria.meetingLink || "");
+      setMeetingLinkData(auditoria?.meetingLink || "");
       setIsMeetingLinkOpen(true);
   };
 
@@ -342,9 +342,9 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
           {auditoria.status === 'EN_PROCESO' && (
             <Button 
                onClick={handleCompleteAudit}
-               disabled={submitting || docRequests.some((d: any) => ['PENDIENTE', 'ENTREGADO', 'RECHAZADO'].includes(d.status))}
+               disabled={submitting || docRequests.some((d: SolicitudDocumento) => ['PENDIENTE', 'ENTREGADO', 'RECHAZADO'].includes(d.status))}
                className="bg-slate-900 hover:bg-black text-white font-black rounded-xl h-11 px-6 shadow-xl"
-               title={docRequests.some((d: any) => ['PENDIENTE', 'ENTREGADO', 'RECHAZADO'].includes(d.status)) ? "Hay documentos pendientes" : ""}
+               title={docRequests.some((d: SolicitudDocumento) => ['PENDIENTE', 'ENTREGADO', 'RECHAZADO'].includes(d.status)) ? "Hay documentos pendientes" : ""}
             >
                {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-5 w-5" />}
                Marcar como Completada

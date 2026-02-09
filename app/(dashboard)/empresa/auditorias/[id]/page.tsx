@@ -22,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { EmpresaApiService, EmpresaAuditoria } from "@/services/empresa-api.service";
+import { PresupuestoStatus } from "@prisma/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, cn } from "@/lib/utils";
 import {
@@ -76,8 +77,9 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
   }, [searchParams, id, router]);
 
   // Stop processing if status changes to EN_PROCESO
+  // Stop processing if status changes to EN_CURSO or PAGADO
   useEffect(() => {
-    if (audit?.status === 'EN_PROCESO' || audit?.status === 'APROBADA') {
+    if (audit?.status === PresupuestoStatus.EN_CURSO || audit?.status === PresupuestoStatus.PAGADO) {
       setIsPaymentProcessing(false);
     }
   }, [audit?.status]);
@@ -227,8 +229,7 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
   }
 
   if (!audit) return <div className="text-center py-20">No se encontró el expediente.</div>;
-
-  const isPendingDecision = audit.status === 'PRESUPUESTADA' || audit.status === 'REUNION_SOLICITADA';
+  const isPendingDecision = (audit.status as any) === PresupuestoStatus.A_PAGAR || ((audit.status as any) === PresupuestoStatus.A_PAGAR && audit.meetingStatus === 'PENDING');
   const meetingStatus = audit.meetingStatus;
   const meetingRequestedBy = audit.meetingRequestedBy;
 
@@ -505,7 +506,7 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
                                         Rechazar Oferta <XCircle className="ml-2 h-4 w-4" />
                                     </Button>
                                 </div>
-                            ) : (audit.status === 'PENDIENTE_DE_PAGO' || searchParams.get('payment') === 'failed' || isPaymentProcessing) ? (
+                            ) : ((audit.status as any) === PresupuestoStatus.A_PAGAR || searchParams.get('payment') === 'failed' || isPaymentProcessing) ? (
                                 <div className="space-y-4">
                                     {isPaymentProcessing ? (
                                         <div className="p-6 bg-blue-500/10 rounded-2xl border border-blue-500/20 text-center animate-pulse">
@@ -537,7 +538,7 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
                                         </Button>
                                     )}
                                 </div>
-                            ) : audit.status === 'APROBADA' || audit.status === 'EN_PROCESO' ? (
+                            ) : audit.status === PresupuestoStatus.PAGADO || audit.status === PresupuestoStatus.EN_CURSO ? (
                                 <div className="p-6 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 text-center">
                                     <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto mb-3" />
                                     <p className="text-sm font-black uppercase tracking-widest mb-1 text-blue-200/50">Servicio Pagado</p>
@@ -749,15 +750,12 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    SOLICITADA: "bg-blue-100 text-blue-700",
-    EN_REVISION: "bg-slate-100 text-slate-500",
-    PRESUPUESTADA: "bg-amber-100 text-amber-700 animate-pulse",
-    REUNION_SOLICITADA: "bg-indigo-100 text-indigo-700",
-    APROBADA: "bg-emerald-100 text-emerald-700",
-    EN_PROCESO: "bg-blue-600 text-white",
-    COMPLETADA: "bg-emerald-600 text-white",
-    CANCELADA: "bg-red-50 text-red-600",
-    RECHAZADA: "bg-slate-900 text-white",
+    [PresupuestoStatus.PENDIENTE_PRESUPUESTAR]: "bg-blue-100 text-blue-700",
+    [PresupuestoStatus.EN_CURSO]: "bg-blue-600 text-white",
+    [PresupuestoStatus.ACEPTADO_PENDIENTE_FACTURAR]: "bg-purple-100 text-purple-700",
+    [PresupuestoStatus.A_PAGAR]: "bg-amber-100 text-amber-700 animate-pulse",
+    [PresupuestoStatus.PAGADO]: "bg-emerald-600 text-white",
+    [PresupuestoStatus.RECHAZADO]: "bg-slate-900 text-white",
   };
 
   return (

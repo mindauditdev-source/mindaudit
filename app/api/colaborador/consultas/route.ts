@@ -12,15 +12,16 @@ export async function GET() {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const userId = (session.user as any).id;
+    const userId = session.user.id;
 
     const consultas = await ConsultaService.listarConsultasColaborador(userId);
 
     return NextResponse.json({ consultas }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error listando consultas:", error);
+    const message = error instanceof Error ? error.message : "Error desconocido";
     return NextResponse.json(
-      { error: "Error al listar consultas", details: error.message },
+      { error: "Error al listar consultas", details: message },
       { status: 500 }
     );
   }
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const userId = (session.user as any).id;
+    const userId = session.user.id;
     const data = await request.json();
 
     // Validación básica
@@ -62,18 +63,19 @@ export async function POST(request: Request) {
         descripcion: consulta.descripcion,
         esUrgente: consulta.esUrgente,
       }, {
-        name: (session.user as any).name || 'Colaborador',
-        email: (session.user as any).email,
+        name: session.user.name || 'Colaborador',
+        email: session.user.email,
       });
     } catch (emailError) {
       console.error('Error enviando email de nueva consulta:', emailError);
     }
 
     return NextResponse.json({ consulta }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creando consulta:", error);
+    const message = error instanceof Error ? error.message : "Error desconocido";
     return NextResponse.json(
-      { error: "Error al crear consulta", details: error.message },
+      { error: "Error al crear consulta", details: message },
       { status: 500 }
     );
   }

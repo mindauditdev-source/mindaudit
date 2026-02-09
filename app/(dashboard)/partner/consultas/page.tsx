@@ -18,7 +18,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { NuevaConsultaModal } from "@/components/consultas/NuevaConsultaModal";
-import Link from "next/link";
+
 import type { ConsultaStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
 

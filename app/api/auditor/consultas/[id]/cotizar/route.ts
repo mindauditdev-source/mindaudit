@@ -15,7 +15,7 @@ export async function PATCH(
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const userRole = (session.user as any).role;
+    const userRole = session.user.role;
 
     if (userRole !== "ADMIN") {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
@@ -100,10 +100,11 @@ export async function PATCH(
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error cotizando consulta:", error);
+    const message = error instanceof Error ? error.message : "Error desconocido";
     return NextResponse.json(
-      { error: "Error al cotizar consulta", details: error.message },
+      { error: "Error al cotizar consulta", details: message },
       { status: 500 }
     );
   }

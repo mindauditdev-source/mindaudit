@@ -2,9 +2,9 @@ import { NextRequest } from 'next/server'
 import { getAuthenticatedUser } from '@/middleware/api-auth'
 import { requireAdmin } from '@/middleware/api-rbac'
 import { successResponse, serverErrorResponse } from '@/lib/api-response'
-import { CommissionService } from '@/services/commission.service'
+
 import { prisma } from '@/lib/db/prisma'
-import { ComisionStatus } from '@prisma/client'
+import { ComisionStatus, Prisma } from '@prisma/client'
 
 /**
  * GET /api/admin/comisiones
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const colaboradorId = searchParams.get('colaboradorId')
 
     // Construir filtros
-    const where: any = {}
+    const where: Prisma.ComisionWhereInput = {}
     if (status) where.status = status
     if (colaboradorId) where.colaboradorId = colaboradorId
 
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        auditoria: {
+        presupuesto: {
           include: {
             empresa: {
               select: {
@@ -80,10 +80,10 @@ export async function GET(request: NextRequest) {
           companyName: c.colaborador.companyName,
           user: c.colaborador.user,
         },
-        auditoria: {
-          id: c.auditoria.id,
-          tipoServicio: c.auditoria.tipoServicio,
-          empresa: c.auditoria.empresa,
+        presupuesto: {
+          id: c.presupuesto.id,
+          tipoServicio: c.presupuesto.tipoServicio,
+          empresa: c.presupuesto.empresa,
         },
       })),
       summary: {
@@ -94,8 +94,8 @@ export async function GET(request: NextRequest) {
         pagadas: comisiones.filter((c) => c.status === ComisionStatus.PAGADA).length,
       },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error en GET /api/admin/comisiones:', error)
-    return serverErrorResponse(error.message)
+    return serverErrorResponse((error as Error).message)
   }
 }

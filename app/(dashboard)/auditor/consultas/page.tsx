@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -11,13 +11,13 @@ import {
   XCircle,
   AlertCircle,
   Loader2,
-  FileText,
+
   Search,
   Calendar,
   ChevronRight,
   MessageSquare
 } from "lucide-react";
-import Link from "next/link";
+
 import type { ConsultaStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -215,7 +215,7 @@ export default function AuditorConsultasPage() {
       {loading && (
         <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-slate-200">
           <Loader2 className="h-10 w-10 animate-spin text-blue-600 mb-4" />
-          <p className="text-slate-500 font-medium font-bold uppercase tracking-widest text-xs">Cargando consultas...</p>
+          <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Cargando consultas...</p>
         </div>
       )}
 

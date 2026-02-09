@@ -16,7 +16,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AdminApiService } from "@/services/admin-api.service";
+import { AdminApiService, Auditoria } from "@/services/admin-api.service";
 import { formatCurrency } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -40,9 +40,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 export default function AuditorAuditoriasPage() {
-  const [auditorias, setAuditorias] = useState<any[]>([]);
+  const [auditorias, setAuditorias] = useState<Auditoria[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedAudit, setSelectedAudit] = useState<any>(null);
+  const [selectedAudit, setSelectedAudit] = useState<Auditoria | null>(null);
   const [budgetAmount, setBudgetAmount] = useState<string>("");
   const [budgetNotes, setBudgetNotes] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
@@ -62,21 +62,21 @@ export default function AuditorAuditoriasPage() {
       setLoading(true);
       const data = await AdminApiService.getAuditorias();
       setAuditorias(data.auditorias || []);
-    } catch (error) {
-      console.error("Error loading auditorias:", error);
+    } catch {
+      console.error("Error loading auditorias");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleOpenBudget = (audit: any) => {
+  const handleOpenBudget = (audit: Auditoria) => {
     setSelectedAudit(audit);
     setBudgetAmount(audit.presupuesto?.toString() || "");
     setBudgetNotes(audit.presupuestoNotas || "");
     setIsDialogOpen(true);
   };
 
-  const handleOpenDocRequest = (audit: any) => {
+  const handleOpenDocRequest = (audit: Auditoria) => {
     setSelectedAudit(audit);
     setDocRequestTitle("");
     setDocRequestDesc("");
@@ -94,7 +94,7 @@ export default function AuditorAuditoriasPage() {
        setIsDialogOpen(false);
        loadAuditorias();
        alert("Presupuesto enviado al cliente");
-     } catch (error) {
+     } catch {
        alert("Error al enviar presupuesto");
      } finally {
        setSubmitting(false);
@@ -113,7 +113,7 @@ export default function AuditorAuditoriasPage() {
       });
       setIsDocDialogOpen(false);
       alert("Documento solicitado correctamente");
-    } catch (error) {
+    } catch {
        alert("Error al solicitar documento");
     } finally {
        setSubmitting(false);
@@ -168,7 +168,7 @@ export default function AuditorAuditoriasPage() {
                       </tr>
                    </thead>
                    <tbody className="divide-y divide-slate-50">
-                      {auditorias.map((a) => (
+                      {auditorias.map((a: Auditoria) => (
                          <tr key={a.id} className="hover:bg-slate-50/70 transition-colors group">
                             <td className="px-6 py-4">
                                <div className="flex flex-col">

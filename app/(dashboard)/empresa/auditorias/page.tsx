@@ -5,15 +5,15 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FileText, Plus, Search, Calendar, AlertCircle } from "lucide-react";
-import { EmpresaApiService, EmpresaAuditoria } from "@/services/empresa-api.service";
-import { AuditoriaStatus } from "@prisma/client";
+import { FileText, Plus, Calendar } from "lucide-react";
+import { EmpresaApiService, EmpresaAuditoria, SolicitudEmpresa } from "@/services/empresa-api.service";
+import { PresupuestoStatus } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
 
 export default function EmpresaAuditoriasPage() {
   const [loading, setLoading] = useState(true);
   const [auditorias, setAuditorias] = useState<EmpresaAuditoria[]>([]);
-  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<SolicitudEmpresa[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -24,7 +24,7 @@ export default function EmpresaAuditoriasPage() {
           EmpresaApiService.getSolicitudesDocumento()
         ]);
         setAuditorias(auditData.auditorias || []);
-        setPendingRequests(requestData.solicitudes?.filter((s: any) => s.status === 'PENDIENTE') || []);
+        setPendingRequests(requestData.solicitudes?.filter((s) => s.status === 'PENDIENTE') || []);
       } catch (error) {
         console.error("Error loading auditorias data:", error);
       } finally {
@@ -120,7 +120,7 @@ export default function EmpresaAuditoriasPage() {
   );
 }
 
-function StatusBadge({ status }: { status: AuditoriaStatus }) {
+function StatusBadge({ status }: { status: PresupuestoStatus }) {
   const styles: Record<string, string> = {
     SOLICITADA: "bg-blue-100 text-blue-800",
     EN_REVISION: "bg-yellow-100 text-yellow-800",

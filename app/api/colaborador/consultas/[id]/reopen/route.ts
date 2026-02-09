@@ -25,7 +25,7 @@ export async function PATCH(
       );
     }
 
-    const { consulta, reabiertaPorPartner } = await ConsultaService.reabrirConsulta(
+    const { consulta } = await ConsultaService.reabrirConsulta(
       id,
       session.user.id,
       razon

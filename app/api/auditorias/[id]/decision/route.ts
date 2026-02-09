@@ -9,7 +9,7 @@ import {
   serverErrorResponse
 } from "@/lib/api-response";
 import { prisma } from "@/lib/db/prisma";
-import { AuditoriaStatus } from "@prisma/client";
+import { PresupuestoStatus } from "@prisma/client";
 
 export async function PATCH(
   req: NextRequest,
@@ -22,13 +22,13 @@ export async function PATCH(
     const { id } = await params;
     const { decision, feedback } = await req.json();
 
-    const auditoria = await prisma.auditoria.findUnique({
+    const auditoria = await prisma.presupuesto.findUnique({
       where: { id },
       include: { empresa: true },
     });
 
     if (!auditoria) {
-      return notFoundResponse("Auditoría no encontrada");
+      return notFoundResponse("Presupuesto no encontrado");
     }
 
     // Verify company ownership
@@ -36,18 +36,18 @@ export async function PATCH(
        return forbiddenResponse("No tienes permiso sobre este expediente");
     }
 
-    let nextStatus: AuditoriaStatus = auditoria.status;
+    let nextStatus: PresupuestoStatus = auditoria.status;
 
     if (decision === 'ACCEPT') {
        // Cliente acepta el presupuesto, ahora debe proceder al pago
-       nextStatus = "PENDIENTE_DE_PAGO";
+       nextStatus = "A_PAGAR";
     } else if (decision === 'REJECT') {
-       nextStatus = "RECHAZADA";
+       nextStatus = "RECHAZADO";
     } else if (decision === 'MEETING') {
-       nextStatus = "REUNION_SOLICITADA";
+        // meetingRequestedBy updated below
     }
 
-    const updatedAuditoria = await prisma.auditoria.update({
+    const updatedAuditoria = await prisma.presupuesto.update({
       where: { id },
       data: {
         status: nextStatus,
@@ -66,7 +66,7 @@ export async function PATCH(
         userId: user.id,
         userRole: "EMPRESA",
         action: decision === 'ACCEPT' ? "APPROVE" : decision === 'REJECT' ? "REJECT" : "UPDATE",
-        entity: "Auditoria",
+        entity: "Presupuesto",
         entityId: id,
         description: `Cliente tomó decisión: ${decision}. Feedback: ${feedback || "Ninguno"}`,
       },

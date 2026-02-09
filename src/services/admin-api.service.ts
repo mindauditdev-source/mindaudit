@@ -32,6 +32,54 @@ export interface AdminColaborador {
   }
 }
 
+export interface Empresa {
+  id: string;
+  companyName: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone?: string | null;
+  cif: string;
+}
+
+export interface Auditoria {
+  id: string;
+  tipoServicio: string;
+  status: string;
+  fiscalYear: number;
+  description?: string | null;
+  urgente: boolean;
+  fechaSolicitud: string;
+  presupuesto?: number | null;
+  presupuestoNotas?: string | null;
+  empresaId: string;
+  empresa: Empresa;
+  colaboradorId?: string | null;
+  colaborador?: {
+    id: string;
+    companyName: string;
+  } | null;
+  meetingStatus?: string | null;
+  meetingDate?: string | null;
+  meetingLink?: string | null;
+  meetingRequestedBy?: string | null;
+}
+
+export interface SolicitudDocumento {
+  id: string;
+  title: string;
+  description?: string | null;
+  status: string;
+  empresaId: string;
+  auditoriaId?: string | null;
+  feedback?: string | null;
+  documento?: {
+    id: string;
+    fileName: string;
+    fileUrl: string;
+    createdAt: string;
+  } | null;
+}
+
 async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const res = await fetch(`/api${endpoint}`, {
     ...options,
@@ -101,12 +149,12 @@ export const AdminApiService = {
     });
   },
 
-  getAuditorias: async (): Promise<{ auditorias: unknown[] }> => {
+  getAuditorias: async (): Promise<{ auditorias: Auditoria[] }> => {
     const response = await apiFetch("/auditorias");
     return response.data;
   },
 
-  getAuditoriaById: async (id: string): Promise<{ auditoria: unknown }> => {
+  getAuditoriaById: async (id: string): Promise<{ auditoria: Auditoria }> => {
     const response = await apiFetch(`/auditorias/${id}`);
     return response.data;
   },
@@ -142,7 +190,7 @@ export const AdminApiService = {
     });
   },
 
-  getSolicitudesByEmpresa: async (empresaId: string) => {
+  getSolicitudesByEmpresa: async (empresaId: string): Promise<{ solicitudes: SolicitudDocumento[] }> => {
     const response = await apiFetch(`/documentos/solicitudes?empresaId=${empresaId}`);
     return response.data;
   },

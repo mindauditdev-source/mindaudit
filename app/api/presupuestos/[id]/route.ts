@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/middleware/api-auth';
-import { requireAdmin } from '@/middleware/api-rbac';
+
 import { successResponse, serverErrorResponse } from '@/lib/api-response';
 import { prisma } from '@/lib/db/prisma';
 
@@ -10,11 +10,11 @@ import { prisma } from '@/lib/db/prisma';
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthenticatedUser();
-    const { id } = params;
+    const { id } = await params;
 
     const presupuesto = await prisma.presupuesto.findUnique({
       where: { id },

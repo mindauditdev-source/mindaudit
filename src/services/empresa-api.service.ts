@@ -1,4 +1,4 @@
-import { EmpresaStatus, EmpresaOrigen, AuditoriaStatus } from "@prisma/client";
+import { EmpresaStatus, EmpresaOrigen, PresupuestoStatus } from "@prisma/client";
 
 // Tipos basados en las respuestas de la API
 export interface EmpresaProfile {
@@ -38,7 +38,7 @@ export interface EmpresaAuditoria {
   tipoServicio: string;
   description: string | null;
   fiscalYear: number;
-  status: AuditoriaStatus;
+  status: PresupuestoStatus;
   urgente: boolean;
   presupuesto: number | null;
   presupuestoNotas?: string | null;
@@ -66,6 +66,15 @@ export interface EmpresaAuditoria {
     id: string;
     companyName: string;
   } | null;
+}
+
+export interface SolicitudEmpresa {
+    id: string;
+    title: string;
+    description: string | null;
+    status: string;
+    auditoriaId?: string | null;
+    createdAt: string;
 }
 
 export class EmpresaApiService {
@@ -114,7 +123,7 @@ export class EmpresaApiService {
     return response.data;
   }
 
-  static async getSolicitudesDocumento(params?: { auditoriaId?: string }): Promise<{ solicitudes: unknown[] }> {
+  static async getSolicitudesDocumento(params?: { auditoriaId?: string }): Promise<{ solicitudes: SolicitudEmpresa[] }> {
     let query = "";
     if (params?.auditoriaId) query = `?auditoriaId=${params.auditoriaId}`;
     const response = await this.fetch(`/documentos/solicitudes${query}`);
