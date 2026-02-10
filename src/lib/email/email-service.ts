@@ -20,16 +20,160 @@ interface EmpresaInfo {
 
 export class EmailService {
   /**
+   * Notificación de Nueva Candidatura (Trabaja con nosotros)
+   */
+  static async notifyNewCareerApplication(data: {
+    nombre: string;
+    email: string;
+    puesto: string;
+    mensaje?: string;
+    cv?: { filename: string; content: Buffer };
+  }) {
+    const adminEmail = process.env.CONTACT_EMAIL_TO || 'admin@mindaudit.es';
+    const subject = `[Candidatura Web] ${data.puesto} - ${data.nombre}`;
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; }
+            .content { background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #e2e8f0; border-top: none; }
+            .field { margin-bottom: 20px; }
+            .label { font-weight: bold; color: #0f172a; margin-bottom: 5px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+            .value { background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+            .footer { text-align: center; margin-top: 30px; color: #64748b; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1 style="margin: 0; font-size: 24px;">🚀 Nueva Candidatura Recibida</h1>
+            </div>
+            <div class="content">
+              <div class="field">
+                <div class="label">Candidato:</div>
+                <div class="value">${data.nombre}</div>
+              </div>
+              <div class="field">
+                <div class="label">Email:</div>
+                <div class="value"><a href="mailto:${data.email}" style="color: #2563eb;">${data.email}</a></div>
+              </div>
+              <div class="field">
+                <div class="label">Puesto de Interés:</div>
+                <div class="value">${data.puesto}</div>
+              </div>
+              <div class="field">
+                <div class="label">Mensaje / Motivación:</div>
+                <div class="value">${data.mensaje ? data.mensaje.replace(/\n/g, '<br>') : 'Sin mensaje adicional'}</div>
+              </div>
+              ${data.cv ? `
+                <div class="field">
+                  <div class="label">Adjunto:</div>
+                  <div class="value">El CV (${data.cv.filename}) se adjunta a este correo.</div>
+                </div>
+              ` : ''}
+              <div class="footer">
+                <p>Este mensaje fue enviado desde el portal de empleo de MindAudit Spain</p>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    const attachments = data.cv ? [data.cv] : [];
+
+    return this.sendEmail({
+      to: adminEmail,
+      subject,
+      html,
+      attachments
+    });
+  }
+
+  /**
+   * Notificación de Nueva Consulta (Contacto)
+   */
+  static async notifyNewContactRequest(data: {
+    nombre: string;
+    email: string;
+    asunto: string;
+    mensaje: string;
+  }) {
+    const adminEmail = process.env.CONTACT_EMAIL_TO || 'admin@mindaudit.es';
+    const subject = `[Contacto Web] ${data.asunto || 'Consulta General'} - ${data.nombre}`;
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #0f4c81 0%, #1e5a94 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; }
+            .content { background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #e2e8f0; border-top: none; }
+            .field { margin-bottom: 20px; }
+            .label { font-weight: bold; color: #0f4c81; margin-bottom: 5px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+            .value { background: white; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+            .footer { text-align: center; margin-top: 30px; color: #64748b; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1 style="margin: 0; font-size: 24px;">📧 Nueva Consulta desde la Web</h1>
+            </div>
+            <div class="content">
+              <div class="field">
+                <div class="label">Nombre:</div>
+                <div class="value">${data.nombre}</div>
+              </div>
+              <div class="field">
+                <div class="label">Email:</div>
+                <div class="value"><a href="mailto:${data.email}" style="color: #0f4c81;">${data.email}</a></div>
+              </div>
+              <div class="field">
+                <div class="label">Asunto:</div>
+                <div class="value">${data.asunto || 'Información General'}</div>
+              </div>
+              <div class="field">
+                <div class="label">Mensaje:</div>
+                <div class="value">${data.mensaje.replace(/\n/g, '<br>')}</div>
+              </div>
+              <div class="footer">
+                <p>Este mensaje fue enviado desde el formulario de contacto de MindAudit Spain</p>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    return this.sendEmail({
+      to: adminEmail,
+      subject,
+      html
+    });
+  }
+
+  /**
    * Envia un email genérico
    */
   static async sendEmail({
     to,
     subject,
     html,
+    attachments,
   }: {
     to: string | string[];
     subject: string;
     html: string;
+    attachments?: { filename: string; content: Buffer | string }[];
   }) {
     try {
       if (!process.env.RESEND_API_KEY) {
@@ -42,6 +186,7 @@ export class EmailService {
         to,
         subject,
         html,
+        attachments,
       });
 
       if (error) {
@@ -55,6 +200,7 @@ export class EmailService {
       return { success: false, error };
     }
   }
+
 
   /**
    * Notificación de Nueva Auditoría Solicitada (Para Admin)
@@ -527,4 +673,5 @@ export class EmailService {
       html
     });
   }
+
 }

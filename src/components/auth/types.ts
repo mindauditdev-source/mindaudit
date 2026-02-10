@@ -20,10 +20,6 @@ export interface RegisterFormData {
   employees: string;
   revenue: string;
   fiscalYear: string;
-  // Paso 3
-  certificado: File | null;
-  especialidades: string[];
-  experiencia: string;
 }
 
 export type RegisterTouched = {

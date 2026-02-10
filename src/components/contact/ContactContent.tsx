@@ -63,6 +63,8 @@ export function ContactContent() {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
+      // Scroll up to show the success/error message
+      window.scrollTo({ top: 100, behavior: 'smooth' });
     }
   };
 

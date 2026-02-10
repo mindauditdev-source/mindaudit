@@ -9,10 +9,8 @@ import { Step2CompanyInfo } from "./Step2CompanyInfo";
 import { Step3ProfessionalCredentials } from "./Step3ProfessionalCredentials";
 import { RegisterFormData, RegisterTouched, RegisterErrors } from "./types";
 import { useRouter } from 'next/navigation';
-import { Loader2, Building2, UserCog, ArrowRight } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 export function RegisterContent() {
   const router = useRouter();
@@ -22,7 +20,7 @@ export function RegisterContent() {
   
   // Unified Form State
   const [formData, setFormData] = React.useState<RegisterFormData>({
-    role: null,
+    role: 'COLABORADOR',
     // Step 1
     nombreCompleto: "",
     email: "",
@@ -42,13 +40,9 @@ export function RegisterContent() {
     employees: "",
     revenue: "",
     fiscalYear: new Date().getFullYear().toString(),
-    // Step 3
-    certificado: null,
-    especialidades: [],
-    experiencia: ""
   });
 
-  const totalSteps = formData.role === 'EMPRESA' ? 2 : 3;
+  const totalSteps = 3;
 
   const [touched, setTouched] = React.useState<RegisterTouched>({});
   const [errors, setErrors] = React.useState<RegisterErrors>({});
@@ -132,10 +126,6 @@ export function RegisterContent() {
     }
   };
 
-  const selectRole = (role: 'COLABORADOR' | 'EMPRESA') => {
-    setFormData(prev => ({ ...prev, role }));
-    setStep(1);
-  };
 
   const nextStep = () => {
     if (step === totalSteps) {
@@ -253,69 +243,6 @@ export function RegisterContent() {
     }
   };
 
-  // Step 0: Role Selection
-  if (!formData.role) {
-    return (
-      <div className="min-h-screen bg-white flex flex-col font-sans text-slate-900">
-        <RegisterHeader />
-        <main className="grow bg-[#f8fafc]/50 flex items-center justify-center p-6">
-          <div className="max-w-5xl w-full space-y-8">
-            <div className="text-center space-y-4">
-              <h1 className="text-4xl font-extrabold text-slate-900">Bienvenido a MindAudit</h1>
-              <p className="text-xl text-slate-500">Seleccione su tipo de cuenta para comenzar</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Card Colaborador */}
-              <Card 
-                className="group relative overflow-hidden border-2 border-slate-100 hover:border-[#0a3a6b] cursor-pointer transition-all duration-300 hover:shadow-2xl bg-white"
-                onClick={() => selectRole('COLABORADOR')}
-              >
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <CardContent className="p-8 lg:p-12 flex flex-col items-center text-center gap-6">
-                  <div className="w-20 h-20 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <UserCog className="w-10 h-10" />
-                  </div>
-                  <div className="space-y-3">
-                    <h2 className="text-2xl font-bold text-slate-900">Soy Colaborador</h2>
-                    <p className="text-slate-500 leading-relaxed">
-                      Para gestorías, asesores y despachos profesionales que gestionan auditorías para sus clientes.
-                    </p>
-                  </div>
-                  <Button variant="ghost" className="mt-4 text-[#0a3a6b] font-bold group-hover:translate-x-1 transition-transform">
-                    Comenzar Registro <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Card Empresa */}
-              <Card 
-                className="group relative overflow-hidden border-2 border-slate-100 hover:border-[#0a3a6b] cursor-pointer transition-all duration-300 hover:shadow-2xl bg-white"
-                onClick={() => selectRole('EMPRESA')}
-              >
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <CardContent className="p-8 lg:p-12 flex flex-col items-center text-center gap-6">
-                  <div className="w-20 h-20 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <Building2 className="w-10 h-10" />
-                  </div>
-                  <div className="space-y-3">
-                    <h2 className="text-2xl font-bold text-slate-900">Soy Empresa</h2>
-                    <p className="text-slate-500 leading-relaxed">
-                      Para empresas que buscan contratar servicios de auditoría directamente o gestionar sus obligaciones.
-                    </p>
-                  </div>
-                  <Button variant="ghost" className="mt-4 text-[#0a3a6b] font-bold group-hover:translate-x-1 transition-transform">
-                    Comenzar Registro <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </main>
-        <RegisterFooter />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans text-slate-900">
@@ -323,15 +250,6 @@ export function RegisterContent() {
 
       <main className="grow bg-[#f8fafc]/50">
         <div className="container mx-auto px-6 py-12 max-w-7xl transition-all duration-500">
-          <div className="mb-8 pl-4">
-             <button 
-                onClick={() => setFormData(prev => ({ ...prev, role: null }))}
-                className="text-sm font-medium text-slate-500 hover:text-[#0a3a6b] flex items-center gap-2 transition-colors"
-                disabled={isSubmitting}
-             >
-                <ArrowRight className="w-4 h-4 rotate-180" /> Cambiar tipo de cuenta ({formData.role === 'COLABORADOR' ? 'Colaborador' : 'Empresa'})
-             </button>
-          </div>
 
           <RegisterStepper currentStep={step} totalSteps={totalSteps} />
 

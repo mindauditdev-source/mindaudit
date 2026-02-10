@@ -38,9 +38,11 @@ export function PartnersContent() {
                 confianza para potenciar el crecimiento de tu despacho.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 mb-2">
-                <Button className="bg-[#0f4c81] hover:bg-[#0d3d68] text-white px-8 h-12 font-bold rounded-lg shadow-lg">
-                  Solicitar colaboración
-                </Button>
+                <Link href="/register">
+                  <Button className="bg-[#0f4c81] hover:bg-[#0d3d68] text-white px-8 h-12 font-bold rounded-lg shadow-lg">
+                    Registrarse como colaborador
+                  </Button>
+                </Link>
                 <Button variant="outline" className="border-slate-200 text-slate-700 bg-white px-8 h-12 font-bold rounded-lg hover:bg-slate-50 transition-colors">
                   Cómo funciona
                 </Button>
@@ -138,9 +140,9 @@ export function PartnersContent() {
             {/* Step 1 */}
             <div className="flex flex-col md:flex-row items-center gap-8 py-8 relative">
               <div className="flex-1 text-center md:text-right">
-                <h3 className="text-xl font-bold text-slate-900 mb-2">1. Registro</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">1. Registro Online</h3>
                 <p className="text-slate-500 text-sm max-w-xs ml-auto">
-                  Completa el formulario de solicitud con los datos de tu firma y áreas de especialización.
+                  Crea tu cuenta de colaborador en nuestra plataforma de registro en pocos minutos.
                 </p>
               </div>
               <div className="z-10 bg-[#0f4c81] h-14 w-14 rounded-full flex items-center justify-center text-white font-bold shrink-0 border-4 border-white shadow-lg">
@@ -164,7 +166,7 @@ export function PartnersContent() {
               <div className="flex-1 order-2 md:order-3 text-center md:text-left">
                 <h3 className="text-xl font-bold text-slate-900 mb-2">2. Validación</h3>
                 <p className="text-slate-500 text-sm max-w-xs">
-                  Nuestro equipo de cumplimiento revisa las credenciales y el perfil profesional.
+                  Validamos tu perfil y credenciales para asegurar la excelencia en nuestra red.
                 </p>
               </div>
               {/* Line Connector */}
@@ -231,7 +233,7 @@ export function PartnersContent() {
         </div>
       </section>
 
-      {/* 5. Footer CTA Form */}
+      {/* 5. Footer CTA Simplified */}
       <section className="bg-[#0f2439] py-20 lg:py-32 relative overflow-hidden">
         {/* Geometric Pattern Backdrop */}
         <div className="absolute inset-0 opacity-10" 
@@ -242,86 +244,46 @@ export function PartnersContent() {
         />
         
         <div className="container relative z-10 mx-auto px-4">
-           <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
-              {/* Left Column */}
-              <div className="flex-1 text-white space-y-10">
-                <div>
-                  <h2 className="text-4xl lg:text-5xl font-extrabold mb-6 leading-tight">Comienza tu solicitud</h2>
-                  <p className="text-xl text-blue-100/80 leading-relaxed max-w-lg">
-                    Únete a una red de éxito. Rellena el formulario y nuestro equipo de desarrollo de negocio contactará contigo en menos de 24 horas.
-                  </p>
-                </div>
+           <div className="max-w-4xl mx-auto text-center space-y-10">
+              <div className="text-white">
+                <h2 className="text-4xl lg:text-5xl font-extrabold mb-6 leading-tight">¿Listo para unirte?</h2>
+                <p className="text-xl text-blue-100/80 leading-relaxed max-w-2xl mx-auto">
+                  Únete a una red de éxito y comienza a colaborar con la firma líder en auditoría digital. El proceso de registro es rápido y sencillo.
+                </p>
+              </div>
 
-                <div className="space-y-6">
-                  <div className="flex items-center gap-5">
-                    <div className="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20">
-                      <Zap className="h-6 w-6 text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-lg">Validación Rápida</p>
-                      <p className="text-blue-200/60 text-sm">Procesado en 48h desde la recepción.</p>
-                    </div>
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-10 text-white">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20">
+                    <Zap className="h-6 w-6 text-blue-400" />
                   </div>
-                  <div className="flex items-center gap-5">
-                    <div className="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20">
-                      <Users className="h-6 w-6 text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-lg">Soporte Dedicado</p>
-                      <p className="text-blue-200/60 text-sm">Un gestor de cuenta asignado desde el inicio.</p>
-                    </div>
+                  <div className="text-left">
+                    <p className="font-bold text-lg">Alta Inmediata</p>
+                    <p className="text-blue-200/60 text-sm">Registro en menos de 5 minutos.</p>
                   </div>
                 </div>
-
-                <div className="pt-10 border-t border-white/10">
-                   <p className="text-sm text-blue-100/40">MindAudit Spain SLP © 2024</p>
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20">
+                    <Users className="h-6 w-6 text-blue-400" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-bold text-lg">Red de Confianza</p>
+                    <p className="text-blue-200/60 text-sm">Acceso a expertos y recursos.</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Right Column: Form */}
-              <div className="w-full max-w-2xl">
-                 <Card className="border-none shadow-2xl rounded-4xl overflow-hidden">
-                    <CardContent className="p-10 lg:p-14 space-y-8 bg-white">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Razón Social</label>
-                          <input type="text" placeholder="Ej. Auditores Asociados SL" className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0f4c81]/10 focus:border-[#0f4c81] outline-none transition-all text-sm" />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">NIF / CIF</label>
-                          <input type="text" placeholder="B-12345678" className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0f4c81]/10 focus:border-[#0f4c81] outline-none transition-all text-sm" />
-                        </div>
-                      </div>
+              <div className="pt-6">
+                <Link href="/register">
+                  <Button size="lg" className="bg-white hover:bg-blue-50 text-[#0f2439] font-bold h-16 px-10 rounded-xl text-xl shadow-2xl group transition-all duration-300">
+                    Registrarse ahora
+                    <ArrowRight className="h-6 w-6 ml-3 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </Link>
+              </div>
 
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Persona de Contacto</label>
-                        <input type="text" placeholder="Nombre y Apellidos" className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0f4c81]/10 focus:border-[#0f4c81] outline-none transition-all text-sm" />
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Email Corporativo</label>
-                          <input type="email" placeholder="nombre@empresa.com" className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0f4c81]/10 focus:border-[#0f4c81] outline-none transition-all text-sm" />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Teléfono</label>
-                          <input type="tel" placeholder="+34 600 000 000" className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0f4c81]/10 focus:border-[#0f4c81] outline-none transition-all text-sm" />
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3 py-2">
-                         <input type="checkbox" id="privacy" className="mt-1 h-4 w-4 rounded border-slate-200 text-[#0f4c81]" />
-                         <label htmlFor="privacy" className="text-xs text-slate-500 leading-relaxed">
-                           Acepto la <Link href="/legal/privacidad" className="underline hover:text-slate-900">Política de Privacidad</Link> y el procesamiento de datos.
-                         </label>
-                      </div>
-
-                      <Button className="w-full bg-[#0f4c81] hover:bg-[#0d3d68] text-white font-bold h-14 rounded-xl text-lg shadow-lg group transition-all duration-300">
-                        Enviar Solicitud
-                        <ArrowRight className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" />
-                      </Button>
-                    </CardContent>
-                 </Card>
+              <div className="pt-10 border-t border-white/10">
+                 <p className="text-sm text-blue-100/40">MindAudit Spain SLP © 2024</p>
               </div>
            </div>
         </div>

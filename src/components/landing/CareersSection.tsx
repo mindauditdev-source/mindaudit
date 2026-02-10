@@ -7,12 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Send, User, Mail, Briefcase, FileText, CheckCircle2, Loader2, Info } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 export function CareersSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -34,8 +34,13 @@ export function CareersSection() {
       }
 
       setIsSuccess(true);
-    } catch (err: any) {
-      setError(err.message || 'Error al conectar con el servidor');
+      // Scroll up to show the success message
+      window.scrollTo({ top: 100, behavior: 'smooth' });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al conectar con el servidor';
+      setError(errorMessage);
+      // Scroll up to show the error message
+      window.scrollTo({ top: 100, behavior: 'smooth' });
     } finally {
       setIsSubmitting(false);
     }
@@ -95,7 +100,7 @@ export function CareersSection() {
             </motion.div>
 
             <div className="flex items-center gap-4 p-4 rounded-xl bg-blue-50/50 border border-blue-100 text-blue-800">
-              <Info className="w-5 h-5 flex-shrink-0" />
+              <Info className="w-5 h-5 shrink-0" />
               <p className="text-sm leading-relaxed">
                 Aceptamos candidaturas tanto para <strong>Auditores ROAC</strong> como para 
                 perfiles de <strong>Tecnología</strong> y <strong>Operaciones</strong>.
@@ -188,11 +193,31 @@ export function CareersSection() {
                             <div className="flex items-center justify-center w-full">
                               <label htmlFor="cv" className="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-200 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 hover:border-blue-300 transition-all">
                                 <div className="flex flex-col items-center justify-center pt-5 pb-6 text-slate-500">
-                                  <FileText className="w-8 h-8 mb-3 text-slate-400" />
-                                  <p className="mb-2 text-sm">Haz clic para subir o arrastra tu PDF</p>
-                                  <p className="text-xs">PDF (Máx. 5MB)</p>
+                                  {selectedFile ? (
+                                    <>
+                                      <CheckCircle2 className="w-8 h-8 mb-3 text-green-500" />
+                                      <p className="mb-2 text-sm font-medium text-slate-900">{selectedFile.name}</p>
+                                      <p className="text-xs text-slate-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <FileText className="w-8 h-8 mb-3 text-slate-400" />
+                                      <p className="mb-2 text-sm">Haz clic para subir o arrastra tu PDF</p>
+                                      <p className="text-xs">PDF (Máx. 5MB)</p>
+                                    </>
+                                  )}
                                 </div>
-                                <input id="cv" name="cv" type="file" accept=".pdf" className="hidden" />
+                                <input 
+                                  id="cv" 
+                                  name="cv" 
+                                  type="file" 
+                                  accept=".pdf" 
+                                  className="hidden" 
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) setSelectedFile(file);
+                                  }}
+                                />
                               </label>
                             </div>
                           </div>
