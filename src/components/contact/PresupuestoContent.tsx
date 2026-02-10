@@ -71,6 +71,8 @@ export default function PresupuestoContent() {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
+      // Scroll up to show the success/error message
+      window.scrollTo({ top: 200, behavior: 'smooth' });
     }
   };
 

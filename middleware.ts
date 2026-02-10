@@ -19,6 +19,9 @@ export async function middleware(req: NextRequest) {
     '/contacto',
     '/trabaja-con-nosotros',
     '/legal',
+    '/api/send-presupuesto',
+    '/api/send-contact',
+    '/api/send-career',
     '/api/payments/webhook',
   ]
 

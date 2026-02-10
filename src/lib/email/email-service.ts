@@ -410,4 +410,121 @@ export class EmailService {
     
     return this.sendEmail({ to: destinatario.email, subject, html });
   }
+
+  /**
+   * Notificación de Nueva Solicitud de Presupuesto desde Landing
+   */
+  static async notifyNewLandingPresupuesto(data: {
+    id: string;
+    razonSocial: string | null;
+    cif: string | null;
+    facturacion: string | null;
+    nombreContacto: string | null;
+    email: string | null;
+    telefono: string | null;
+    tipoServicio: string | null;
+    urgente: boolean;
+    descripcion: string | null;
+  }) {
+    const adminEmail = process.env.CONTACT_EMAIL_TO || 'admin@mindaudit.es';
+    const fromName = process.env.CONTACT_EMAIL_FROM_NAME || 'MindAudit Spain';
+
+    const subject = `[Nuevo Presupuesto #${data.id.substring(0, 6).toUpperCase()}] ${data.tipoServicio} - ${data.razonSocial}`;
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #0f4c81 0%, #1e5a94 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; }
+            .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 12px; margin-top: 10px; }
+            .content { background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #e2e8f0; border-top: none; }
+            .section { margin-bottom: 25px; }
+            .section-title { font-size: 14px; font-weight: bold; color: #0f4c81; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+            .field { margin-bottom: 15px; }
+            .label { font-weight: 600; color: #64748b; font-size: 12px; margin-bottom: 5px; }
+            .value { background: white; padding: 12px; border-radius: 6px; border-left: 3px solid #0f4c81; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+            .footer { text-align: center; margin-top: 30px; color: #64748b; font-size: 12px; }
+            .urgent { background: #ef4444; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1 style="margin: 0; font-size: 24px;">💼 Nueva Solicitud de Presupuesto</h1>
+              ${data.urgente ? '<span class="badge urgent">⚡ URGENTE</span>' : '<span class="badge">📋 Normal</span>'}
+              <div style="margin-top: 10px; font-size: 14px; opacity: 0.8;">ID Registro: ${data.id}</div>
+            </div>
+            <div class="content">
+              
+              <div class="section">
+                <div class="section-title">📊 Datos de la Empresa</div>
+                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                  <div style="flex: 1;">
+                    <div class="label">Razón Social</div>
+                    <div class="value">${data.razonSocial || 'N/A'}</div>
+                  </div>
+                  <div style="flex: 1;">
+                    <div class="label">CIF/NIF</div>
+                    <div class="value">${data.cif || 'No proporcionado'}</div>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="label">Facturación Anual</div>
+                  <div class="value">${data.facturacion || 'No especificado'}</div>
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="section-title">👤 Datos de Contacto</div>
+                <div class="field">
+                  <div class="label">Persona de Contacto</div>
+                  <div class="value">${data.nombreContacto || 'N/A'}</div>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                  <div style="flex: 1;">
+                    <div class="label">Email</div>
+                    <div class="value"><a href="mailto:${data.email}" style="color: #0f4c81;">${data.email}</a></div>
+                  </div>
+                  <div style="flex: 1;">
+                    <div class="label">Teléfono</div>
+                    <div class="value">${data.telefono || 'No proporcionado'}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="section-title">🔍 Detalles del Servicio</div>
+                <div class="field">
+                  <div class="label">Tipo de Servicio</div>
+                  <div class="value"><strong>${data.tipoServicio}</strong></div>
+                </div>
+                ${data.descripcion ? `
+                  <div class="field">
+                    <div class="label">Descripción del Encargo</div>
+                    <div class="value">${data.descripcion.replace(/\n/g, '<br>')}</div>
+                  </div>
+                ` : ''}
+              </div>
+
+              <div class="footer">
+                <p>Este presupuesto fue solicitado desde el formulario web de ${fromName}</p>
+                <p style="margin-top: 10px;">⏰ Compromiso de respuesta: 24 horas</p>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    return this.sendEmail({
+      to: adminEmail,
+      subject,
+      html
+    });
+  }
 }
