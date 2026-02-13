@@ -22,6 +22,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Server-side validation for file size (30MB limit)
+    const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30MB
+    const oversizedFiles = files.filter(file => file.size > MAX_FILE_SIZE);
+
+    if (oversizedFiles.length > 0) {
+      return NextResponse.json(
+        { 
+          error: `Uno o más archivos exceden el límite de 30MB`,
+          details: oversizedFiles.map(f => `${f.name} (${(f.size / 1024 / 1024).toFixed(2)}MB)`).join(', ')
+        },
+        { status: 400 }
+      );
+    }
+
     const uploadedFiles = [];
 
     for (const file of files) {

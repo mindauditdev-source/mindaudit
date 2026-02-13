@@ -95,9 +95,9 @@ export function ConsultationChat({ currentUserId, apiEndpoint }: ConsultationCha
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // 5MB limit
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("El archivo es muy pesado (máximo 5MB)");
+    // 30MB limit
+    if (file.size > 30 * 1024 * 1024) {
+      toast.error("El archivo es muy pesado (máximo 30MB)");
       return;
     }
 
