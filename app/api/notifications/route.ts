@@ -154,6 +154,35 @@ export async function GET(request: Request) {
             include: { colaborador: { select: { name: true } } },
             take: limit,
             skip
+          }),
+          // Consultas comunes para Admin (Ver todo)
+          prisma.presupuesto.findMany({
+            where: { status: 'PENDIENTE_PRESUPUESTAR' },
+            include: { empresa: { select: { companyName: true } } },
+            take: limit,
+            skip
+          }),
+          prisma.presupuesto.findMany({
+            where: { meetingStatus: 'PENDING' },
+            include: { empresa: { select: { companyName: true } } },
+            take: limit,
+            skip
+          }),
+          prisma.solicitudDocumento.findMany({
+            where: { status: 'ENTREGADO' },
+            include: { empresa: { select: { companyName: true } }, presupuesto: true },
+            take: limit,
+            skip
+          }),
+          prisma.presupuesto.findMany({
+            where: {
+              status: 'ACEPTADO_PENDIENTE_FACTURAR',
+              updatedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
+            },
+            include: { empresa: { select: { companyName: true } } },
+            orderBy: { updatedAt: 'desc' },
+            take: limit,
+            skip
           })
         );
       } else {
@@ -167,41 +196,51 @@ export async function GET(request: Request) {
             select: { id: true, titulo: true, respondidaAt: true, status: true, updatedAt: true },
             take: limit,
             skip
+          }),
+           // Consultas comunes para Colaborador (FILTRADO por su ID)
+           // Solo ve lo que tiene asignado
+           prisma.presupuesto.findMany({
+            where: { 
+              status: 'PENDIENTE_PRESUPUESTAR',
+              colaboradorId: user.colaboradorId || 'undefined_colab_id' // Fillet by assignee
+            },
+            include: { empresa: { select: { companyName: true } } },
+            take: limit,
+            skip
+          }),
+          prisma.presupuesto.findMany({
+            where: { 
+              meetingStatus: 'PENDING',
+              colaboradorId: user.colaboradorId || 'undefined_colab_id'
+            },
+            include: { empresa: { select: { companyName: true } } },
+            take: limit,
+            skip
+          }),
+          prisma.solicitudDocumento.findMany({
+            where: { 
+              status: 'ENTREGADO',
+              presupuesto: {
+                colaboradorId: user.colaboradorId || 'undefined_colab_id'
+              }
+            },
+            include: { empresa: { select: { companyName: true } }, presupuesto: true },
+            take: limit,
+            skip
+          }),
+          prisma.presupuesto.findMany({
+            where: {
+              status: 'ACEPTADO_PENDIENTE_FACTURAR',
+              colaboradorId: user.colaboradorId || 'undefined_colab_id',
+              updatedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
+            },
+            include: { empresa: { select: { companyName: true } } },
+            orderBy: { updatedAt: 'desc' },
+            take: limit,
+            skip
           })
         );
       }
-
-      // Consultas comunes para Admin/Colaborador (Auditoría)
-      promises.push(
-        prisma.presupuesto.findMany({
-          where: { status: 'PENDIENTE_PRESUPUESTAR' },
-          include: { empresa: { select: { companyName: true } } },
-          take: limit,
-          skip
-        }),
-        prisma.presupuesto.findMany({
-          where: { meetingStatus: 'PENDING' },
-          include: { empresa: { select: { companyName: true } } },
-          take: limit,
-          skip
-        }),
-        prisma.solicitudDocumento.findMany({
-          where: { status: 'ENTREGADO' },
-          include: { empresa: { select: { companyName: true } }, presupuesto: true },
-          take: limit,
-          skip
-        }),
-        prisma.presupuesto.findMany({
-          where: {
-            status: 'ACEPTADO_PENDIENTE_FACTURAR',
-            updatedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
-          },
-          include: { empresa: { select: { companyName: true } } },
-          orderBy: { updatedAt: 'desc' },
-          take: limit,
-          skip
-        })
-      );
     }
 
     // Ejecutar todas las consultas en paralelo
