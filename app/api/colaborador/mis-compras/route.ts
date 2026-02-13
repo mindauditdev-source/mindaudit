@@ -1,26 +1,33 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/auth-options";
+import { NextRequest, NextResponse } from "next/server";
+import { getAuthenticatedUser } from "@/middleware/api-auth";
 import { PaqueteHorasService } from "@/services/paquete-horas.service";
 
-// GET /api/colaborador/mis-compras - Historial de compras
-export async function GET() {
+// GET /api/colaborador/mis-compras - Historial de compras con paginación
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser();
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const userId = (session.user as any).id;
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
 
-    const compras = await PaqueteHorasService.historialCompras(userId);
+    const { items, total } = await PaqueteHorasService.historialCompras(user.id, page, limit);
 
-    return NextResponse.json({ compras }, { status: 200 });
-  } catch (error: any) {
+    return NextResponse.json({ 
+      compras: items,
+      total,
+      page,
+      limit
+    }, { status: 200 });
+  } catch (error: unknown) {
     console.error("Error obteniendo historial:", error);
+    const message = error instanceof Error ? error.message : "Error desconocido";
     return NextResponse.json(
-      { error: "Error al obtener historial", details: error.message },
+      { error: "Error al obtener historial", details: message },
       { status: 500 }
     );
   }

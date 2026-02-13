@@ -9,6 +9,16 @@ export class PaqueteHorasService {
       where: {
         activo: true,
       },
+      select: {
+        id: true,
+        nombre: true,
+        descripcion: true,
+        horas: true,
+        precio: true,
+        descuento: true,
+        destacado: true,
+        orden: true,
+      },
       orderBy: [
         { destacado: "desc" },
         { orden: "asc" },
@@ -157,24 +167,35 @@ export class PaqueteHorasService {
   /**
    * Historial de compras del colaborador
    */
-  static async historialCompras(colaboradorId: string) {
-    const compras = await prisma.compraHoras.findMany({
-      where: {
-        colaboradorId,
-      },
-      include: {
-        paquete: {
-          select: {
-            nombre: true,
-            descripcion: true,
+  static async historialCompras(colaboradorId: string, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const [items, total] = await Promise.all([
+      prisma.compraHoras.findMany({
+        where: {
+          colaboradorId,
+        },
+        include: {
+          paquete: {
+            select: {
+              nombre: true,
+              descripcion: true,
+            },
           },
         },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.compraHoras.count({
+        where: {
+          colaboradorId,
+        },
+      }),
+    ]);
 
-    return compras;
+    return { items, total };
   }
 }

@@ -14,42 +14,49 @@ export async function GET() {
     const user = await getAuthenticatedUser()
     requireColaborador(user)
 
-    // Obtener perfil del colaborador
-    const colaborador = await prisma.colaborador.findUnique({
-      where: { userId: user.id },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            status: true,
-            emailVerified: true,
-            createdAt: true,
-            horasDisponibles: true,
-            _count: {
-              select: {
-                consultas: true,
-              }
-            }
+    // Obtener perfil del colaborador y estadísticas en paralelo para evitar latencia de joins complejos
+    const [colaborador, consultasCount, statsCounts] = await Promise.all([
+      // 1. Perfil básico
+      prisma.colaborador.findUnique({
+        where: { userId: user.id },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              status: true,
+              emailVerified: true,
+              createdAt: true,
+              horasDisponibles: true,
+            },
           },
         },
-        _count: {
-          select: {
-            empresas: true,
-            presupuestos: true,
-            comisiones: true,
+      }),
+      // 2. Conteo de consultas (sobre el user)
+      prisma.consulta.count({
+        where: { colaboradorId: user.id }
+      }),
+      // 3. Conteos del colaborador
+      prisma.colaborador.findUnique({
+        where: { userId: user.id },
+        select: {
+          _count: {
+            select: {
+              empresas: true,
+              presupuestos: true,
+              comisiones: true,
+            },
           },
-        },
-      },
-    })
+        }
+      })
+    ])
 
-    if (!colaborador) {
+    if (!colaborador || !statsCounts) {
       return errorResponse('Perfil de colaborador no encontrado', 404)
     }
 
     // Cast user to include _count with proper typing
-    const userData = colaborador.user as (typeof colaborador.user & { _count?: { consultas: number } }); 
 
     return successResponse({
       colaborador: {
@@ -73,8 +80,8 @@ export async function GET() {
         updatedAt: colaborador.updatedAt,
         user: colaborador.user,
         stats: {
-          totalEmpresas: colaborador._count.empresas,
-          totalConsultas: userData._count?.consultas || 0,
+          totalEmpresas: statsCounts._count.empresas,
+          totalConsultas: consultasCount,
         },
       },
     })

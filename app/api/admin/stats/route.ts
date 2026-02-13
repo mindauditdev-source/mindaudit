@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getAuthenticatedUser } from '@/middleware/api-auth'
 import { requireAdmin } from '@/middleware/api-rbac'
 import { successResponse, serverErrorResponse } from '@/lib/api-response'
@@ -13,25 +14,32 @@ export async function GET() {
     const user = await getAuthenticatedUser()
     requireAdmin(user)
 
-    // Obtener estadísticas en paralelo
-    const results = await Promise.all([
+    // Calcular el primer día del mes actual para el filtro de ingresos
+    const now = new Date()
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+
+    // Obtener todas las estadísticas en paralelo para minimizar latencia
+    const [
+      totalColaboradores,
+      totalEmpresas,
+      presupuestosStats,
+      totalConsultas,
+      consultasPendientes,
+      compraHorasAgg,
+      ingresosMesAgg
+    ] = await Promise.all([
       // Total colaboradores
       prisma.colaborador.count(),
 
       // Total empresas
       prisma.empresa.count(),
 
-      // --- SISTEMA DE PRESUPUESTOS ---
-      prisma.presupuesto.count(),
-      
+      // Presupuestos agrupados por estado (usaremos esto para el total también)
       prisma.presupuesto.groupBy({
         by: ['status'],
-        _count: {
-          _all: true
-        }
+        _count: { _all: true }
       }),
 
-      // --- SISTEMA DE CONSULTAS ---
       // Total consultas
       prisma.consulta.count(),
 
@@ -39,59 +47,45 @@ export async function GET() {
       prisma.consulta.count({
         where: {
           status: {
-            in: ['PENDIENTE', 'ACEPTADA'] // PENDIENTE: Cotizar, ACEPTADA: Trabajar
+            in: ['PENDIENTE', 'ACEPTADA']
           }
         }
       }),
 
-      // Compras de horas completadas
-      prisma.compraHoras.count({
-        where: { status: 'COMPLETADO' }
-      }),
-
-      // Total horas vendidas
+      // Estadísticas consolidadas de CompraHoras (Total, Horas e Ingresos Totales)
       prisma.compraHoras.aggregate({
         where: { status: 'COMPLETADO' },
-        _sum: { horas: true }
+        _count: { _all: true },
+        _sum: {
+          horas: true,
+          precio: true
+        }
       }),
 
-      // Ingresos totales por venta de horas
+      // Ingresos del mes actual
       prisma.compraHoras.aggregate({
-        where: { status: 'COMPLETADO' },
+        where: {
+          status: 'COMPLETADO',
+          createdAt: { gte: firstDayOfMonth }
+        },
         _sum: { precio: true }
       })
     ])
 
-    const totalColaboradores = results[0] as number;
-    const totalEmpresas = results[1] as number;
-    const totalPresupuestos = results[2] as number;
-    const presupuestosStats = results[3] as any[];
-    const totalConsultas = results[4] as number;
-    const consultasPendientes = results[5] as number;
-    const totalComprasHoras = results[6] as number;
-    const totalHorasVendidasAgg = results[7] as { _sum: { horas: number | null } };
-    const totalHorasVendidas = totalHorasVendidasAgg._sum.horas || 0;
-    const ingresosTotalesAgg = results[8] as { _sum: { precio: { toNumber: () => number } | null } };
-    const ingresosTotales = ingresosTotalesAgg._sum.precio?.toNumber() || 0;
+    // Procesar estadísticas de presupuestos y calcular el total acumulado
+    let totalPresupuestos = 0
+    const presupuestosPorEstado = (presupuestosStats as any[]).reduce((acc, curr) => {
+      const count = curr._count._all
+      acc[curr.status] = count
+      totalPresupuestos += count
+      return acc
+    }, {} as Record<string, number>)
 
-    // Mapear presupuestos por estado
-    const presupuestosPorEstado = presupuestosStats.reduce((acc, curr) => {
-      acc[curr.status] = curr._count._all;
-      return acc;
-    }, {} as Record<string, number>);
-
-    // Calcular ingresos del mes actual por venta de horas
-    const now = new Date()
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const ingresosMes = await prisma.compraHoras.aggregate({
-      where: {
-        status: 'COMPLETADO',
-        createdAt: {
-          gte: firstDayOfMonth,
-        },
-      },
-      _sum: { precio: true },
-    })
+    // Extraer valores de agregaciones de CompraHoras
+    const totalComprasHoras = compraHorasAgg._count._all
+    const totalHorasVendidas = compraHorasAgg._sum.horas || 0
+    const ingresosTotales = (compraHorasAgg._sum.precio as any)?.toNumber() || 0
+    const ingresosMes = (ingresosMesAgg._sum.precio as any)?.toNumber() || 0
 
     return successResponse({
       stats: {
@@ -104,7 +98,7 @@ export async function GET() {
         totalComprasHoras,
         totalHorasVendidas,
         ingresosTotales,
-        ingresosMes: ingresosMes._sum.precio?.toNumber() || 0,
+        ingresosMes,
       },
     })
   } catch (error: unknown) {
