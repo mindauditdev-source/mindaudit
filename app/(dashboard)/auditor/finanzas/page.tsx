@@ -273,11 +273,11 @@ export default function AuditorFinancesPage() {
                               </td>
                               <td className="px-8 py-4 text-center">
                                   <Button 
-                                    variant="ghost" 
+                                    variant="default" 
                                     size="sm" 
                                     onClick={() => handleDownloadInvoice(tx.id)}
                                     disabled={downloadingId === tx.id}
-                                    className="gap-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50"
+                                    className="gap-2 text-white hover:text-emerald-600 hover:bg-emerald-50"
                                   >
                                       {downloadingId === tx.id ? (
                                         <Loader2 className="h-4 w-4 animate-spin" />

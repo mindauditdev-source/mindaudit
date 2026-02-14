@@ -58,9 +58,6 @@ export function AuditorNavbar() {
                <p className="text-xs text-slate-500">{session?.user?.email}</p>
             </div>
             <DropdownMenuSeparator className="bg-slate-100" />
-            <DropdownMenuItem className="cursor-pointer font-medium py-2.5 rounded-lg mx-1 focus:bg-blue-50 focus:text-blue-700">Ajustes del Portal</DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer font-medium py-2.5 rounded-lg mx-1 focus:bg-blue-50 focus:text-blue-700">Centro de Soporte</DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-slate-100" />
             <DropdownMenuItem className="text-red-600 cursor-pointer font-bold py-2.5 rounded-lg mx-1 focus:bg-red-50 focus:text-red-700">
                Cerrar Sesión
             </DropdownMenuItem>

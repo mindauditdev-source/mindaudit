@@ -5,13 +5,17 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Building2, Plus, AlertCircle, ArrowRight, MessageCircle, Clock } from "lucide-react";
+import { Building2, Plus, AlertCircle, ArrowRight, MessageCircle, Clock, Calendar } from "lucide-react";
 import { PartnerApiService, PartnerProfile } from "@/services/partner-api.service";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { CalendlyWidget } from "@/components/shared/CalendlyWidget";
+import { toast } from "sonner";
 
 export default function PartnerDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<PartnerProfile | null>(null);
   const [companiesStats, setCompaniesStats] = useState<{ totalEmpresas: number; empresasActivas: number; totalAuditorias: number } | null>(null);
+  const [calendlyModalOpen, setCalendlyModalOpen] = useState(false);
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -35,12 +39,24 @@ export default function PartnerDashboardPage() {
     loadDashboardData();
   }, []);
 
+  const handleMeetingScheduled = async () => {
+    try {
+      toast.success("Reunión agendada correctamente");
+      setCalendlyModalOpen(false);
+    } catch (error: unknown) {
+      console.error("Error scheduling meeting:", error);
+      const err = error as Error;
+      toast.error(err.message || "Error al agendar la reunión");
+    }
+  };
+
   if (loading) {
     return <DashboardSkeleton />;
   }
 
   return (
-    <div className="space-y-8">
+    <>
+      <div className="space-y-8">
       {/* Header Section */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -179,6 +195,20 @@ export default function PartnerDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-3">
+              <Button 
+                onClick={() => setCalendlyModalOpen(true)}
+                variant="outline" 
+                className="w-full justify-start bg-white hover:bg-emerald-50 h-auto py-3 border-emerald-200"
+              >
+                <div className="rounded-full bg-emerald-100 p-2 text-emerald-600 mr-3">
+                  <Calendar className="h-4 w-4" />
+                </div>
+                <div className="text-left">
+                  <p className="font-semibold text-slate-900">Agendar ahora</p>
+                  <p className="text-xs text-slate-500">Reservar sesión con el equipo</p>
+                </div>
+              </Button>
+
               <Link href="/partner/clientes/nuevo">
                 <Button variant="outline" className="w-full justify-start bg-white hover:bg-blue-50 h-auto py-3">
                   <div className="rounded-full bg-blue-100 p-2 text-blue-600 mr-3">
@@ -219,6 +249,34 @@ export default function PartnerDashboardPage() {
         </Card>
       </div>
     </div>
+
+      {/* Calendly Modal */}
+      <Dialog open={calendlyModalOpen} onOpenChange={setCalendlyModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto p-0 rounded-3xl border-none">
+          <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+            <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Agendar Sesión Técnica</h2>
+          </div>
+          <div className="h-[70vh] w-full bg-white">
+            {process.env.NEXT_PUBLIC_CALENDLY_URL ? (
+              <CalendlyWidget
+                url={process.env.NEXT_PUBLIC_CALENDLY_URL}
+                onEventScheduled={handleMeetingScheduled}
+              />
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center p-20 text-center">
+                <Calendar className="h-20 w-20 text-slate-200 mb-6" />
+                <p className="text-slate-500 text-xl font-black max-w-sm mx-auto leading-tight">
+                  Configuración de Calendly no encontrada.
+                </p>
+                <p className="text-sm text-slate-400 mt-2 font-medium">
+                  Contacta a soporte técnico para asistencia manual.
+                </p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

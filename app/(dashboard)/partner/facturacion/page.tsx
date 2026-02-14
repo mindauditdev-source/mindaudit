@@ -229,7 +229,7 @@ export default function PartnerFacturacionPage() {
               Si tienes problemas con alguna de tus facturas o el desglose del IVA, contacta con nuestro equipo de soporte fiscal.
             </CardDescription>
             <Button variant="link" className="p-0 h-auto text-blue-600 font-bold justify-start">
-              soporte@mindaudit.es
+              admin@mindaudit.es
             </Button>
           </CardHeader>
         </Card>

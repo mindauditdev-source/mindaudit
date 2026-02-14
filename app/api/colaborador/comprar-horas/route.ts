@@ -45,6 +45,10 @@ export async function POST(request: Request) {
       payment_method_types: ["card"],
       mode: "payment",
       customer_email: userEmail,
+      billing_address_collection: "required",
+      shipping_address_collection: {
+        allowed_countries: ["ES"], // Solo España
+      },
       line_items: [
         {
           price_data: {
