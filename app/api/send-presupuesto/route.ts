@@ -14,7 +14,13 @@ export async function POST(req: NextRequest) {
       telefono, 
       tipoServicio, 
       urgencia, 
-      descripcion 
+      descripcion,
+      numTrabajadores,
+      cpSede,
+      cpAlmacenes,
+      numExpediente,
+      esSociedadMatriz,
+      elSocioMayoritarioTieneParticipacion
     } = body;
 
     // Validación básica
@@ -37,6 +43,12 @@ export async function POST(req: NextRequest) {
         tipoServicio_landing: tipoServicio,
         urgente: urgencia === 'urgente',
         description: descripcion,
+        numTrabajadores,
+        cpSede,
+        cpAlmacenes,
+        numExpediente,
+        esSociedadMatriz,
+        elSocioMayoritarioTieneParticipacion,
         status: 'PENDIENTE_PRESUPUESTAR'
       }
     });
@@ -52,7 +64,13 @@ export async function POST(req: NextRequest) {
       telefono,
       tipoServicio,
       urgente: urgencia === 'urgente',
-      descripcion
+      descripcion,
+      numTrabajadores,
+      cpSede,
+      cpAlmacenes,
+      numExpediente,
+      esSociedadMatriz,
+      elSocioMayoritarioTieneParticipacion
     });
 
     if (!emailResult.success) {

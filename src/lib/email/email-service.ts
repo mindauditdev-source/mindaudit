@@ -571,6 +571,12 @@ export class EmailService {
     tipoServicio: string | null;
     urgente: boolean;
     descripcion: string | null;
+    numTrabajadores?: string | null;
+    cpSede?: string | null;
+    cpAlmacenes?: string | null;
+    numExpediente?: string | null;
+    esSociedadMatriz?: boolean;
+    elSocioMayoritarioTieneParticipacion?: boolean;
   }) {
     const adminEmail = process.env.CONTACT_EMAIL_TO || 'admin@mindaudit.es';
     const fromName = process.env.CONTACT_EMAIL_FROM_NAME || 'MindAudit Spain';
@@ -619,10 +625,27 @@ export class EmailService {
                     <div class="value">${data.cif || 'No proporcionado'}</div>
                   </div>
                 </div>
-                <div class="field">
-                  <div class="label">Facturación Anual</div>
-                  <div class="value">${data.facturacion || 'No especificado'}</div>
+                  <div style="flex: 1;">
+                    <div class="label">Facturación Anual</div>
+                    <div class="value">${data.facturacion || 'No especificado'}</div>
+                  </div>
                 </div>
+                <div style="display: flex; gap: 15px;">
+                  <div style="flex: 1;">
+                    <div class="label">Núm. Trabajadores</div>
+                    <div class="value">${data.numTrabajadores || 'No especificado'}</div>
+                  </div>
+                  <div style="flex: 1;">
+                    <div class="label">CP Sede</div>
+                    <div class="value">${data.cpSede || 'No proporcionado'}</div>
+                  </div>
+                </div>
+                ${data.cpAlmacenes ? `
+                <div class="field">
+                  <div class="label">CP Almacenes</div>
+                  <div class="value">${data.cpAlmacenes}</div>
+                </div>
+                ` : ''}
               </div>
 
               <div class="section">
@@ -648,6 +671,20 @@ export class EmailService {
                 <div class="field">
                   <div class="label">Tipo de Servicio</div>
                   <div class="value"><strong>${data.tipoServicio}</strong></div>
+                </div>
+                ${data.numExpediente ? `
+                <div class="field">
+                  <div class="label">Número de Expediente (Sector Público)</div>
+                  <div class="value">${data.numExpediente}</div>
+                </div>
+                ` : ''}
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+                  <div style="font-size: 13px; color: ${data.esSociedadMatriz ? '#0f4c81' : '#94a3b8'}; font-weight: ${data.esSociedadMatriz ? 'bold' : 'normal'};">
+                    ${data.esSociedadMatriz ? '✅ Es sociedad matriz de un grupo consolidable' : '❌ No es sociedad matriz'}
+                  </div>
+                  <div style="font-size: 13px; color: ${data.elSocioMayoritarioTieneParticipacion ? '#0f4c81' : '#94a3b8'}; font-weight: ${data.elSocioMayoritarioTieneParticipacion ? 'bold' : 'normal'};">
+                    ${data.elSocioMayoritarioTieneParticipacion ? '✅ El socio mayoritario tiene participación en otras entidades' : '❌ El socio mayoritario no tiene participación en otras entidades'}
+                  </div>
                 </div>
                 ${data.descripcion ? `
                   <div class="field">

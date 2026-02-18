@@ -8,7 +8,8 @@ import {
   Zap,
   ShieldCheck,
   CheckCircle2,
-  Loader2
+  Loader2,
+  Building
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -24,6 +25,12 @@ export default function PresupuestoContent() {
     tipoServicio: '',
     urgencia: 'normal',
     descripcion: '',
+    numTrabajadores: '',
+    cpSede: '',
+    cpAlmacenes: '',
+    numExpediente: '',
+    esSociedadMatriz: false,
+    elSocioMayoritarioTieneParticipacion: false,
     privacidad: false
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,6 +68,12 @@ export default function PresupuestoContent() {
           tipoServicio: '',
           urgencia: 'normal',
           descripcion: '',
+          numTrabajadores: '',
+          cpSede: '',
+          cpAlmacenes: '',
+          numExpediente: '',
+          esSociedadMatriz: false,
+          elSocioMayoritarioTieneParticipacion: false,
           privacidad: false
         });
       } else {
@@ -84,7 +97,7 @@ export default function PresupuestoContent() {
         <div className="container relative z-10 mx-auto px-4 text-center">
           <h1 className="text-4xl lg:text-6xl font-extrabold mb-6">Solicitud de Presupuesto</h1>
           <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Obtenga una propuesta técnica y económica detallada para sus necesidades de auditoría en menos de 24 horas.
+            Obtenga una propuesta técnica y económica detallada para sus necesidades de auditoría En menos de 48 horas.
           </p>
         </div>
       </section>
@@ -98,7 +111,7 @@ export default function PresupuestoContent() {
               {submitStatus === 'success' && (
                 <div className="bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5" />
-                  <p className="text-sm font-medium">¡Solicitud enviada correctamente! Nos pondremos en contacto en menos de 24 horas.</p>
+                  <p className="text-sm font-medium">¡Solicitud enviada correctamente! Nos pondremos en contacto En menos de 48 horas.</p>
                 </div>
               )}
 
@@ -135,7 +148,7 @@ export default function PresupuestoContent() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Facturación Anual (Aprox.)</label>
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">RANGO DE FACTURACIÓN</label>
                         <div className="relative">
                           <select 
                             value={formData.facturacion}
@@ -147,6 +160,23 @@ export default function PresupuestoContent() {
                               <option value="1m-5m">1M - 5M €</option>
                               <option value="5m-20m">5M - 20M €</option>
                               <option value=">20m">&gt; 20M €</option>
+                          </select>
+                          <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">NÚM. DE TRABAJADORES</label>
+                        <div className="relative">
+                          <select 
+                            value={formData.numTrabajadores}
+                            onChange={(e) => setFormData({...formData, numTrabajadores: e.target.value})}
+                            className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-medium appearance-none cursor-pointer"
+                          >
+                              <option value="">Seleccione rango...</option>
+                              <option value="<10">&lt;10</option>
+                              <option value="10-50">Entre 10 y 50</option>
+                              <option value=">50">mas de 50</option>
+                              <option value=">250">mas de 250</option>
                           </select>
                           <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
                         </div>
@@ -189,6 +219,26 @@ export default function PresupuestoContent() {
                           className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-medium" 
                         />
                       </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Código postal de la sede</label>
+                        <input 
+                          type="text" 
+                          placeholder="28001"
+                          value={formData.cpSede}
+                          onChange={(e) => setFormData({...formData, cpSede: e.target.value})}
+                          className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-medium" 
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1 leading-tight">CP de almacenes (opcional si es distinto a sede)</label>
+                        <input 
+                          type="text" 
+                          placeholder="28850"
+                          value={formData.cpAlmacenes}
+                          onChange={(e) => setFormData({...formData, cpAlmacenes: e.target.value})}
+                          className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-medium" 
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -210,6 +260,8 @@ export default function PresupuestoContent() {
                               <option value="subvenciones">Auditoría de Subvenciones</option>
                               <option value="ecoembes">Auditoría Ecoembes</option>
                               <option value="due-diligence">Due Diligence</option>
+                              <option value="legalidad">Auditoría de cumplimiento de la legalidad</option>
+                              <option value="operativa">Auditoría operativa</option>
                               <option value="otros">Otros Informes Especiales</option>
                           </select>
                           <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
@@ -244,7 +296,51 @@ export default function PresupuestoContent() {
                       </div>
                   </div>
                   <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Descripción del encargo</label>
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Número Expediente (Sólo para empresas del Sector Público)</label>
+                      <input 
+                        type="text" 
+                        placeholder="EXP-2024-001"
+                        value={formData.numExpediente}
+                        onChange={(e) => setFormData({...formData, numExpediente: e.target.value})}
+                        className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-medium" 
+                      />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                    <button 
+                      type="button"
+                      onClick={() => setFormData({...formData, esSociedadMatriz: !formData.esSociedadMatriz})}
+                      className={`flex items-start gap-3 p-4 rounded-xl border transition-all text-left ${
+                        formData.esSociedadMatriz 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-slate-100 bg-slate-50/50 hover:bg-white hover:border-blue-200'
+                      }`}
+                    >
+                      <div className={`mt-1 h-5 w-5 rounded border flex items-center justify-center shrink-0 ${
+                        formData.esSociedadMatriz ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-200'
+                      }`}>
+                        {formData.esSociedadMatriz && <CheckCircle2 className="h-3 w-3" />}
+                      </div>
+                      <span className="text-xs font-bold text-slate-700 leading-tight">La sociedad es una sociedad matriz de un grupo consolidable</span>
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => setFormData({...formData, elSocioMayoritarioTieneParticipacion: !formData.elSocioMayoritarioTieneParticipacion})}
+                      className={`flex items-start gap-3 p-4 rounded-xl border transition-all text-left ${
+                        formData.elSocioMayoritarioTieneParticipacion 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-slate-100 bg-slate-50/50 hover:bg-white hover:border-blue-200'
+                      }`}
+                    >
+                      <div className={`mt-1 h-5 w-5 rounded border flex items-center justify-center shrink-0 ${
+                        formData.elSocioMayoritarioTieneParticipacion ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-200'
+                      }`}>
+                        {formData.elSocioMayoritarioTieneParticipacion && <CheckCircle2 className="h-3 w-3" />}
+                      </div>
+                      <span className="text-xs font-bold text-slate-700 leading-tight">El socio mayoritario tiene participación en otras entidades</span>
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Otras consideraciones</label>
                       <textarea 
                         rows={4} 
                         placeholder="Por favor, detalle brevemente la situación o requerimientos específicos..."
@@ -300,8 +396,8 @@ export default function PresupuestoContent() {
                     <div className="h-14 w-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
                         <Zap className="h-7 w-7" />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-900">Respuesta en 24h</h3>
-                    <p className="text-sm text-slate-500">Nuestro equipo revisa y responde a cada solicitud en menos de un día laborable.</p>
+                    <h3 className="text-lg font-bold text-slate-900">Respuesta en 48h</h3>
+                    <p className="text-sm text-slate-500">Nuestro equipo revisa las propuestas en menos de dos días laborables. Gratuitas y sin compromiso.</p>
                 </div>
                 <div className="flex flex-col items-center text-center space-y-4">
                     <div className="h-14 w-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
@@ -312,10 +408,10 @@ export default function PresupuestoContent() {
                 </div>
                 <div className="flex flex-col items-center text-center space-y-4">
                     <div className="h-14 w-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                        <CheckCircle2 className="h-7 w-7" />
+                        <Building className="h-7 w-7" />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-900">Sin Compromiso</h3>
-                    <p className="text-sm text-slate-500">Nuestras propuestas técnicas son totalmente gratuitas y no implican obligación de contratación.</p>
+                    <h3 className="text-lg font-bold text-slate-900">Apto para el sector público</h3>
+                    <p className="text-sm text-slate-500">Nuestros presupuestos son aptos para el cumplimiento de la Ley de Contratos del Sector Público.</p>
                 </div>
             </div>
         </div>

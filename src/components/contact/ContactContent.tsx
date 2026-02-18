@@ -103,8 +103,8 @@ export function ContactContent() {
                   <div>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Dirección</p>
                     <p className="text-slate-700 font-semibold leading-relaxed">
-                      Av. Diagonal, 640<br />
-                      08017 Barcelona, España
+                      GV CARLES III nº98 Pl.10 <br />
+                      08028 Barcelona
                     </p>
                   </div>
                 </div>
@@ -116,7 +116,7 @@ export function ContactContent() {
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Email</p>
-                    <p className="text-slate-700 font-semibold">info@mindaudit.es</p>
+                    <p className="text-slate-700 font-semibold">admin@mindaudit.es</p>
                   </div>
                 </div>
 
@@ -127,33 +127,33 @@ export function ContactContent() {
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Teléfono</p>
-                    <p className="text-slate-700 font-semibold">+34 932 00 00 00</p>
+                    <p className="text-slate-700 font-semibold">+34 930 494 038</p>
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-slate-50 flex items-center gap-3">
-                  <div className="h-6 w-6 rounded-full bg-green-50 flex items-center justify-center text-green-600">
-                    <CheckCircle2 className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-900">Inscritos en el ROAC</p>
-                    <p className="text-[10px] text-slate-400">Nº S2348 - Garantía de Calidad</p>
-                  </div>
-                </div>
+               
               </CardContent>
             </Card>
 
             {/* Simplified Map Placeholder */}
-            <div className="relative rounded-3xl overflow-hidden shadow-sm h-[300px] border border-slate-200 bg-slate-100 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
-              <div className="absolute inset-0 bg-slate-100 grayscale opacity-40"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                 <div className="bg-[#0f4c81] h-10 w-10 rounded-full flex items-center justify-center text-white shadow-xl z-10">
-                    <MapPin className="h-5 w-5" />
-                 </div>
-              </div>
+            <div className="relative rounded-3xl overflow-hidden shadow-sm h-[300px] border border-slate-200 bg-slate-100">
+              <iframe 
+                src="https://maps.google.com/maps?q=GV%20CARLES%20III%20n%BA98%2008028%20Barcelona&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                width="100%" 
+                height="100%" 
+                style={{ border: 0 }} 
+                allowFullScreen={true} 
+                loading="lazy" 
+                referrerPolicy="no-referrer-when-downgrade"
+                className="grayscale opacity-80 hover:grayscale-0 transition-all duration-500"
+              ></iframe>
               <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-xl p-3 flex justify-between items-center shadow-lg border border-white/20">
                 <span className="text-[10px] font-bold text-slate-700">Oficinas Barcelona</span>
-                <Link href="#" className="text-[9px] font-bold text-blue-600 uppercase flex items-center gap-1 hover:underline">
+                <Link 
+                  href="https://www.google.com/maps/dir/?api=1&destination=Gran+Via+de+Carles+III,+98,+08028+Barcelona" 
+                  target="_blank"
+                  className="text-[9px] font-bold text-blue-600 uppercase flex items-center gap-1 hover:underline"
+                >
                     Cómo llegar
                     <ArrowRight className="h-2 w-2" />
                 </Link>
@@ -265,7 +265,7 @@ export function ContactContent() {
                             </>
                           ) : (
                             <>
-                              Enviar Consulta
+                              Enviar Mensaje
                               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                             </>
                           )}

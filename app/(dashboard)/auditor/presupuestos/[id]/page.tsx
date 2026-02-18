@@ -35,6 +35,12 @@ interface Presupuesto {
   presupuesto: number | null;
   presupuestoNotas: string | null;
   colaboradorId: string | null;
+  numTrabajadores: string | null;
+  cpSede: string | null;
+  cpAlmacenes: string | null;
+  numExpediente: string | null;
+  esSociedadMatriz: boolean;
+  elSocioMayoritarioTieneParticipacion: boolean;
 }
 
 export default function PresupuestoDetailPage() {
@@ -167,6 +173,36 @@ export default function PresupuestoDetailPage() {
               <div>
                 <Label className="text-xs text-slate-500">Persona de Contacto</Label>
                 <p className="font-semibold text-slate-900">{presupuesto.nombreContacto || "N/A"}</p>
+              </div>
+              <div>
+                <Label className="text-xs text-slate-500">Núm. Trabajadores</Label>
+                <p className="font-semibold text-slate-900">{presupuesto.numTrabajadores || "N/A"}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4 border-t pt-4">
+              <div>
+                <Label className="text-xs text-slate-500">Cod. Postal Sede</Label>
+                <p className="font-semibold text-slate-900">{presupuesto.cpSede || "N/A"}</p>
+              </div>
+              <div>
+                <Label className="text-xs text-slate-500">CP Almacenes</Label>
+                <p className="font-semibold text-slate-900">{presupuesto.cpAlmacenes || "N/A"}</p>
+              </div>
+              <div>
+                <Label className="text-xs text-slate-500">Nº Expediente</Label>
+                <p className="font-semibold text-slate-900">{presupuesto.numExpediente || "N/A"}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 border-t pt-4">
+              <div className="flex items-center gap-2">
+                <Badge variant={presupuesto.esSociedadMatriz ? "default" : "outline"} className="rounded-full">
+                  {presupuesto.esSociedadMatriz ? "✓" : "✗"} Sociedad Matriz
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant={presupuesto.elSocioMayoritarioTieneParticipacion ? "default" : "outline"} className="rounded-full">
+                  {presupuesto.elSocioMayoritarioTieneParticipacion ? "✓" : "✗"} Socio con participaciones
+                </Badge>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4 pt-4 border-t">

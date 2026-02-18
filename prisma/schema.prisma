@@ -115,6 +115,12 @@ model Presupuesto {
   email                  String?
   telefono               String?
   tipoServicio_landing   String?
+  numTrabajadores        String?
+  cpSede                 String?
+  cpAlmacenes            String?
+  numExpediente          String?
+  esSociedadMatriz        Boolean              @default(false)
+  elSocioMayoritarioTieneParticipacion Boolean @default(false)
 
   tipoServicio           TipoServicio?
   fiscalYear             Int?
@@ -306,6 +312,8 @@ enum TipoServicio {
   REVISION_LIMITADA
   DUE_DILIGENCE
   AUDITORIA_FORENSE
+  AUDITORIA_LEGALIDAD
+  AUDITORIA_OPERATIVA
   OTROS
 }
 
