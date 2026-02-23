@@ -25,6 +25,8 @@ export interface AdminColaborador {
   commissionRate: number;
   totalCommissions: number;
   pendingCommissions: number;
+  contractSignedAt: string | null;
+  contractUrl: string | null;
   createdAt: string;
   user: {
      name: string;

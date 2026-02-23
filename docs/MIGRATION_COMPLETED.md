@@ -63,12 +63,12 @@ La migración completa de la base de datos y el código ha sido **exitosa**. El 
 
 ### **Usuarios Creados:**
 
-| Rol             | Email                   | Password         | Descripción                       |
-| --------------- | ----------------------- | ---------------- | --------------------------------- |
-| **ADMIN**       | `admin@mindaudit.es`    | `admin123`       | Administrador del sistema         |
-| **COLABORADOR** | `garcia@gestoria.es`    | `colaborador123` | Gestoría García (12% comisión)    |
-| **COLABORADOR** | `martinez@asesoria.es`  | `colaborador123` | Asesoría Martínez (10% comisión)  |
-| **EMPRESA**     | `info@techsolutions.es` | `empresa123`     | Tech Solutions (registro directo) |
+| Rol             | Email                    | Password         | Descripción                       |
+| --------------- | ------------------------ | ---------------- | --------------------------------- |
+| **ADMIN**       | `admin@mindaudit.es`     | `admin123`       | Administrador del sistema         |
+| **COLABORADOR** | `jjhurtado017@gmail.com` | `colaborador123` | Gestoría García (12% comisión)    |
+| **COLABORADOR** | `martinez@asesoria.es`   | `colaborador123` | Asesoría Martínez (10% comisión)  |
+| **EMPRESA**     | `info@techsolutions.es`  | `empresa123`     | Tech Solutions (registro directo) |
 
 ### **Empresas:**
 

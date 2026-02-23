@@ -11,7 +11,13 @@ import {
   ShieldCheck,
   PieChart,
   Loader2,
-  Euro
+  Euro,
+  FileText,
+  UserCircle,
+  TrendingUp,
+  Plus,
+  ChevronRight,
+  Building2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -56,6 +62,9 @@ export default function AuditorAsociadosPage() {
   // Confirmation State
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [colabToApprove, setColabToApprove] = useState<AdminColaborador | null>(null);
+
+  // Contract View State
+  const [isContractOpen, setIsContractOpen] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -205,8 +214,8 @@ export default function AuditorAsociadosPage() {
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-xl border-slate-200">
                                      <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-3">Gestión de Cuenta</DropdownMenuLabel>
-                                     <DropdownMenuItem onClick={() => handleViewHistory(c)} className="py-2.5 rounded-lg font-medium mx-1">
-                                        <ExternalLink className="mr-2 h-4 w-4 text-blue-500" /> Historial de Liquidaciones
+                                     <DropdownMenuItem onClick={() => { setSelectedColab(c); setIsContractOpen(true); }} className="py-2.5 rounded-lg font-medium mx-1">
+                                        <FileText className="mr-2 h-4 w-4 text-emerald-500" /> Ver Contrato Firmado
                                      </DropdownMenuItem>
                                      <DropdownMenuItem onClick={() => handleOpenCommissionEdit(c)} className="py-2.5 rounded-lg font-medium mx-1">
                                         <Settings className="mr-2 h-4 w-4 text-slate-400" /> Ajustar Comisión

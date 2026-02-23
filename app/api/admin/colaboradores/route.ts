@@ -65,6 +65,8 @@ export async function GET(request: NextRequest) {
         cif: c.cif,
         phone: c.phone,
         status: c.status,
+        contractSignedAt: c.contractSignedAt,
+        contractUrl: c.contractUrl,
         commissionRate: c.commissionRate.toNumber(),
         totalCommissions: c.totalCommissions.toNumber(),
         pendingCommissions: c.pendingCommissions.toNumber(),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -12,6 +12,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { PartnerApiService } from "@/services/partner-api.service";
 import { ArrowLeft, Loader2, Building2 } from "lucide-react";
 import { PartnerContractModal } from "@/components/partner/PartnerContractModal";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // Schema de validación
 const createClientSchema = z.object({
@@ -31,6 +39,14 @@ export default function CreateClientPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isContractOpen, setIsContractOpen] = useState(false);
+  const [pendingData, setPendingData] = useState<CreateClientFormValues | null>(null);
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    PartnerApiService.getProfile().then(setProfile).catch(console.error);
+  }, []);
 
   const form = useForm<CreateClientFormValues>({
     resolver: zodResolver(createClientSchema),
@@ -44,10 +60,22 @@ export default function CreateClientPage() {
   });
 
   async function onSubmit(data: CreateClientFormValues) {
+    if (profile && !profile.contractSignedAt) {
+      setIsContractOpen(true);
+      return;
+    }
+    setPendingData(data);
+    setIsConfirmOpen(true);
+  }
+
+  async function handleConfirm() {
+    if (!pendingData) return;
+    
     setLoading(true);
     setError(null);
+    setIsConfirmOpen(false);
     try {
-      await PartnerApiService.createCompany(data);
+      await PartnerApiService.createCompany(pendingData);
       router.push("/partner/clientes");
       router.refresh();
     } catch (err: any) {
@@ -60,7 +88,32 @@ export default function CreateClientPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 py-6">
-      <PartnerContractModal />
+      <PartnerContractModal 
+        externalOpen={isContractOpen} 
+        onOpenChange={setIsContractOpen} 
+        profile={profile}
+      />
+      
+      {/* Confirmation Dialog */}
+      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>¿Confirmar registro de empresa?</DialogTitle>
+            <DialogDescription>
+              Estás a punto de dar de alta a <strong>{pendingData?.companyName}</strong> como cliente. 
+              Asegúrate de que los datos son correctos.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="ghost" onClick={() => setIsConfirmOpen(false)}>
+              Revisar datos
+            </Button>
+            <Button onClick={handleConfirm} className="bg-[#0a3a6b]">
+              Confirmar Registro
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="h-5 w-5" />

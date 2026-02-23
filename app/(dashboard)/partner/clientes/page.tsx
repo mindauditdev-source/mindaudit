@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Building2, Plus, Search, MoreHorizontal } from "lucide-react";
+import { Building2, Plus, Search, MoreHorizontal, Loader2 } from "lucide-react";
 import { PartnerApiService, PartnerCompany } from "@/services/partner-api.service";
 import { 
   DropdownMenu, 
@@ -16,12 +17,17 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { PartnerContractModal } from "@/components/partner/PartnerContractModal";
 
 export default function PartnerCompaniesPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [empresas, setEmpresas] = useState<PartnerCompany[]>([]);
   const [filteredEmpresas, setFilteredEmpresas] = useState<PartnerCompany[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [profile, setProfile] = useState<any>(null);
+  const [isContractOpen, setIsContractOpen] = useState(false);
+  const [isCheckingProfile, setIsCheckingProfile] = useState(true);
 
   useEffect(() => {
     const loadEmpresas = async () => {
@@ -38,6 +44,12 @@ export default function PartnerCompaniesPage() {
     };
 
     loadEmpresas();
+
+    setIsCheckingProfile(true);
+    PartnerApiService.getProfile()
+      .then(setProfile)
+      .catch(console.error)
+      .finally(() => setIsCheckingProfile(false));
   }, []);
 
   useEffect(() => {
@@ -59,13 +71,36 @@ export default function PartnerCompaniesPage() {
             Gestiona tus clientes y sus expedientes de auditoría.
           </p>
         </div>
-        <Link href="/partner/clientes/nuevo">
-          <Button className="bg-[#0a3a6b] hover:bg-[#082e56] shadow-md">
-            <Plus className="mr-2 h-4 w-4" />
-            Registrar Empresa
-          </Button>
-        </Link>
+        <Button 
+          className="bg-[#0a3a6b] hover:bg-[#082e56] shadow-md"
+          disabled={isCheckingProfile}
+          onClick={() => {
+            console.log("[DEBUG] Registrar Empresa click - Profile:", profile);
+            if (!profile) {
+              console.log("[DEBUG] Profile missing, navigating to create page forced");
+              router.push("/partner/clientes/nuevo");
+              return;
+            }
+
+            if (!profile.contractSignedAt) {
+              console.log("[DEBUG] Contract NOT signed. Opening MODAL.");
+              setIsContractOpen(true);
+            } else {
+              console.log("[DEBUG] Contract ALREADY signed. Navigating to creation page.");
+              router.push("/partner/clientes/nuevo");
+            }
+          }}
+        >
+          {isCheckingProfile ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+          Registrar Empresa
+        </Button>
       </div>
+
+      <PartnerContractModal 
+        externalOpen={isContractOpen} 
+        onOpenChange={setIsContractOpen} 
+        profile={profile}
+      />
 
       <Card className="shadow-sm border-slate-100">
         <CardHeader className="pb-4">
@@ -99,9 +134,20 @@ export default function PartnerCompaniesPage() {
               <p className="text-slate-500 max-w-sm mt-1 mb-6">
                 Aún no has registrado ninguna empresa. Comienza registrando tu primer cliente.
               </p>
-              <Link href="/partner/clientes/nuevo">
-                <Button variant="outline">Registrar Empresa</Button>
-              </Link>
+              <Button 
+                variant="outline"
+                disabled={isCheckingProfile}
+                onClick={() => {
+                  if (profile && !profile.contractSignedAt) {
+                    setIsContractOpen(true);
+                  } else {
+                    router.push("/partner/clientes/nuevo");
+                  }
+                }}
+              >
+                {isCheckingProfile && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Registrar Empresa
+              </Button>
             </div>
           ) : (
             <div className="rounded-md border border-slate-200 overflow-hidden">

@@ -17,6 +17,7 @@ model User {
   hashedPassword String?
   emailVerified  DateTime?
   dismissedPartnerPlanModal Boolean @default(false)
+  isCommissioning            Boolean @default(false)
   image          String?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt

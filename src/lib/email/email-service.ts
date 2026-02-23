@@ -711,4 +711,65 @@ export class EmailService {
     });
   }
 
+  /**
+   * Notificación de Invitación a Firmar el Contrato de Partner
+   */
+  static async sendContractInvitation(partner: { 
+    name: string; 
+    email: string;
+  }, signLink: string) {
+    return this.sendEmail({
+      to: partner.email,
+      subject: `🖋️ Acción requerida: Firma tu acuerdo de Partner de MindAudit`,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
+          <div style="background: white; border-radius: 12px; padding: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <div style="background: #0c3a6b; width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                <span style="font-size: 30px;">🖋️</span>
+              </div>
+            </div>
+            
+            <h2 style="color: #0c3a6b; margin: 0 0 20px 0; font-size: 24px; font-weight: 700; text-align: center;">
+              ¡Bienvenido al Plan de Partners!
+            </h2>
+            
+            <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
+              Hola ${partner.name}, nos alegra enormemente que hayas decidido dar el paso para unirte oficialmente a nuestro Plan de Partners.
+            </p>
+            
+            <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
+              Para activar todos tus beneficios, incluyendo el acceso a comisiones directas y herramientas exclusivas, es necesario formalizar nuestro acuerdo de colaboración.
+            </p>
+            
+            <div style="background: #f1f5f9; border-radius: 8px; padding: 24px; margin-bottom: 30px;">
+              <h3 style="color: #334155; margin: 0 0 12px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">Pasos a seguir:</h3>
+              <ul style="color: #475569; font-size: 14px; margin: 0; padding-left: 20px; line-height: 1.8;">
+                <li>Revisa los términos del contrato en el enlace inferior.</li>
+                <li>Realiza la firma digital a través de nuestra plataforma segura.</li>
+                <li>Una vez firmado, tus beneficios se activarán automáticamente.</li>
+              </ul>
+            </div>
+            
+            <div style="text-align: center;">
+              <a href="${signLink}" 
+                 style="display: inline-block; background: #0c3a6b; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 14px rgba(12, 58, 107, 0.3);">
+                Ver y Firmar Contrato
+              </a>
+            </div>
+            
+            <p style="color: #94a3b8; font-size: 14px; margin: 30px 0 0 0; text-align: center;">
+              Si tienes alguna duda, responde a este correo o contacta con el soporte de MindAudit.
+            </p>
+          </div>
+          
+          <div style="text-align: center; margin-top: 24px;">
+            <p style="color: #94a3b8; font-size: 12px; margin: 0;">
+              © 2024 MindAudit Spain. Todos los derechos reservados.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+  }
 }

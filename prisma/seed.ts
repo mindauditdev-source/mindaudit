@@ -53,7 +53,7 @@ async function main() {
   // 2. COLABORADOR 1 (Gestoría García)
   const colaborador1User = await prisma.user.create({
     data: {
-      email: 'garcia@gestoria.es',
+      email: 'jjhurtado017@gmail.com',
       name: 'Juan García López',
       role: UserRole.COLABORADOR,
       status: UserStatus.ACTIVE,
@@ -338,7 +338,7 @@ async function main() {
   console.log('')
   console.log('🔑 Test credentials:')
   console.log('Admin: admin@mindaudit.es / admin123')
-  console.log('Colaborador 1: garcia@gestoria.es / colaborador123 (5 horas disponibles)')
+  console.log('Colaborador 1: jjhurtado017@gmail.com / colaborador123 (5 horas disponibles)')
   console.log('Colaborador 2: martinez@asesoria.es / colaborador123')
   console.log('Empresa Directa: info@techsolutions.es / empresa123')
 }

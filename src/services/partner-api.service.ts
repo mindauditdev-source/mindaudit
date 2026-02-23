@@ -223,4 +223,17 @@ export class PartnerApiService {
     const response = await this.fetch(`/auditorias${query}`);
     return response.data;
   }
+
+  static async requestContract(): Promise<void> {
+    await this.fetch("/colaboradores/me/request-contract", {
+      method: "POST",
+    });
+  }
+
+  static async signContract(signatureData: string): Promise<void> {
+    await this.fetch("/colaboradores/me/sign-contract", {
+      method: "POST",
+      body: JSON.stringify({ signatureData }),
+    });
+  }
 }

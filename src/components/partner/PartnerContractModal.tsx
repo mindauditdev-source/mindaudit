@@ -20,31 +20,51 @@ import { toast } from "sonner";
 
 interface PartnerContractModalProps {
   onStatusChange?: () => void;
+  externalOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  profile?: PartnerProfile | null;
 }
 
-export function PartnerContractModal({ onStatusChange }: PartnerContractModalProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [profile, setProfile] = useState<PartnerProfile | null>(null);
+export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChange, profile: externalProfile }: PartnerContractModalProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setIsOpen = onOpenChange !== undefined ? onOpenChange : setInternalOpen;
+  const [internalProfile, setInternalProfile] = useState<PartnerProfile | null>(null);
+  const profile = externalProfile !== undefined ? externalProfile : internalProfile;
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"invitation" | "success">("invitation");
 
   useEffect(() => {
     const checkStatus = async () => {
-      try {
-        const data = await PartnerApiService.getProfile();
-        setProfile(data);
-        
-        // Show modal if contract not signed and not dismissed
-        if (!data.contractSignedAt && !data.user.dismissedPartnerPlanModal) {
-          setIsOpen(true);
+      // 1. If we don't have a profile and none was provided, fetch it
+      if (!profile && externalProfile === undefined) {
+        try {
+          console.log("[DEBUG] PartnerContractModal - Fetching profile internally...");
+          const data = await PartnerApiService.getProfile();
+          setInternalProfile(data);
+          
+          // Check for auto-opening with the newly fetched data
+          if (!data.contractSignedAt && !data.user.dismissedPartnerPlanModal && externalOpen === undefined) {
+            console.log("[DEBUG] PartnerContractModal - Auto-opening (internal fetch)");
+            setIsOpen(true);
+          }
+        } catch (error) {
+          console.error("Error fetching partner profile:", error);
         }
-      } catch (error) {
-        console.error("Error fetching partner profile:", error);
+        return;
+      }
+
+      // 2. If we already have a profile (internal or external), check for auto-opening
+      if (profile && externalOpen === undefined) {
+        if (!profile.contractSignedAt && !profile.user.dismissedPartnerPlanModal && !internalOpen) {
+          console.log("[DEBUG] PartnerContractModal - Auto-opening (existing profile)");
+          setInternalOpen(true);
+        }
       }
     };
 
     checkStatus();
-  }, []);
+  }, [profile, externalOpen, externalProfile, internalOpen, setIsOpen]);
 
   const handleDismiss = async () => {
     setLoading(true);
@@ -63,9 +83,8 @@ export function PartnerContractModal({ onStatusChange }: PartnerContractModalPro
   const handleAccept = async () => {
     setLoading(true);
     try {
-      // Logic for "joining" the plan. 
-      // In a real flow, this might trigger a contract generation or email.
-      // For now, let's assume it sends an email request or prepares the sign flow.
+      console.log("[DEBUG] PartnerContractModal - Requesting contract...");
+      await PartnerApiService.requestContract();
       toast.success("¡Excelente decisión! Te enviaremos el contrato a tu email.");
       setStep("success");
       onStatusChange?.();
@@ -77,7 +96,7 @@ export function PartnerContractModal({ onStatusChange }: PartnerContractModalPro
     }
   };
 
-  if (!profile) return null;
+  // REMOVED: if (!profile) return null; to allow Dialog to render even while loading
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -98,8 +117,13 @@ export function PartnerContractModal({ onStatusChange }: PartnerContractModalPro
           </div>
         </div>
 
-        <div className="p-8 bg-white">
-          {step === "invitation" ? (
+        <div className="p-8 bg-white min-h-[300px] flex flex-col justify-center">
+          {!profile ? (
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <div className="h-8 w-8 border-4 border-slate-200 border-t-[#0a3a6b] rounded-full animate-spin" />
+              <p className="text-slate-500 text-sm animate-pulse">Cargando perfil...</p>
+            </div>
+          ) : step === "invitation" ? (
             <div className="space-y-6">
               <div className="space-y-2">
                 <p className="text-slate-600">
@@ -169,7 +193,7 @@ export function PartnerContractModal({ onStatusChange }: PartnerContractModalPro
               <h3 className="text-xl font-bold text-slate-900">¡Solicitud recibida!</h3>
               <p className="text-slate-600 max-w-xs mx-auto">
                 Te hemos enviado el contrato de colaboración a **{profile.user.email}**. 
-                Por favor, rírmalo digitalmente para activar tus beneficios.
+                Por favor, rírmalo digitalmente en nuestra plataforma para activar tus beneficios.
               </p>
               <Button 
                 onClick={() => setIsOpen(false)}
