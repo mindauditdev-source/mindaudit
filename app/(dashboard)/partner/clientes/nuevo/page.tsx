@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { PartnerApiService } from "@/services/partner-api.service";
 import { ArrowLeft, Loader2, Building2 } from "lucide-react";
+import { PartnerContractModal } from "@/components/partner/PartnerContractModal";
 
 // Schema de validación
 const createClientSchema = z.object({
@@ -59,6 +60,7 @@ export default function CreateClientPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 py-6">
+      <PartnerContractModal />
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="h-5 w-5" />

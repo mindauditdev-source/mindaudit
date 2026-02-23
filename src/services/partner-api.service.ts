@@ -22,13 +22,14 @@ export interface PartnerProfile {
   status: ColaboradorStatus;
   commissionRate: number;
   totalCommissions: number;
-  pendingCommissions: number;
+  contractSignedAt: string | null;
   stats: PartnerStats;
   user: {
     name: string;
     email: string;
     image?: string;
     horasDisponibles: number;
+    dismissedPartnerPlanModal: boolean;
   };
 }
 
@@ -128,6 +129,23 @@ export class PartnerApiService {
       body: JSON.stringify(data),
     });
     return response.data.empresa;
+  }
+  
+  static async updateProfile(data: Partial<{
+    companyName: string;
+    phone: string;
+    address: string;
+    city: string;
+    province: string;
+    postalCode: string;
+    website: string;
+    dismissedPartnerPlanModal: boolean;
+  }>): Promise<PartnerProfile> {
+    const response = await this.fetch("/colaboradores/me", {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+    return response.data.colaborador;
   }
 
   static async getCompanyDetails(id: string): Promise<PartnerCompany> {

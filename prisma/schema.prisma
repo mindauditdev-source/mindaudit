@@ -16,6 +16,7 @@ model User {
   status         UserStatus   @default(PENDING_VERIFICATION)
   hashedPassword String?
   emailVerified  DateTime?
+  dismissedPartnerPlanModal Boolean @default(false)
   image          String?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
@@ -51,8 +52,9 @@ model Colaborador {
   totalCommissions   Decimal           @default(0) @db.Decimal(12, 2)
   pendingCommissions Decimal           @default(0) @db.Decimal(12, 2)
   contractUrl        String?
-  contractSignedAt   DateTime?
-  createdAt          DateTime          @default(now())
+  contractSignedAt          DateTime?
+  createdAt                 DateTime          @default(now())
+
   updatedAt          DateTime          @updatedAt
   presupuestos       Presupuesto[]
   user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)

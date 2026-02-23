@@ -1,6 +1,6 @@
 import { getAuthenticatedUser } from '@/middleware/api-auth'
 import { requireColaborador } from '@/middleware/api-rbac'
-import { successResponse, serverErrorResponse } from '@/lib/api-response'
+import { successResponse, errorResponse, serverErrorResponse } from '@/lib/api-response'
 import { prisma } from '@/lib/db/prisma'
 
 /**
@@ -18,13 +18,19 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || '10')
     const skip = (page - 1) * limit
 
-    // Obtener perfil del colaborador y sus empresas (paginadas) en paralelo
-    const [colaborador, empresasItems, totalItems] = await Promise.all([
-      prisma.colaborador.findUnique({
-        where: { userId: user.id },
-      }),
+    // 1. Obtener perfil del colaborador para tener su ID real (CUID)
+    const colaborador = await prisma.colaborador.findUnique({
+      where: { userId: user.id },
+    })
+
+    if (!colaborador) {
+      return errorResponse('Perfil de colaborador no encontrado', 404)
+    }
+
+    // 2. Obtener sus empresas y total en paralelo
+    const [empresasItems, totalItems] = await Promise.all([
       prisma.empresa.findMany({
-        where: { colaboradorId: user.id }, // Note: assuming colaboradorId maps to userId in this context if it was working before, or checking the previous logic
+        where: { colaboradorId: colaborador.id },
         include: {
           _count: {
             select: {
@@ -53,7 +59,7 @@ export async function GET(request: Request) {
         take: limit,
       }),
       prisma.empresa.count({
-        where: { colaboradorId: user.id }
+        where: { colaboradorId: colaborador.id }
       })
     ])
 

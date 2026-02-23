@@ -27,6 +27,7 @@ export async function GET() {
               name: true,
               status: true,
               emailVerified: true,
+              dismissedPartnerPlanModal: true,
               createdAt: true,
               horasDisponibles: true,
             },
@@ -52,7 +53,13 @@ export async function GET() {
       })
     ])
 
+    // DEBUG: Log status
+    console.log('[DEBUG] GET /api/colaboradores/me - User ID:', user.id)
+    console.log('[DEBUG] Colaborador found:', !!colaborador)
+    console.log('[DEBUG] Stats counts found:', !!statsCounts)
+
     if (!colaborador || !statsCounts) {
+      console.warn('[DEBUG] Profile not found for User:', user.id)
       return errorResponse('Perfil de colaborador no encontrado', 404)
     }
 
@@ -76,9 +83,13 @@ export async function GET() {
         pendingCommissions: colaborador.pendingCommissions.toNumber(),
         contractUrl: colaborador.contractUrl,
         contractSignedAt: colaborador.contractSignedAt,
+        dismissedPartnerPlanModal: colaborador.user.dismissedPartnerPlanModal,
         createdAt: colaborador.createdAt,
         updatedAt: colaborador.updatedAt,
-        user: colaborador.user,
+        user: {
+          ...colaborador.user,
+          dismissedPartnerPlanModal: colaborador.user.dismissedPartnerPlanModal,
+        },
         stats: {
           totalEmpresas: statsCounts._count.empresas,
           totalConsultas: consultasCount,
@@ -104,7 +115,7 @@ export async function PATCH(request: NextRequest) {
 
     // Parsear body
     const body = await request.json()
-    const { companyName, phone, address, city, province, postalCode, website } = body
+    const { companyName, phone, address, city, province, postalCode, website, dismissedPartnerPlanModal } = body
 
     // Actualizar colaborador
     const colaborador = await prisma.colaborador.update({
@@ -117,6 +128,14 @@ export async function PATCH(request: NextRequest) {
         ...(province !== undefined && { province }),
         ...(postalCode !== undefined && { postalCode }),
         ...(website !== undefined && { website }),
+        // Update User model
+        ...(dismissedPartnerPlanModal !== undefined && {
+          user: {
+            update: {
+              dismissedPartnerPlanModal
+            }
+          }
+        }),
       },
       include: {
         user: {
