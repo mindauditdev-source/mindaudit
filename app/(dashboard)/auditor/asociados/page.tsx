@@ -1,23 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { 
   Users, 
   Mail, 
   CheckCircle2, 
   Settings,
   MoreVertical,
-  ExternalLink,
   ShieldCheck,
   PieChart,
   Loader2,
   Euro,
   FileText,
-  UserCircle,
-  TrendingUp,
-  Plus,
-  ChevronRight,
-  Building2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,6 +37,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ContractViewerModal } from "@/components/auditor/ContractViewerModal";
 
 export default function AuditorAsociadosPage() {
   const [colaboradores, setColaboradores] = useState<AdminColaborador[]>([]);
@@ -66,11 +61,7 @@ export default function AuditorAsociadosPage() {
   // Contract View State
   const [isContractOpen, setIsContractOpen] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const data = await AdminApiService.getColaboradores();
@@ -80,7 +71,11 @@ export default function AuditorAsociadosPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleOpenConfirmApprove = (colab: AdminColaborador) => {
      setColabToApprove(colab);
@@ -191,7 +186,7 @@ export default function AuditorAsociadosPage() {
                                   <span className="text-xs text-slate-400 mt-1 flex items-center gap-1 font-medium">
                                      <Mail className="h-3 w-3" /> {c.user.email} • CIF: {c.cif}
                                   </span>
-                               </div>
+                                </div>
                             </td>
                             <td className="px-6 py-4 text-center">
                                <StatusBadge status={c.status} />
@@ -219,6 +214,9 @@ export default function AuditorAsociadosPage() {
                                      </DropdownMenuItem>
                                      <DropdownMenuItem onClick={() => handleOpenCommissionEdit(c)} className="py-2.5 rounded-lg font-medium mx-1">
                                         <Settings className="mr-2 h-4 w-4 text-slate-400" /> Ajustar Comisión
+                                     </DropdownMenuItem>
+                                     <DropdownMenuItem onClick={() => handleViewHistory(c)} className="py-2.5 rounded-lg font-medium mx-1">
+                                        <PieChart className="mr-2 h-4 w-4 text-blue-400" /> Ver Historial
                                      </DropdownMenuItem>
                                      <DropdownMenuSeparator className="bg-slate-50" />
                                      {c.status === 'PENDING_APPROVAL' && (
@@ -291,7 +289,7 @@ export default function AuditorAsociadosPage() {
                </div>
                <DialogTitle className="text-2xl font-black text-slate-900 leading-tight mb-2">¿Verificar Asociado?</DialogTitle>
                <DialogDescription className="text-slate-500 font-medium px-4">
-                  Confirmas que <b>{colabToApprove?.companyName}</b> ha sido revisado y cumple con los requisitos para operar en la plataforma.
+                   Confirmas que <b>{colabToApprove?.companyName}</b> ha sido revisado y cumple con los requisitos para operar en la plataforma.
                </DialogDescription>
             </div>
             <div className="p-6 pt-2 grid grid-cols-2 gap-3 bg-slate-50 mt-4">
@@ -424,6 +422,13 @@ export default function AuditorAsociadosPage() {
             </div>
          </DialogContent>
       </Dialog>
+
+      {/* Reusable Contract Viewer Modal */}
+      <ContractViewerModal 
+        isOpen={isContractOpen} 
+        onOpenChange={setIsContractOpen} 
+        colaborador={selectedColab} 
+      />
     </div>
   );
 }

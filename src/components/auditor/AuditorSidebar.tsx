@@ -43,6 +43,11 @@ const sidebarItems = [
     href: "/auditor/finanzas",
     icon: PieChart,
   },
+  {
+    title: "Contratos",
+    href: "/auditor/contratos",
+    icon: FileText,
+  },
 ];
 
 export function AuditorSidebar() {

@@ -25,6 +25,10 @@ export interface AdminColaborador {
   commissionRate: number;
   totalCommissions: number;
   pendingCommissions: number;
+  address: string | null;
+  city: string | null;
+  province: string | null;
+  postalCode: string | null;
   contractSignedAt: string | null;
   contractUrl: string | null;
   createdAt: string;
