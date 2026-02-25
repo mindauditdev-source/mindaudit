@@ -91,14 +91,16 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                 
                 <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100">
-                    <h3 className="text-xl font-bold text-slate-900 mb-4 font-sans">Por qué elegirnos</h3>
+                    <h3 className="text-xl font-bold text-slate-900 mb-4 font-sans">
+                      {service.id === 'annual-accounts' ? '¿Por qué elegirnos como partner de auditoría?' : 'Por qué elegirnos'}
+                    </h3>
                     <ul className="space-y-4 list-none p-0 m-0">
-                      {[
+                      {(service.features || [
                         'Experiencia contrastada en el sector',
                         'Metodología propia basada en estándares internacionales',
                         'Atención personalizada y directa con socios',
                         'Tecnología avanzada para el análisis de datos'
-                      ].map((item, i) => (
+                      ]).map((item, i) => (
                         <li key={i} className="flex items-start gap-3 text-slate-600">
                           <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
                           <span>{item}</span>
@@ -122,7 +124,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
               <div>
                 <h2 className="text-3xl font-bold text-slate-900 mb-8">Preguntas Frecuentes</h2>
                 <div className="space-y-6">
-                  {[
+                  {(service.faqs || [
                     {
                       q: "¿Cuál es el proceso habitual para este servicio?",
                       a: "Iniciamos con una fase de planificación detallada, seguida por la ejecución de pruebas sustantivas y de cumplimiento, finalizando con la emisión del informe correspondiente."
@@ -131,7 +133,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                       q: "¿Cuánto tiempo suele durar el encargo?",
                       a: "La duración depende de la complejidad y dimensiones de la organización, pero establecemos cronogramas claros desde el inicio para cumplir con todos los plazos."
                     }
-                  ].map((faq, i) => (
+                  ]).map((faq, i) => (
                     <div key={i} className="border-b border-slate-100 pb-6">
                       <h4 className="text-lg font-bold text-slate-900 mb-2">{faq.q}</h4>
                       <p className="text-slate-600 leading-relaxed">{faq.a}</p>

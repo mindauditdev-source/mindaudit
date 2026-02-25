@@ -11,6 +11,8 @@ export interface AuditService {
   icon: string;
   featured: boolean;
   category: 'financial' | 'grants' | 'special' | 'other';
+  features?: string[];
+  faqs?: { q: string; a: string }[];
 }
 
 export const auditServices: AuditService[] = [
@@ -19,21 +21,36 @@ export const auditServices: AuditService[] = [
     id: 'annual-accounts',
     name: 'Auditoría de Cuentas Anuales individuales y grupos',
     slug: 'auditoria-cuentas-anuales',
-    shortDescription: 'Auditoría de cuentas anuales con rigor y transparencia',
-    description: 'Auditoría completa de estados financieros para garantizar la fiabilidad de la información contable de su empresa, tanto para cuentas individuales como grupos consolidados.',
+    shortDescription: 'Para despachos que buscan rigor técnico, reputación y valor añadido para sus clientes',
+    description: 'En MindAudit Spain SLP prestamos servicios de auditoría de cuentas anuales individuales y consolidadas dirigidos exclusivamente a despachos profesionales que desean ofrecer auditoría a sus clientes bajo los estándares normativos de la Ley 22/2015.',
     icon: 'Building2',
     featured: true,
     category: 'financial',
+    features: [
+      'Especialización exclusiva en auditoría: No competimos con los servicios ofertados. Somos auditores puros.',
+      'Trabajo en remoto eficiente: Sin desplazamientos innecesarios. Plataforma digital, intercambio seguro y seguimiento online.',
+      'Tecnología e IA aplicada a auditoría: Automatización de análisis, revisión masiva de datos, detección de anomalías y mejora de eficiencia.'
+    ]
   },
   {
     id: 'public-sector',
     name: 'Auditoría de Cuentas de empresas del sector Público',
     slug: 'auditoria-sector-publico',
     shortDescription: 'Auditoría especializada en entidades públicas',
-    description: 'Auditoría de cuentas de empresas y organismos del sector público con conocimiento específico de la normativa y fiscalización pública.',
-    icon: 'Globe',
+    description: 'Especializados en auditorías de entidades del sector público local y autonómico. Especialidad en auditorías de cumplimiento y operativas. Emitimos presupuestos para dar cumplimiento con la Ley de Contratos del sector público con el máximo de detalles y transparencia.',
+    icon: 'Building',
     featured: false,
     category: 'financial',
+    faqs: [
+      {
+        q: "¿Podemos contar con vosotros como apoyo técnico para Intervención o para encargos de control financiero?",
+        a: "Sí. Actuamos como soporte técnico especializado en trabajos de control financiero permanente, auditorías operativas, revisiones de legalidad y fiscalización de subvenciones o entes dependientes. Nos integramos con el despacho colaborador respetando su relación institucional con la entidad pública, aportando independencia técnica, documentación estructurada y metodología alineada con estándares profesionales."
+      },
+      {
+        q: "¿Por qué elegir MindAudit en el Sector Público?",
+        a: "En MindAudit aportamos más de 15 años de experiencia en auditoría, control financiero y fiscalización en entornos públicos y entidades dependientes, trabajando bajo los estándares técnicos y legales aplicables en este sector."
+      }
+    ]
   },
   {
     id: 'limited-review',
@@ -68,30 +85,30 @@ export const auditServices: AuditService[] = [
     category: 'special',
   },
   {
-    id: 'biofuels',
-    name: 'Auditoría Biocarburantes',
-    slug: 'auditoria-biocarburantes',
-    shortDescription: 'Auditoría especializada en biocarburantes',
-    description: 'Verificación de la sostenibilidad y cumplimiento de criterios para el sector de los biocarburantes según la normativa vigente.',
-    icon: 'Zap',
+    id: 'banco-de-espana',
+    name: 'Banco de España',
+    slug: 'banco-de-espana',
+    shortDescription: 'Informe complementarios de auditores externos',
+    description: 'Informes complementarios a la auditoría de cuentas requeridos por el regulador para entidades bajo su supervisión.',
+    icon: 'Landmark',
     featured: false,
     category: 'special',
   },
   {
     id: 'sicbios',
-    name: 'Auditoría SICBIOS',
-    slug: 'auditoria-sicbios',
-    shortDescription: 'Auditoría del sistema de información de biocarburantes',
-    description: 'Auditoría técnica del Sistema de Información de Biocarburantes (SICBIOS) para garantizar la veracidad de los datos reportados.',
+    name: 'Informes SICBIOS',
+    slug: 'informes-sicbios',
+    shortDescription: 'Certificación de los Biocarburantes',
+    description: 'Informes técnicos del Sistema de Información de Biocarburantes (SICBIOS) para garantizar la veracidad de los datos reportados.',
     icon: 'ShieldCheck',
     featured: false,
     category: 'special',
   },
   {
     id: 'cores',
-    name: 'Auditoría CORES',
-    slug: 'auditoria-cores',
-    shortDescription: 'Auditoría de reservas estratégicas',
+    name: 'Informes CORES',
+    slug: 'informes-cores',
+    shortDescription: 'Informes periódicos para el sector de hidrocarburos',
     description: 'Informes de auditoría relacionados con la Corporación de Reservas Estratégicas de Productos Petrolíferos.',
     icon: 'Layers',
     featured: false,
@@ -100,11 +117,11 @@ export const auditServices: AuditService[] = [
 
   // ========== INFORMES ESPECIALES Y MERCANTILES ==========
   {
-    id: 'grant-audit',
-    name: 'Auditoría de Subvenciones',
-    slug: 'auditoria-subvenciones',
-    shortDescription: 'Verificación de fondos y ayudas públicas',
-    description: 'Auditoría especializada para verificar el correcto uso y justificación de subvenciones y ayudas públicas nacionales e internacionales.',
+    id: 'insolvency-report',
+    name: 'Informe de mayorías de la Ley Concursal',
+    slug: 'informe-mayorias-ley-concursal',
+    shortDescription: 'Informe de mayorías de la Ley Concursal',
+    description: 'Informe de mayorías de la Ley Concursal',
     icon: 'Award',
     featured: true,
     category: 'grants',
@@ -126,16 +143,6 @@ export const auditServices: AuditService[] = [
     shortDescription: 'Informe para reducciones de capital',
     description: 'Informes periciales o de auditoría necesarios para la reducción de capital social con el fin de restablecer el equilibrio patrimonial.',
     icon: 'Scale',
-    featured: false,
-    category: 'grants',
-  },
-  {
-    id: 'banco-espana',
-    name: 'Informes Complementarios del Banco de España',
-    slug: 'informes-banco-espana',
-    shortDescription: 'Informes para entidades financieras',
-    description: 'Realización de informes complementarios a la auditoría de cuentas requeridos por el regulador para entidades bajo su supervisión.',
-    icon: 'Landmark',
     featured: false,
     category: 'grants',
   },
@@ -162,15 +169,15 @@ export const auditServices: AuditService[] = [
     category: 'other',
   },
   {
-    id: 'financial-verification',
-    name: 'Verificación de Estados Financieros',
-    slug: 'verificacion-estados-financieros',
-    shortDescription: 'Verificación de solidez financiera',
-    description: 'Servicios de comprobación de estados financieros para terceros, entidades bancarias o procesos de licitación.',
-    icon: 'ShieldCheck',
-    featured: false,
+    id: 'grant-audit',
+    name: 'Auditoría de Subvenciones',
+    slug: 'auditoria-subvenciones',
+    shortDescription: 'Verificación de fondos y ayudas públicas',
+    description: 'Auditoría especializada para verificar el correcto uso y justificación de subvenciones y ayudas públicas nacionales e internacionales.',
+    icon: 'Award',
+    featured: true,
     category: 'other',
-  },
+  }
 ];
 
 /**

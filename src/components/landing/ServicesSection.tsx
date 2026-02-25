@@ -12,15 +12,15 @@ export function ServicesSection() {
       items: auditServices.filter(s => s.category === 'financial')
     },
     {
-      title: "Auditorías Especializadas",
+      title: "Informes especializados",
       items: auditServices.filter(s => s.category === 'special')
     },
     {
-      title: "Informes Especiales y Mercantiles",
+      title: "Informes Especiales",
       items: auditServices.filter(s => s.category === 'grants')
     },
     {
-      title: "Consultoría y Transacciones",
+      title: "Otros",
       items: auditServices.filter(s => s.category === 'other')
     }
   ];
@@ -32,14 +32,12 @@ export function ServicesSection() {
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
         <div className="container relative z-10 mx-auto px-4">
            <div className="max-w-4xl">
-              <span className="text-blue-400 font-bold tracking-widest uppercase text-sm mb-4 block">Nuestros servicios de auditoría</span>
               <h1 className="text-4xl lg:text-6xl font-extrabold mb-8 leading-tight">
-                Servicios Integrales de auditoría, <br />
-                <span className="text-blue-500">adaptados a la realidad de su negocio</span>
+                Servicios Integrales de auditoría <br />
+                <span className="text-blue-500">Complementa vuestra oferta de servicios sin necesidad de ampliar la plantilla y sin costes innecesarios</span>
               </h1>
               <p className="text-xl text-slate-400 leading-relaxed max-w-2xl">
-                Ofrecemos un catálogo completo de soluciones técnicas para garantizar la transparencia, 
-                el cumplimiento y la seguridad financiera de su organización.
+               Ofrecemos un catálogo completo que ayuda a la captación y retención de clientes para lanzar 🚀 vuestro despacho profesional al nivel de excelencia
               </p>
            </div>
         </div>
