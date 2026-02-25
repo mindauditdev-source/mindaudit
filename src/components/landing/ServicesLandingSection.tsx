@@ -31,9 +31,10 @@ export function ServicesLandingSection() {
                   <h3 className="text-xl font-bold text-gray-900">{service.name}</h3>
                 </CardHeader>
                 <CardContent className="grow">
-                  <p className="text-sm text-gray-500 leading-relaxed line-clamp-3">
-                    {service.description}
-                  </p>
+                  <p 
+                    className="text-sm text-gray-500 leading-relaxed line-clamp-3"
+                    dangerouslySetInnerHTML={{ __html: service.description }}
+                  />
                 </CardContent>
                 <CardFooter className="pb-8 pt-0">
                   <Link href={`/servicios/${service.slug}`} className="group inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700">

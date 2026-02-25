@@ -66,7 +66,7 @@ export default function SignContractPage() {
           </div>
           <h1 className="text-3xl font-bold text-slate-900">¡Contrato Firmado!</h1>
           <p className="text-slate-600 text-lg">
-            Gracias por unirte oficialmente al equipo de MindAudit Spain. 
+            Gracias por unirte oficialmente al equipo de <strong>MindAudit Spain</strong>. 
             Tus beneficios como Partner han sido activados.
           </p>
           <p className="text-sm text-slate-400">

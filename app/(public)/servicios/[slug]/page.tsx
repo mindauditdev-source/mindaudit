@@ -70,9 +70,10 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
             <h1 className="text-4xl lg:text-5xl font-extrabold mb-6 leading-tight">
               {service.name}
             </h1>
-            <p className="text-xl text-slate-400 leading-relaxed max-w-2xl">
-              {service.description}
-            </p>
+            <p 
+              className="text-xl text-slate-400 leading-relaxed max-w-2xl"
+              dangerouslySetInnerHTML={{ __html: service.description }}
+            />
           </div>
         </div>
       </section>

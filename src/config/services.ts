@@ -22,7 +22,7 @@ export const auditServices: AuditService[] = [
     name: 'Auditoría de Cuentas Anuales individuales y grupos',
     slug: 'auditoria-cuentas-anuales',
     shortDescription: 'Para despachos que buscan rigor técnico, reputación y valor añadido para sus clientes',
-    description: 'En MindAudit Spain SLP prestamos servicios de auditoría de cuentas anuales individuales y consolidadas dirigidos exclusivamente a despachos profesionales que desean ofrecer auditoría a sus clientes bajo los estándares normativos de la Ley 22/2015.',
+    description: 'En <strong>MindAudit Spain SLP</strong> prestamos servicios de auditoría de cuentas anuales individuales y consolidadas dirigidos exclusivamente a despachos profesionales que desean ofrecer auditoría a sus clientes bajo los estándares normativos de la Ley 22/2015.',
     icon: 'Building2',
     featured: true,
     category: 'financial',

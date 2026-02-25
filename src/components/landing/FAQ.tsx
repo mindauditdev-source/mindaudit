@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const faqs = [
   {
     question: "¿Qué es exactamente y para qué sirve la plataforma de MindAudit para colaboradores?",
-    answer: "Nuestra plataforma es una herramienta tecnológica diseñada para canalizar las oportunidades de negocio relacionadas con el sector de la auditoría. Permite al colaborador registrar potenciales clientes, recibir propuestas de honorarios y realizar consultas técnicas relacionadas con la contabilidad y la auditoría de cuentas. Con MindAudit vuestro despacho abrirá un nuevo abanico de servicios sin invertir en estructura y sin preocuparse por el cumplimiento normativo exigido."
+    answer: "Nuestra plataforma es una herramienta tecnológica diseñada para canalizar las oportunidades de negocio relacionadas con el sector de la auditoría. Permite al colaborador registrar potenciales clientes, recibir propuestas de honorarios y realizar consultas técnicas relacionadas con la contabilidad y la auditoría de cuentas. Con <strong>MindAudit</strong> vuestro despacho abrirá un nuevo abanico de servicios sin invertir en estructura y sin preocuparse por el cumplimiento normativo exigido."
   },
   {
     question: "¿Qué beneficios obtiene nuestro despacho al colaborar con una firma de auditoría especializada?",
@@ -15,7 +15,7 @@ const faqs = [
   },
   {
     question: "¿Podemos seguir trabajando con otras firmas de auditoría?",
-    answer: "Sí, MindAudit no es un acuerdo en exclusiva y el cliente podrá elegir otros presupuestos si así lo desea. MindAudit facilita el objetivo de llevar los servicios reservados a los despachos de auditores de cuentas a otros despachos profesionales. Con MindAudit es más fácil que nunca dar un salto de calidad en la oferta de vuestra firma."
+    answer: "Sí, <strong>MindAudit</strong> no es un acuerdo en exclusiva y el cliente podrá elegir otros presupuestos si así lo desea. <strong>MindAudit</strong> facilita el objetivo de llevar los servicios reservados a los despachos de auditores de cuentas a otros despachos profesionales. Con <strong>MindAudit</strong> es más fácil que nunca dar un salto de calidad en la oferta de vuestra firma."
   },
   {
     question: "¿Quién firma el contrato de auditoría con el cliente?",
@@ -27,11 +27,11 @@ const faqs = [
   },
   {
     question: "¿Cómo se protege al cliente frente a posibles conflictos de interés?",
-    answer: "La protección del cliente es prioritaria. Antes de aceptar o continuar cualquier encargo, MindAudit aplica procedimientos formales de evaluación de independencia y análisis de incompatibilidades, tal como exige la normativa vigente. Si se detectara cualquier riesgo potencial, se adoptan las salvaguardas necesarias o, en su caso, se declina el encargo. Puesto que ya existe una relación previa entre colaborador y MindAudit, los posibles casos de discrepancias técnicas se reducen drásticamente, por lo que el cliente suele percibir uniformidad de criterios entre su despacho de confianza y su auditor."
+    answer: "La protección del cliente es prioritaria. Antes de aceptar o continuar cualquier encargo, <strong>MindAudit</strong> aplica procedimientos formales de evaluación de independencia y análisis de incompatibilidades, tal como exige la normativa vigente. Si se detectara cualquier riesgo potencial, se adoptan las salvaguardas necesarias o, en su caso, se declina el encargo. Puesto que ya existe una relación previa entre colaborador y <strong>MindAudit</strong>, los posibles casos de discrepancias técnicas se reducen drásticamente, por lo que el cliente suele percibir uniformidad de criterios entre su despacho de confianza y su auditor."
   },
   {
     question: "¿Puede el despacho ofrecer el servicio de auditoría como propio?",
-    answer: "No. El servicio de auditoría solo puede ser prestado y asumido legalmente por una firma inscrita en el ROAC, que es quien firma el contrato y emite el informe bajo su responsabilidad profesional. La colaboración permite al despacho ampliar su oferta de servicios a través de un partner especializado, pero siempre manteniendo la independencia, la identidad y la responsabilidad jurídica de la firma auditora. No obstante, los usuarios registrados en el programa de incentivos, pueden utilizar el logo y la marca MindAudit en su imagen corporativa."
+    answer: "No. El servicio de auditoría solo puede ser prestado y asumido legalmente por una firma inscrita en el ROAC, que es quien firma el contrato y emite el informe bajo su responsabilidad profesional. La colaboración permite al despacho ampliar su oferta de servicios a través de un partner especializado, pero siempre manteniendo la independencia, la identidad y la responsabilidad jurídica de la firma auditora. No obstante, los usuarios registrados en el programa de incentivos, pueden utilizar el logo y la marca <strong>MindAudit</strong> en su imagen corporativa."
   },
   {
     question: "¿Podemos rescindir la colaboración en cualquier momento?",
@@ -39,11 +39,11 @@ const faqs = [
   },
   {
     question: "¿Qué son las igualas de consultas y cómo pueden beneficiarme como colaborador?",
-    answer: "Las igualas de consultas son paquetes de horas de asesoramiento técnico especializado que pueden ser contratadas dentro de la plataforma. Os permiten acceder directamente al equipo de MindAudit para resolver dudas complejas en materia contable, auditoría, cumplimiento normativo o criterios técnicos, ya sea en forma de chat, videollamadas o reuniones con especialistas. Descubre las modalidades de iguala disponibles y reforzad vuestra firma con soporte experto cuando sea necesario."
+    answer: "Las igualas de consultas son paquetes de horas de asesoramiento técnico especializado que pueden ser contratadas dentro de la plataforma. Os permiten acceder directamente al equipo de <strong>MindAudit</strong> para resolver dudas complejas en materia contable, auditoría, cumplimiento normativo o criterios técnicos, ya sea en forma de chat, videollamadas o reuniones con especialistas. Descubre las modalidades de iguala disponibles y reforzad vuestra firma con soporte experto cuando sea necesario."
   },
   {
     question: "¿Cómo puedo empezar a colaborar con MindAudit y activar las ventajas?",
-    answer: "Es muy sencillo. Solo tienes que crear tu cuenta como colaborador en la plataforma de MindAudit, completar el proceso de alta y comenzar a canalizar oportunidades de auditoría de tus propios clientes. Desde ese momento podrás gestionar propuestas, hacer seguimiento de estados y visualizar los incentivos generados de forma automática y transparente. Crea tu cuenta y descubre cómo funciona nuestro modelo de colaboración, ¡es fácil, rápido y sin coste!"
+    answer: "Es muy sencillo. Solo tienes que crear tu cuenta como colaborador en la plataforma de <strong>MindAudit</strong>, completar el proceso de alta y comenzar a canalizar oportunidades de auditoría de tus propios clientes. Desde ese momento podrás gestionar propuestas, hacer seguimiento de estados y visualizar los incentivos generados de forma automática y transparente. Crea tu cuenta y descubre cómo funciona nuestro modelo de colaboración, ¡es fácil, rápido y sin coste!"
   }
 ];
 
@@ -100,9 +100,10 @@ export function FAQ() {
                   >
                     <div className="px-6 pb-6 pt-0 ml-14">
                       <div className="h-px bg-gray-100 mb-6 w-full" />
-                      <p className="text-gray-600 leading-relaxed">
-                        {faq.answer}
-                      </p>
+                      <p 
+                        className="text-gray-600 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: faq.answer }}
+                      />
                     </div>
                   </motion.div>
                 )}

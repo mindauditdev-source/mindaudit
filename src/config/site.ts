@@ -6,7 +6,7 @@ export const siteConfig = {
   name: 'MindAudit Spain SLP',
   shortName: 'MindAudit',
   description:
-    'Firma boutique de auditoría que combina rigor profesional con tecnología moderna para ofrecer servicios de auditoría transparentes y eficientes en toda España.',
+    'Firma boutique de auditoría que combina rigor profesional con tecnología moderna para ofrecer servicios de auditoría transparentes y eficientes en toda España a través de <strong>MindAudit Spain</strong>.',
   tagline: 'Rigor. Transparencia. Tecnología al servicio de la excelencia en auditoría.',
   url: 'https://www.mindaudit.es',
   

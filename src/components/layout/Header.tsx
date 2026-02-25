@@ -29,7 +29,7 @@ export function Header() {
               <ShieldCheck className="h-6 w-6" />
             </div>
             <div className="flex flex-col leading-none">
-              <span className="text-xl font-bold tracking-tight text-[#0f4c81]">MindAudit Spain</span>
+              <span className="text-xl font-bold tracking-tight text-[#0f4c81]"><strong>MindAudit Spain</strong></span>
             </div>
           </Link>
 

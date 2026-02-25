@@ -70,7 +70,7 @@ export function CareersSection() {
                 Construye el futuro de la <span className="text-blue-600">auditoría digital</span>
               </h2>
               <p className="text-xl text-slate-600 leading-relaxed max-w-xl">
-                En MindAudit Spain buscamos profesionales apasionados por la tecnología, 
+                En <strong>MindAudit Spain</strong> buscamos profesionales apasionados por la tecnología, 
                 el rigor financiero y la transparencia. Si quieres transformar el sector 
                 con nosotros, queremos conocerte.
               </p>
