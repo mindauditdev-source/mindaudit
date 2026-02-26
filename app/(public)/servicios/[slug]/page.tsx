@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle2, ShieldCheck, Mail, LucideIcon } from 'lucide-react';
@@ -87,7 +88,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                 <h2 className="text-3xl font-bold text-slate-900 mb-6">Detalles del Servicio</h2>
                 {service.detailedDescription ? (
                   <div 
-                    className="leading-relaxed whitespace-pre-wrap mb-8"
+                    className="leading-relaxed whitespace-pre-wrap mb-8 w-full"
                     dangerouslySetInnerHTML={{ __html: service.detailedDescription }}
                   />
                 ) : (
@@ -97,11 +98,32 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                   </p>
                 )}
                 
-                <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 h-full">
-                    <h3 className="text-xl font-bold text-slate-900 mb-6 font-sans">
-                      ¿Por qué elegirnos?
-                    </h3>
+              {/* Service Images Section */}
+              {service.images && service.images.length > 0 && (
+                <div className="mt-16">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-8 font-sans">Visualización del Servicio</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {service.images.map((image, i) => (
+                      <div key={i} className="relative aspect-video rounded-3xl overflow-hidden shadow-lg border border-slate-100 group bg-slate-50">
+                        <LucideIcons.Image className="absolute inset-0 m-auto h-12 w-12 text-slate-200" />
+                        <Image 
+                          src={image} 
+                          alt={`${service.name} image ${i + 1}`}
+                          fill
+                          className="object-cover relative z-10 transition-transform duration-700 group-hover:scale-105"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 h-full">
+                  <h3 className="text-xl font-bold text-slate-900 mb-6 font-sans">
+                    ¿Por qué elegirnos?
+                  </h3>
                     <ul className="space-y-4 list-none p-0 m-0">
                       {(service.features && service.features.length > 0) ? service.features.map((item, i) => (
                         <li key={i} className="flex items-start gap-3 text-slate-600">
