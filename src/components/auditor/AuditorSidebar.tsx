@@ -7,14 +7,12 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Users,
-  Building2,
   PieChart,
   LogOut,
-  ShieldCheck,
   MessageCircle,
-  Package,
   FileText,
 } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 const sidebarItems = [
@@ -55,9 +53,15 @@ export function AuditorSidebar() {
 
   return (
     <div className="flex h-full w-64 flex-col bg-[#0f172a] text-white transition-all duration-300">
-      <div className="flex h-16 items-center px-6 border-b border-slate-800">
-        <ShieldCheck className="h-6 w-6 mr-2 text-blue-400" />
-        <span className="text-xl font-bold tracking-tight text-slate-100">MindAudit Auditor</span>
+      <div className="flex h-16 items-center px-4 border-b border-slate-800">
+        <div className="relative h-8 w-32">
+          <Image
+            src="/logo/t-png.png"
+            alt="MindAudit Logo"
+            fill
+            className="object-contain brightness-0 invert"
+          />
+        </div>
       </div>
       
       <div className="flex-1 overflow-y-auto py-6">

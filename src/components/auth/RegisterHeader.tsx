@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
+import Image from "next/image";
 
 interface RegisterHeaderProps {
   showHelp?: boolean;
@@ -12,10 +12,15 @@ export function RegisterHeader({ showHelp }: RegisterHeaderProps) {
     <header className="w-full border-b border-slate-100 py-6 bg-white">
       <div className="container mx-auto px-6 flex justify-between items-center">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-[#0f4c81] text-white shadow-md">
-            <ShieldCheck className="h-5 w-5" />
+          <div className="relative h-10 w-40">
+            <Image
+              src="/logo/t-png.png"
+              alt="MindAudit Logo"
+              fill
+              className="object-contain"
+              priority
+            />
           </div>
-          <span className="text-xl font-bold tracking-tight text-[#0f4c81]">MindAudit Spain</span>
         </Link>
         <div className="flex items-center gap-4 text-sm font-medium">
           {showHelp ? (

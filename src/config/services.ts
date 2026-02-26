@@ -161,7 +161,7 @@ export const auditServices: AuditService[] = [
     shortDescription: 'Certificación de los Biocarburantes',
     description: 'Certificación obligatoria sobre la declaración anual de compras, ventas y producción de biocarburantes y otros combustibles renovables con fines de transporte conforme a la Circular 1/2016, de 30 de marzo, de la Comisión Nacional de los Mercados y la Competencia',
     detailedDescription: 'Informe de auditoría para dar cumplimiento a los sujetos titulares de instalaciones de plantas de producción de biodiésel.',
-    icon: 'ShieldCheck',
+    icon: 'Shield',
     featured: false,
     category: 'special',
     features: [

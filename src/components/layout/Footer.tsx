@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Linkedin, Twitter, ShieldCheck } from 'lucide-react';
+import Image from 'next/image';
+import { Linkedin, Twitter } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -10,10 +11,14 @@ export function Footer() {
           {/* Column 1: Brand */}
           <div className="space-y-6">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="flex aspect-square size-9 items-center justify-center rounded-lg bg-[#0f4c81] text-white">
-                <ShieldCheck className="h-6 w-6" />
+              <div className="relative h-10 w-40">
+                <Image
+                  src="/logo/t-png.png"
+                  alt="MindAudit Logo"
+                  fill
+                  className="object-contain"
+                />
               </div>
-              <span className="text-xl font-bold tracking-tight text-[#0f4c81]"><strong>MindAudit®</strong></span>
             </Link>
             <p className="text-slate-500 text-sm leading-relaxed">
               Servicios profesionales de auditoría y consultoría para empresas 

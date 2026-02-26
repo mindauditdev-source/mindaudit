@@ -8,13 +8,12 @@ import {
   LayoutDashboard,
   Users,
   Building2,
-  FileText,
   PieChart,
   Settings,
   LogOut,
-  ShieldCheck,
   ClipboardList
 } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 const sidebarItems = [
@@ -55,9 +54,15 @@ export function AdminSidebar() {
 
   return (
     <div className="flex h-full w-64 flex-col bg-slate-900 text-white transition-all duration-300">
-      <div className="flex h-16 items-center px-6 border-b border-slate-800">
-        <ShieldCheck className="h-6 w-6 mr-2 text-indigo-400" />
-        <span className="text-xl font-bold tracking-tight">Admin Portal</span>
+      <div className="flex h-16 items-center px-4 border-b border-slate-800">
+        <div className="relative h-8 w-32">
+          <Image
+            src="/logo/t-png.png"
+            alt="MindAudit Logo"
+            fill
+            className="object-contain brightness-0 invert"
+          />
+        </div>
       </div>
       
       <div className="flex-1 overflow-y-auto py-6">
@@ -77,7 +82,7 @@ export function AdminSidebar() {
               >
                 <item.icon
                   className={cn(
-                    "mr-3 h-5 w-5 flex-shrink-0 transition-colors",
+                    "mr-3 h-5 w-5 shrink-0 transition-colors",
                     isActive ? "text-white" : "text-slate-500 group-hover:text-white"
                   )}
                   aria-hidden="true"

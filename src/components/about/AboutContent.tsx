@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
-  ShieldCheck, 
+  Award, 
   Lightbulb, 
   Eye, 
   Users
@@ -51,7 +51,7 @@ export function AboutContent() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <ValueCard 
-                icon={<ShieldCheck className="h-6 w-6" />}
+                icon={<Award className="h-6 w-6" />}
                 title="Rigor"
                 description="Mantenemos los más altos estándares éticos y técnicos en cada proceso de auditoría que realizamos."
             />

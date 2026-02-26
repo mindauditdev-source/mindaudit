@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, Eye, EyeOff, ArrowRight, ShieldCheck, Loader2, AlertCircle } from "lucide-react";
+import { Mail, Eye, EyeOff, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -93,13 +93,15 @@ function LoginForm() {
           {/* Logo and Mobile Branding */}
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-[#0f4c81] text-white shadow-lg">
-                <ShieldCheck className="h-7 w-7" />
+              <div className="relative h-12 w-48">
+                <Image
+                  src="/logo/t-png.png"
+                  alt="MindAudit Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
               </div>
-              <span className="text-2xl font-bold tracking-tight text-[#0f4c81]">
-                MindAudit{" "}
-                <span className="text-blue-500 font-medium">Spain</span>
-              </span>
             </div>
             <p className="text-slate-500 font-medium text-lg pt-2 leading-none">
               Acceso al Portal de Socios

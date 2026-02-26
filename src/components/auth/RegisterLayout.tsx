@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ShieldCheck, Users, Cpu, MessageCircle } from "lucide-react";
+import { Shield, Users, Cpu, MessageCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 export function RegisterSidebar() {
@@ -16,7 +16,7 @@ export function RegisterSidebar() {
           <div className="space-y-8">
             <div className="flex gap-5">
               <div className="flex aspect-square size-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                <ShieldCheck className="h-6 w-6" />
+                <Shield className="h-6 w-6" />
               </div>
               <div className="space-y-1">
                 <h4 className="text-[15px] font-extrabold text-slate-900">Máxima Seguridad</h4>

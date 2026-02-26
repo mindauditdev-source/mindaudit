@@ -3,7 +3,8 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, ShieldCheck } from "lucide-react";
+import { Menu } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
@@ -25,11 +26,14 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex aspect-square size-9 items-center justify-center rounded-lg bg-[#0f4c81] text-white">
-              <ShieldCheck className="h-6 w-6" />
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-xl font-bold tracking-tight text-[#0f4c81]"><strong>MindAudit® Spain</strong></span>
+            <div className="relative h-10 w-40">
+              <Image
+                src="/logo/t-png.png"
+                alt="MindAudit Logo"
+                fill
+                className="object-contain"
+                priority
+              />
             </div>
           </Link>
 
@@ -70,10 +74,14 @@ export function Header() {
                   className="flex items-center gap-2"
                   onClick={() => setIsOpen(false)}
                 >
-                  <div className="flex aspect-square size-9 items-center justify-center rounded-lg bg-[#0f4c81] text-white">
-                    <ShieldCheck className="h-6 w-6" />
+                  <div className="relative h-8 w-32">
+                    <Image
+                      src="/logo/t-png.png"
+                      alt="MindAudit Logo"
+                      fill
+                      className="object-contain"
+                    />
                   </div>
-                  <span className="text-xl font-bold text-[#0f4c81]">MindAudit®</span>
                 </Link>
                 <nav className="flex flex-col gap-5">
                   {navigation.map((item) => {

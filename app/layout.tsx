@@ -1,10 +1,25 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 import { cn } from '@/lib/utils/cn';
 import AuthProvider from '@/components/providers/AuthProvider';
 
-const inter = Inter({ subsets: ['latin'] });
+const satoshi = localFont({
+  src: [
+    {
+      path: '../public/Fonts/WEB/fonts/Satoshi-Variable.woff2',
+      weight: '300 900',
+      style: 'normal',
+    },
+    {
+      path: '../public/Fonts/WEB/fonts/Satoshi-VariableItalic.woff2',
+      weight: '300 900',
+      style: 'italic',
+    },
+  ],
+  variable: '--font-satoshi',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'MindAudit® Spain SLP - Auditoría Profesional',
@@ -17,8 +32,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="scroll-smooth">
-      <body className={cn(inter.className, 'min-h-screen bg-background antialiased')}>
+    <html lang="es" className={cn(satoshi.variable, "scroll-smooth")}>
+      <body className="min-h-screen bg-background antialiased font-sans">
         <AuthProvider>
           {children}
         </AuthProvider>
