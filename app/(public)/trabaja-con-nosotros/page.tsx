@@ -2,7 +2,7 @@ import { CareersSection } from '@/components/landing/CareersSection';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Trabaja con Nosotros | MindAudit Spain',
+  title: 'Trabaja con Nosotros | MindAudit® Spain',
   description: 'Únete a nuestro equipo de auditores y expertos en tecnología. Buscamos talento apasionado por la transparencia financiera.',
 };
 

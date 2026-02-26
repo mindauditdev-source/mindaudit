@@ -66,8 +66,8 @@ export class PandaDocService {
         Authorization: `API-Key ${this.API_KEY}`,
       },
       body: JSON.stringify({
-        message: "Hola, aquí tienes tu contrato de colaboración con MindAudit. Por favor, rírmalo para activar tus beneficios.",
-        subject: "Firma de Contrato MindAudit",
+        message: "Hola, aquí tienes tu contrato de colaboración con MindAudit®. Por favor, rírmalo para activar tus beneficios.",
+        subject: "Firma de Contrato MindAudit®",
         silent: false,
       }),
     });

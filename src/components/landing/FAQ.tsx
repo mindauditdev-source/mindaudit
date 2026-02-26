@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const faqs = [
   {
-    question: "¿Qué es exactamente y para qué sirve la plataforma de MindAudit para colaboradores?",
+    question: "¿Qué es exactamente y para qué sirve la plataforma de MindAudit® para colaboradores?",
     answer: "Nuestra plataforma es una herramienta tecnológica diseñada para canalizar las oportunidades de negocio relacionadas con el sector de la auditoría. Permite al colaborador registrar potenciales clientes, recibir propuestas de honorarios y realizar consultas técnicas relacionadas con la contabilidad y la auditoría de cuentas. Con <strong>MindAudit</strong> vuestro despacho abrirá un nuevo abanico de servicios sin invertir en estructura y sin preocuparse por el cumplimiento normativo exigido."
   },
   {
@@ -43,7 +43,7 @@ const faqs = [
   },
   {
     question: "¿Cómo puedo empezar a colaborar con MindAudit y activar las ventajas?",
-    answer: "Es muy sencillo. Solo tienes que crear tu cuenta como colaborador en la plataforma de <strong>MindAudit</strong>, completar el proceso de alta y comenzar a canalizar oportunidades de auditoría de tus propios clientes. Desde ese momento podrás gestionar propuestas, hacer seguimiento de estados y visualizar los incentivos generados de forma automática y transparente. Crea tu cuenta y descubre cómo funciona nuestro modelo de colaboración, ¡es fácil, rápido y sin coste!"
+    answer: "Es muy sencillo. Solo tienes que crear tu cuenta como colaborador en la plataforma de <strong>MindAudit®</strong>, completar el proceso de alta y comenzar a canalizar oportunidades de auditoría de tus propios clientes. Desde ese momento podrás gestionar propuestas, hacer seguimiento de estados y visualizar los incentivos generados de forma automática y transparente. Crea tu cuenta y descubre cómo funciona nuestro modelo de colaboración, ¡es fácil, rápido y sin coste!"
   }
 ];
 

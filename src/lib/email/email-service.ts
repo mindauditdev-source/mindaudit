@@ -77,7 +77,7 @@ export class EmailService {
                 </div>
               ` : ''}
               <div class="footer">
-                <p>Este mensaje fue enviado desde el portal de empleo de MindAudit Spain</p>
+                <p>Este mensaje fue enviado desde el portal de empleo de MindAudit® Spain</p>
               </div>
             </div>
           </div>
@@ -146,7 +146,7 @@ export class EmailService {
                 <div class="value">${data.mensaje.replace(/\n/g, '<br>')}</div>
               </div>
               <div class="footer">
-                <p>Este mensaje fue enviado desde el formulario de contacto de MindAudit Spain</p>
+                <p>Este mensaje fue enviado desde el formulario de contacto de MindAudit® Spain</p>
               </div>
             </div>
           </div>
@@ -241,7 +241,7 @@ export class EmailService {
         <div style="font-family: sans-serif; padding: 20px;">
           <h2 style="color: #0c3a6b;">Presupuesto de Auditoría Listo</h2>
           <p>Hola ${empresa.contactName},</p>
-          <p>El equipo técnico de MindAudit ha revisado tu solicitud y el presupuesto ya está disponible para tu revisión.</p>
+          <p>El equipo técnico de <strong>MindAudit®</strong> ha revisado tu solicitud y el presupuesto ya está disponible para tu revisión.</p>
           <p><strong>Servicio:</strong> ${audit.tipoServicio}</p>
           <p><strong>Importe:</strong> ${audit.presupuesto} € + IVA</p>
           <br/>
@@ -282,7 +282,7 @@ export class EmailService {
   }) {
     return this.sendEmail({
       to: partner.user.email,
-      subject: `🎉 ¡Bienvenido a MindAudit Spain!`,
+      subject: `🎉 ¡Bienvenido a MindAudit® Spain!`,
       html: `
         <div style="font-family: sans-serif; padding: 20px;">
           <h2 style="color: #0c3a6b;">¡Tu cuenta ha sido activada!</h2>
@@ -321,7 +321,7 @@ export class EmailService {
             <li><strong>Concepto:</strong> Auditoría para ${commission.auditoria.empresa.companyName}</li>
           </ul>
           <p>El abono debería aparecer en tu cuenta en las próximas 24-48h hábiles.</p>
-          <p>Gracias por confiar en MindAudit Spain.</p>
+          <p>Gracias por confiar en MindAudit® Spain.</p>
         </div>
       `,
     });
@@ -346,7 +346,7 @@ export class EmailService {
           </div>
           <p>Recuerda que puedes subir documentos adicionales o consultar el estado de las solicitudes desde tu dashboard.</p>
           <a href="${process.env.NEXTAUTH_URL}/empresa/auditorias/${audit.id}" style="background: #0c3a6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Ver Detalles en Dashboard</a>
-          <p>Gracias por elegir MindAudit Spain.</p>
+          <p>Gracias por elegir MindAudit® Spain.</p>
         </div>
       `,
     });
@@ -547,7 +547,7 @@ export class EmailService {
           
           <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
             <p style="color: #94a3b8; font-size: 13px; margin: 0;">
-              Este es un mensaje automático de MindAudit. Por favor, no respondas a este correo.
+              Este es un mensaje automático de MindAudit®. Por favor, no respondas a este correo.
             </p>
           </div>
         </div>
@@ -720,7 +720,7 @@ export class EmailService {
   }, signLink: string) {
     return this.sendEmail({
       to: partner.email,
-      subject: `🖋️ Acción requerida: Firma tu acuerdo de Partner de MindAudit`,
+      subject: `🖋️ Acción requerida: Firma tu acuerdo de Partner de MindAudit®`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
           <div style="background: white; border-radius: 12px; padding: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
@@ -759,13 +759,13 @@ export class EmailService {
             </div>
             
             <p style="color: #94a3b8; font-size: 14px; margin: 30px 0 0 0; text-align: center;">
-              Si tienes alguna duda, responde a este correo o contacta con el soporte de MindAudit.
+              Si tienes alguna duda, responde a este correo o contacta con el soporte de MindAudit®.
             </p>
           </div>
           
           <div style="text-align: center; margin-top: 24px;">
             <p style="color: #94a3b8; font-size: 12px; margin: 0;">
-              © 2024 MindAudit Spain. Todos los derechos reservados.
+              © 2024 MindAudit® Spain. Todos los derechos reservados.
             </p>
           </div>
         </div>

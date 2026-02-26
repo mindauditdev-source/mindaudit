@@ -70,7 +70,7 @@ export function CareersSection() {
                 Construye el futuro de la <span className="text-blue-600">auditoría digital</span>
               </h2>
               <p className="text-xl text-slate-600 leading-relaxed max-w-xl">
-                En <strong>MindAudit Spain</strong> buscamos profesionales apasionados por la tecnología, 
+                En <strong>MindAudit® Spain</strong> buscamos profesionales apasionados por la tecnología, 
                 el rigor financiero y la transparencia. Si quieres transformar el sector 
                 con nosotros, queremos conocerte.
               </p>
@@ -132,7 +132,7 @@ export function CareersSection() {
                         </div>
                         <h4 className="text-2xl font-bold text-slate-900 mb-2">¡Candidatura enviada!</h4>
                         <p className="text-slate-500 mb-8 max-w-sm">
-                          Gracias por tu interés en MindAudit. Tu información ha sido recibida correctamente por nuestro equipo de RRHH.
+                          Gracias por tu interés en MindAudit®. Tu información ha sido recibida correctamente por nuestro equipo de RRHH.
                         </p>
                         <Button 
                           onClick={() => setIsSuccess(false)}

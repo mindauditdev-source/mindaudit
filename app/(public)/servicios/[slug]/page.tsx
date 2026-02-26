@@ -85,63 +85,75 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
             <div className="lg:col-span-2 space-y-12">
               <div className="prose prose-slate prose-lg max-w-none text-slate-600">
                 <h2 className="text-3xl font-bold text-slate-900 mb-6">Detalles del Servicio</h2>
-                <p className="leading-relaxed">
-                  En MindAudit Spain, proporcionamos un enfoque riguroso y profesional para {service.name.toLowerCase()}. 
-                  Nuestro objetivo es aportar valor real a través de una revisión exhaustiva y un compromiso inquebrantable con la calidad.
-                </p>
+                {service.detailedDescription ? (
+                  <div 
+                    className="leading-relaxed whitespace-pre-wrap mb-8"
+                    dangerouslySetInnerHTML={{ __html: service.detailedDescription }}
+                  />
+                ) : (
+                  <p className="leading-relaxed mb-8">
+                    En <strong>MindAudit® Spain</strong>, proporcionamos un enfoque riguroso y profesional para {service.name.toLowerCase()}. 
+                    Nuestro objetivo es aportar valor real a través de una revisión exhaustiva y un compromiso inquebrantable con la calidad.
+                  </p>
+                )}
                 
                 <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100">
-                    <h3 className="text-xl font-bold text-slate-900 mb-4 font-sans">
-                      {service.id === 'annual-accounts' ? '¿Por qué elegirnos como partner de auditoría?' : 'Por qué elegirnos'}
+                  <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 h-full">
+                    <h3 className="text-xl font-bold text-slate-900 mb-6 font-sans">
+                      ¿Por qué elegirnos?
                     </h3>
                     <ul className="space-y-4 list-none p-0 m-0">
-                      {(service.features || [
-                        'Experiencia contrastada en el sector',
-                        'Metodología propia basada en estándares internacionales',
-                        'Atención personalizada y directa con socios',
-                        'Tecnología avanzada para el análisis de datos'
-                      ]).map((item, i) => (
+                      {(service.features && service.features.length > 0) ? service.features.map((item, i) => (
                         <li key={i} className="flex items-start gap-3 text-slate-600">
                           <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
-                          <span>{item}</span>
+                          <span dangerouslySetInnerHTML={{ __html: item }} />
                         </li>
-                      ))}
+                      )) : (
+                        [
+                          'Experiencia contrastada en el sector',
+                          'Metodología propia basada en tecnología <strong>MindAudit®</strong>',
+                          'Atención personalizada y directa con socios',
+                          'Máximo rigor técnico y cumplimiento normativo'
+                        ].map((item, i) => (
+                          <li key={i} className="flex items-start gap-3 text-slate-600">
+                            <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+                            <span dangerouslySetInnerHTML={{ __html: item }} />
+                          </li>
+                        ))
+                      )}
                     </ul>
                   </div>
                   
-                  <div className="bg-blue-600 p-8 rounded-2xl text-white">
-                    <h3 className="text-xl font-bold mb-4 text-white font-sans">Nuestro Compromiso</h3>
-                    <p className="text-blue-100 mb-6">
-                      Garantizamos la máxima transparencia y el cumplimiento de todos los requisitos legales y técnicos vigentes.
-                    </p>
-                    <Link href="/contacto" className="text-white underline font-medium hover:text-blue-100 transition-colors">
-                      Más información sobre nuestra cultura →
+                  <div className="bg-[#0f4c81] p-8 rounded-2xl text-white h-full flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-xl font-bold mb-4 text-white font-sans">Nuestro Compromiso</h3>
+                      <p className="text-blue-100 mb-6 leading-relaxed">
+                        Garantizamos la máxima transparencia y el cumplimiento de todos los requisitos legales y técnicos vigentes, apoyándonos en la innovación constante de <strong>MindAudit®</strong>.
+                      </p>
+                    </div>
+                    <Link href="/contacto" className="text-white underline font-medium hover:text-blue-100 transition-colors inline-flex items-center gap-2">
+                      Más sobre nuestra cultura <LucideIcons.ArrowRight className="h-4 w-4" />
                     </Link>
                   </div>
                 </div>
               </div>
 
-              <div>
-                <h2 className="text-3xl font-bold text-slate-900 mb-8">Preguntas Frecuentes</h2>
-                <div className="space-y-6">
-                  {(service.faqs || [
-                    {
-                      q: "¿Cuál es el proceso habitual para este servicio?",
-                      a: "Iniciamos con una fase de planificación detallada, seguida por la ejecución de pruebas sustantivas y de cumplimiento, finalizando con la emisión del informe correspondiente."
-                    },
-                    {
-                      q: "¿Cuánto tiempo suele durar el encargo?",
-                      a: "La duración depende de la complejidad y dimensiones de la organización, pero establecemos cronogramas claros desde el inicio para cumplir con todos los plazos."
-                    }
-                  ]).map((faq, i) => (
-                    <div key={i} className="border-b border-slate-100 pb-6">
-                      <h4 className="text-lg font-bold text-slate-900 mb-2">{faq.q}</h4>
-                      <p className="text-slate-600 leading-relaxed">{faq.a}</p>
-                    </div>
-                  ))}
+              {service.faqs && service.faqs.length > 0 && (
+                <div className="pt-8">
+                  <h2 className="text-3xl font-bold text-slate-900 mb-8">Preguntas Frecuentes</h2>
+                  <div className="space-y-6">
+                    {service.faqs.map((faq, i) => (
+                      <div key={i} className="border-b border-slate-100 pb-6 group">
+                        <h4 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">{faq.q}</h4>
+                        <p 
+                          className="text-slate-600 leading-relaxed"
+                          dangerouslySetInnerHTML={{ __html: faq.a }}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Sidebar */}

@@ -45,7 +45,7 @@ export function AboutContent() {
             <h2 className="text-3xl font-bold text-slate-900 mb-4 tracking-tight">Valores Fundamentales</h2>
             <p className="text-lg text-slate-500 leading-relaxed max-w-2xl">
               La ética, la objetividad y la calidad son el corazón de todo lo que hacemos 
-              en MindAudit.
+              en <strong>MindAudit®</strong>.
             </p>
           </div>
 

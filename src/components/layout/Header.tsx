@@ -29,7 +29,7 @@ export function Header() {
               <ShieldCheck className="h-6 w-6" />
             </div>
             <div className="flex flex-col leading-none">
-              <span className="text-xl font-bold tracking-tight text-[#0f4c81]"><strong>MindAudit Spain</strong></span>
+              <span className="text-xl font-bold tracking-tight text-[#0f4c81]"><strong>MindAudit® Spain</strong></span>
             </div>
           </Link>
 
@@ -73,7 +73,7 @@ export function Header() {
                   <div className="flex aspect-square size-9 items-center justify-center rounded-lg bg-[#0f4c81] text-white">
                     <ShieldCheck className="h-6 w-6" />
                   </div>
-                  <span className="text-xl font-bold text-[#0f4c81]">MindAudit</span>
+                  <span className="text-xl font-bold text-[#0f4c81]">MindAudit®</span>
                 </Link>
                 <nav className="flex flex-col gap-5">
                   {navigation.map((item) => {

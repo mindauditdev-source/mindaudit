@@ -66,7 +66,7 @@ export default function SignContractPage() {
           </div>
           <h1 className="text-3xl font-bold text-slate-900">¡Contrato Firmado!</h1>
           <p className="text-slate-600 text-lg">
-            Gracias por unirte oficialmente al equipo de <strong>MindAudit Spain</strong>. 
+            Gracias por unirte oficialmente al equipo de <strong>MindAudit® Spain</strong>. 
             Tus beneficios como Partner han sido activados.
           </p>
           <p className="text-sm text-slate-400">
@@ -97,7 +97,7 @@ export default function SignContractPage() {
             <FileText className="h-6 w-6" />
             <span className="text-sm font-medium uppercase tracking-wider opacity-80">Acuerdo de Colaboración Oficial</span>
           </div>
-          <CardTitle className="text-3xl font-bold italic">MindAudit Partners Program</CardTitle>
+          <CardTitle className="text-3xl font-bold italic">MindAudit® Partners Program</CardTitle>
         </CardHeader>
         
         <CardContent className="p-0">
@@ -134,24 +134,24 @@ export default function SignContractPage() {
                 </section>
 
                 <section className="space-y-4">
-                  <h3 className="text-lg font-black border-b-2 border-slate-900 inline-block pb-1">EXPONEN</h3>
-                  <div className="space-y-2">
-                    <p>(I) Que MindAudit es una sociedad profesional autorizada para el ejercicio de la actividad de auditoría de cuentas conforme a la Ley 22/2015 de 20 de julio.</p>
-                    <p>(II) Que el Colaborador es un despacho profesional dedicado al asesoramiento profesional.</p>
-                    <p>(III) Que ambas partes desean establecer un marco de colaboración comercial en los términos y condiciones que se detallan en el presente contrato.</p>
-                  </div>
-                </section>
-
-                <section className="space-y-6">
-                  <h3 className="text-lg font-black border-b-2 border-slate-900 inline-block pb-1">ACUERDAN</h3>
-                  
-                  <div className="space-y-6">
-                    <div>
-                      <p className="font-bold underline">PRIMERA. - Naturaleza jurídica y objeto:</p>
-                      <p>
-                        El presente acuerdo tiene por objeto regular la colaboración comercial entre MindAudit y el Colaborador
-                        para la canalización de clientes interesados en servicios de auditoría prestados por MindAudit.
-                      </p>
+                      <h3 className="text-lg font-black border-b-2 border-slate-900 inline-block pb-1">EXPONEN</h3>
+                      <div className="space-y-2">
+                        <p>(I) Que <strong>MindAudit®</strong> es una sociedad profesional autorizada para el ejercicio de la actividad de auditoría de cuentas conforme a la Ley 22/2015 de 20 de julio.</p>
+                        <p>(II) Que el Colaborador es un despacho profesional dedicado al asesoramiento profesional.</p>
+                        <p>(III) Que ambas partes desean establecer un marco de colaboración comercial en los términos y condiciones que se detallan en el presente contrato.</p>
+                      </div>
+                    </section>
+    
+                    <section className="space-y-6">
+                      <h3 className="text-lg font-black border-b-2 border-slate-900 inline-block pb-1">ACUERDAN</h3>
+                      
+                      <div className="space-y-6">
+                        <div>
+                          <p className="font-bold underline">PRIMERA. - Naturaleza jurídica y objeto:</p>
+                          <p>
+                            El presente acuerdo tiene por objeto regular la colaboración comercial entre <strong>MindAudit®</strong> y el Colaborador
+                            para la canalización de clientes interesados en servicios de auditoría prestados por <strong>MindAudit®</strong>.
+                          </p>
                       <p>
                         La presente relación tiene carácter estrictamente mercantil y no constituye sociedad, agencia, franquicia,
                         joint venture ni relación laboral alguna entre las partes. Cada parte mantiene plena autonomía jurídica,
@@ -429,7 +429,7 @@ export default function SignContractPage() {
                 <div className="mt-8 pt-4">
                   <div className="grid grid-cols-2 gap-12">
                     <div className="text-center space-y-4">
-                      <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest">Por MindAudit Spain, S.L.P.:</p>
+                      <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest">Por MindAudit® Spain, S.L.P.:</p>
                       <div className="h-24 flex flex-col items-center justify-center bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-100">
                         <span className="text-slate-300 italic text-[10px] mb-1">Firmado Digitalmente</span>
                         <span className="font-black text-[#0a3a6b]">Emilio José Silva Fernández</span>

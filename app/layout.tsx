@@ -7,7 +7,7 @@ import AuthProvider from '@/components/providers/AuthProvider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'MindAudit Spain SLP - Auditoría Profesional',
+  title: 'MindAudit® Spain SLP - Auditoría Profesional',
   description: 'Firma boutique de auditoría que combina rigor profesional con tecnología moderna.',
 };
 

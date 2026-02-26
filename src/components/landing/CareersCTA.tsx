@@ -18,7 +18,7 @@ export function CareersCTA() {
               <span>Oportunidades de carrera</span>
             </div>
             <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-              ¿Quieres formar parte de <span className="text-blue-600"><strong>MindAudit Spain</strong></span>?
+              ¿Quieres formar parte de <span className="text-blue-600"><strong>MindAudit® Spain</strong></span>?
             </h2>
             <p className="text-slate-500 max-w-xl text-lg">
               Estamos en constante búsqueda de auditores, consultores y perfiles tecnológicos para transformar el sector de la auditoría digital.

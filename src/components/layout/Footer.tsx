@@ -13,7 +13,7 @@ export function Footer() {
               <div className="flex aspect-square size-9 items-center justify-center rounded-lg bg-[#0f4c81] text-white">
                 <ShieldCheck className="h-6 w-6" />
               </div>
-              <span className="text-xl font-bold tracking-tight text-[#0f4c81]"><strong>MindAudit</strong></span>
+              <span className="text-xl font-bold tracking-tight text-[#0f4c81]"><strong>MindAudit®</strong></span>
             </Link>
             <p className="text-slate-500 text-sm leading-relaxed">
               Servicios profesionales de auditoría y consultoría para empresas 
@@ -104,7 +104,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-[10px] font-medium text-slate-400">
-            © 2024 <strong>MindAudit Spain SLP</strong>. Todos los derechos reservados.
+            © 2024 <strong>MindAudit® Spain SLP</strong>. Todos los derechos reservados.
           </p>
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-green-500"></div>

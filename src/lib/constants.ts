@@ -1,5 +1,5 @@
 /**
- * Constantes globales del proyecto MindAudit Spain
+ * Constantes globales del proyecto MindAudit® Spain
  */
 
 // ============================================================================

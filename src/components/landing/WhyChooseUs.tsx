@@ -29,7 +29,7 @@ export function WhyChooseUs() {
           <div className="flex-1 space-y-8">
             <div>
               <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mb-4">
-                Por qué los líderes de la industria eligen <strong>MindAudit Spain</strong>.
+                Por qué los líderes de la industria eligen <strong>MindAudit® Spain</strong>.
               </h2>
               <p className="text-lg text-gray-500 leading-relaxed">
                 No nos limitamos a marcar casillas. Proporcionamos una visión estratégica de su realidad financiera, 

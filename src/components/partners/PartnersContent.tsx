@@ -35,13 +35,13 @@ export function PartnersContent() {
       avatar: "/avatar-1.png"
     },
     {
-      quote: "Acceder a la red de expertos de MindAudit nos ha permitido licitar y ganar proyectos en sectores donde antes no teníamos alcance.",
+      quote: "Acceder a la red de expertos de <strong>MindAudit®</strong> nos ha permitido licitar y ganar proyectos en sectores donde antes no teníamos alcance.",
       name: "Elena Ruiz",
       role: "Auditora Senior, Global Finance",
       avatar: "/avatar-2.png"
     },
     {
-      quote: "Seguridad y profesionalidad. Desde el primer día sentimos que MindAudit no es un proveedor, sino un socio real.",
+      quote: "Seguridad y profesionalidad. Desde el primer día sentimos que <strong>MindAudit®</strong> no es un proveedor, sino un socio real.",
       name: "Roberto Gil",
       role: "CEO, Gil Audit & Tax",
       avatar: "/avatar-3.png"
@@ -53,7 +53,7 @@ export function PartnersContent() {
       avatar: "/avatar-4.png"
     },
     {
-      quote: "MindAudit ha transformado nuestra forma de trabajar, aportando una capa tecnológica que antes era impensable en nuestro sector.",
+      quote: "<strong>MindAudit®</strong> ha transformado nuestra forma de trabajar, aportando una capa tecnológica que antes era impensable en nuestro sector.",
       name: "Javier López",
       role: "Socio, López & Asociados",
       avatar: "/avatar-5.png"
@@ -150,7 +150,7 @@ confianza para potenciar el crecimiento de vuestro despacho profesional
       <section className="py-24 bg-slate-50/50">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">¿Por qué colaborar con MindAudit?</h2>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">¿Por qué colaborar con <strong>MindAudit®</strong>?</h2>
             <p className="text-lg text-slate-600">
               Explora las ventajas de unirse al programa de partners para integrar servicios de auditoría
               en vuestra firma sin inversión inicial y sin necesidad de cumplir con los requerimientos normativos.
@@ -273,7 +273,7 @@ Sin papeles. Ágil y en tiempo real
           <div className="flex justify-between items-end mb-16">
             <div>
               <h2 className="text-4xl font-bold text-slate-900 mb-4">Lo que dicen nuestros partners</h2>
-              <p className="text-lg text-slate-600">Profesionales que confían en MindAudit para escalar sus servicios.</p>
+              <p className="text-lg text-slate-600">Profesionales que confían en <strong>MindAudit®</strong> para escalar sus servicios.</p>
             </div>
             <div className="hidden sm:flex gap-4">
                 <button
@@ -402,7 +402,7 @@ Sin papeles. Ágil y en tiempo real
               <div className="text-white">
                 <h2 className="text-4xl lg:text-5xl font-extrabold mb-6 leading-tight">¿Listo para unirte?</h2>
                 <p className="text-xl text-blue-100/80 leading-relaxed max-w-2xl mx-auto">
-                  Únete a una firma de éxito y aumenta el prestigio de tu despacho con MindAudit. Es sencillo, rápido y sin costes
+                  Únete a una firma de éxito y aumenta el prestigio de tu despacho con <strong>MindAudit®</strong>. Es sencillo, rápido y sin costes
                 </p>
               </div>
 
@@ -437,7 +437,7 @@ Sin papeles. Ágil y en tiempo real
               </div>
 
               <div className="pt-10 border-t border-white/10">
-                 <p className="text-sm text-blue-100/40">MindAudit Spain SLP © 2024</p>
+                 <p className="text-sm text-blue-100/40">MindAudit® Spain SLP © 2024</p>
               </div>
            </div>
         </div>
