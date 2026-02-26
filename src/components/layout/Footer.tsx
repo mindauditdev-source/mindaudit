@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Linkedin, Twitter } from 'lucide-react';
+import TrustBox from '../shared/TrustBox';
 
 export function Footer() {
   return (
@@ -102,6 +103,13 @@ export function Footer() {
               <Link href="#" className="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-[#0f4c81] hover:text-white transition-all">
                 <Twitter className="h-4 w-4" />
               </Link>
+            </div>
+            <div className="pt-4">
+              <TrustBox 
+                templateId="5410636154a3752b0440b347"
+                businessunitId="699f36b07ac84e3c59224579"
+                height="52px"
+              />
             </div>
           </div>
         </div>
