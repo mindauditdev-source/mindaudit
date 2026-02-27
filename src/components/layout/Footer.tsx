@@ -106,8 +106,9 @@ export function Footer() {
             </div>
             <div className="pt-4">
               <TrustBox 
-                templateId="5410636154a3752b0440b347"
+                templateId="56278e9abfbbba0bdcd568bc"
                 businessunitId="699f36b07ac84e3c59224579"
+                token="a595f18e-ed5c-4857-b080-4c661aeeec77"
                 height="52px"
               />
             </div>

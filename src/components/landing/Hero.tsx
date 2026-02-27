@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import TrustBox from '../shared/TrustBox';
 
 export function Hero() {
   const stats = [
@@ -36,9 +37,21 @@ export function Hero() {
 
       <div className="container relative z-10 mx-auto px-4 md:px-6 pt-20 pb-32 lg:pb-40 lg:pt-32">
         <div className="flex flex-col max-w-3xl">
-          <div className="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-sm text-blue-300 mb-6 w-fit">
-            <span className="flex h-2 w-2 rounded-full bg-blue-400 mr-2"></span>
-            Excelencia en servicios de auditoría
+          <div className="flex items-center space-x-4 mb-6">
+            <div className="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-sm text-blue-300 w-fit">
+              <span className="flex h-2 w-2 rounded-full bg-blue-400 mr-2"></span>
+              Excelencia en servicios de auditoría
+            </div>
+            <div className="max-w-[200px]">
+              <TrustBox 
+                templateId="56278e9abfbbba0bdcd568bc"
+                businessunitId="699f36b07ac84e3c59224579"
+                token="a595f18e-ed5c-4857-b080-4c661aeeec77"
+                height="52px"
+                width="100%"
+                theme="dark"
+              />
+            </div>
           </div>
           
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl mb-6 leading-tight">

@@ -15,12 +15,13 @@ export function TrustpilotSection() {
           </p>
         </div>
         
-        <div className="max-w-5xl mx-auto">
-          {/* Trustpilot Carousel Widget */}
+        <div className="max-w-5xl mx-auto flex justify-center">
+          {/* Trustpilot Review Collector Widget */}
           <TrustBox 
-            templateId="539ad60def9d5c11bcbb5511" // Carousel template
-            businessunitId="699f36b07ac84e3c59224579" // Mock ID
-            height="520px"
+            templateId="56278e9abfbbba0bdcd568bc"
+            businessunitId="699f36b07ac84e3c59224579"
+            token="a595f18e-ed5c-4857-b080-4c661aeeec77"
+            height="52px"
             width="100%"
             theme="light"
           />

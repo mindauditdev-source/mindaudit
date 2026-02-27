@@ -35,6 +35,10 @@ interface TrustBoxProps {
    * Language/Locale code (e.g., 'es-ES').
    */
   locale?: string;
+  /**
+   * Optional token for specific widgets (like Review Collector).
+   */
+  token?: string;
 }
 
 const TrustBox = ({
@@ -46,6 +50,7 @@ const TrustBox = ({
   theme = 'light',
   stars,
   locale = 'es-ES',
+  token,
 }: TrustBoxProps) => {
   // Reference to the element where Trustpilot will inject the widget
   const ref = useRef<HTMLDivElement>(null);
@@ -68,6 +73,7 @@ const TrustBox = ({
       data-style-width={width}
       data-theme={theme}
       {...(stars ? { 'data-stars': stars } : {})}
+      {...(token ? { 'data-token': token } : {})}
     >
       <a
         href="https://es.trustpilot.com/review/mindaudit.es"
