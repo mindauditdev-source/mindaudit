@@ -187,43 +187,88 @@ export function RegisterContent() {
       if (!response.ok) {
         if (result.details && Array.isArray(result.details)) {
           const newErrors: RegisterErrors = {};
+          const newTouched: RegisterTouched = { ...touched };
           let firstErrorStep: number | null = null;
 
           result.details.forEach((err: { path: string[]; message: string }) => {
             if (err.path && err.path.length > 0) {
               const fieldName = err.path[0];
               let mappedName = fieldName;
-              if (fieldName === 'contactPhone') mappedName = 'telefono';
+              
+              // Backend -> Frontend field mapping
+              if (fieldName === 'contactPhone' || fieldName === 'phone') mappedName = 'telefono';
               if (fieldName === 'name') mappedName = 'nombreCompleto';
               if (fieldName === 'companyName') mappedName = 'empresa';
-              if (fieldName === 'acceptTerms') mappedName = 'terms';
+              if (fieldName === 'acceptTerms' || fieldName === 'terms') mappedName = 'terms';
+              if (fieldName === 'address') mappedName = 'direccion';
+              if (fieldName === 'city') mappedName = 'ciudad';
+              if (fieldName === 'postalCode') mappedName = 'codigoPostal';
+              if (fieldName === 'website') mappedName = 'web';
+              if (fieldName === 'postal_code') mappedName = 'codigoPostal';
               
               newErrors[mappedName] = err.message;
+              newTouched[mappedName] = true; // Force error visibility
 
-              // Determine collision step for auto-navigation
+              // Determine step for auto-navigation
               const step1Fields = ['nombreCompleto', 'email', 'password', 'confirmPassword', 'empresa', 'cif', 'terms'];
-              // const step2Fields = ['telefono', 'direccion', 'ciudad', 'codigoPostal', 'web', 'employees', 'revenue', 'fiscalYear'];
+              const step2Fields = ['telefono', 'direccion', 'ciudad', 'codigoPostal', 'web'];
 
               if (step1Fields.includes(mappedName)) {
                  if (firstErrorStep === null || firstErrorStep > 1) firstErrorStep = 1;
+              } else if (step2Fields.includes(mappedName)) {
+                 if (firstErrorStep === null || firstErrorStep > 2) firstErrorStep = 2;
               } else {
-                 // Assume step 2
-                 if (firstErrorStep === null) firstErrorStep = 2;
+                 // Likely step 3 (Professional Credentials) or other
+                 if (firstErrorStep === null) firstErrorStep = 3;
               }
             }
           });
           
           setErrors(newErrors);
+          setTouched(newTouched);
           
           if (firstErrorStep && firstErrorStep !== step) {
             setStep(firstErrorStep); // Auto-navigate to the step with errors
-             setSubmitError(`Hay errores en el paso ${firstErrorStep}. Por favor revíselos.`);
+            setSubmitError(`Hay errores en el paso ${firstErrorStep}. Por favor revíselos.`);
           } else {
-             setSubmitError("Por favor, revise los errores en el formulario.");
+            setSubmitError("Por favor, revise los errores en el formulario.");
           }
           throw new Error("Validación fallida");
         }
-        throw new Error(result.error || 'Error en el registro');
+
+        if (result.error) {
+          const errStr = result.error.toLowerCase();
+          let mappedName: string | null = null;
+          let targetStep: number | null = null;
+
+          if (errStr.includes("email")) mappedName = "email";
+          else if (errStr.includes("cif") || errStr.includes("nif")) mappedName = "cif";
+          else if (errStr.includes("nombre")) mappedName = "nombreCompleto";
+          else if (errStr.includes("empresa") || errStr.includes("razón social")) mappedName = "empresa";
+          else if (errStr.includes("teléfono") || errStr.includes("telefono")) mappedName = "telefono";
+          else if (errStr.includes("dirección") || errStr.includes("direccion")) mappedName = "direccion";
+
+          if (mappedName) {
+            setErrors(prev => ({ ...prev, [mappedName!]: result.error }));
+            setTouched(prev => ({ ...prev, [mappedName!]: true }));
+
+            const step1Fields = ["nombreCompleto", "email", "password", "confirmPassword", "empresa", "cif", "terms"];
+            const step2Fields = ["telefono", "direccion", "ciudad", "codigoPostal", "web"];
+
+            if (step1Fields.includes(mappedName)) targetStep = 1;
+            else if (step2Fields.includes(mappedName)) targetStep = 2;
+
+            if (targetStep) {
+              setStep(targetStep);
+              setSubmitError(`Error en el paso ${targetStep}: ${result.error}`);
+            } else {
+              setSubmitError(result.error);
+            }
+            throw new Error("Validación fallida");
+          }
+        }
+
+        throw new Error(result.error || "Error en el registro");
       }
 
       // Success logic

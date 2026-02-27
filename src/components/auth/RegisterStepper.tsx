@@ -7,13 +7,13 @@ interface RegisterStepperProps {
 
 const STEP_TITLES: Record<number, string> = {
   1: "Detalles de la Cuenta",
-  2: "Información de Empresa",
-  3: "Credenciales Profesionales",
+  2: "Información del Despacho",
+  3: "Validación Profesional",
 };
 
 const NEXT_STEP_TITLES: Record<number, string> = {
-  1: "Información de Empresa",
-  2: "Credenciales Profesionales",
+  1: "Información del Despacho",
+  2: "Validación Profesional",
   3: "Finalización del perfil",
 };
 
