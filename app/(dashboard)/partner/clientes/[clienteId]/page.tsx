@@ -16,9 +16,7 @@ import {
   Euro, 
   Users, 
   ArrowLeft,
-  Plus,
-  Calendar,
-  FileText
+  Calendar
 } from "lucide-react";
 import { PartnerApiService, PartnerCompany } from "@/services/partner-api.service";
 import { formatCurrency } from "@/lib/utils";
@@ -132,12 +130,6 @@ export default function CompanyDetailsPage() {
               Editar Datos
             </Button>
           </Link>
-          <Link href={`/partner/auditorias/nueva?empresaId=${clienteId}`}>
-            <Button className="bg-[#0a3a6b] hover:bg-[#082e56] shadow-sm">
-              <Plus className="mr-2 h-4 w-4" />
-              Solicitar Auditoría
-            </Button>
-          </Link>
         </div>
       </div>
 
@@ -242,62 +234,13 @@ export default function CompanyDetailsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                  <div className="flex justify-between items-center bg-white p-3 rounded-md border border-slate-100">
-                    <span className="text-sm font-medium text-slate-700">Total Auditorías</span>
-                    <span className="text-lg font-bold text-slate-900">{company.stats.totalAuditorias}</span>
-                 </div>
-                 <div className="flex justify-between items-center bg-white p-3 rounded-md border border-slate-100">
                     <span className="text-sm font-medium text-slate-700">Documentos</span>
                     <span className="text-lg font-bold text-slate-900">{company.stats.totalDocumentos}</span>
                  </div>
               </CardContent>
            </Card>
 
-           <Card className="shadow-sm border-slate-100">
-              <CardHeader>
-                 <CardTitle className="text-base font-semibold">Auditorías Recientes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                 {company.recentAuditorias && company.recentAuditorias.length > 0 ? (
-                    <div className="space-y-4">
-                       {company.recentAuditorias.map((a) => (
-                          <div key={a.id} className="flex flex-col gap-1 pb-3 border-b border-slate-50 last:border-0 last:pb-0">
-                             <div className="flex justify-between items-start">
-                                <span className="text-sm font-medium text-slate-900">{a.tipoServicio.replace(/_/g, " ")}</span>
-                                <AuditStatusBadge status={a.status} />
-                             </div>
-                             <span className="text-xs text-slate-500">Ejercicio {a.fiscalYear} • {new Date(a.createdAt).toLocaleDateString()}</span>
-                          </div>
-                       ))}
-                       <Link href={`/partner/auditorias?companyId=${company.id}`} className="block mt-2">
-                          <Button variant="link" size="sm" className="w-full text-slate-500">Ver historial completo</Button>
-                       </Link>
-                    </div>
-                 ) : (
-                    <div className="text-center py-6">
-                       {company.status === 'IN_AUDIT' ? (
-                          <div className="mb-4">
-                             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 mb-3">
-                                <FileText className="h-6 w-6 text-amber-600" />
-                             </div>
-                             <h3 className="text-sm font-semibold text-slate-900">Auditoría Inicial en Curso</h3>
-                             <p className="text-xs text-slate-500 mt-1 max-w-[200px] mx-auto">
-                                Esta empresa está siendo auditada por primera vez.
-                             </p>
-                          </div>
-                       ) : (
-                          <>
-                             <p className="text-sm text-slate-500">No hay auditorías registradas.</p>
-                             <Link href={`/partner/auditorias/nueva?empresaId=${clienteId}`}>
-                                <Button variant="link" size="sm" className="mt-2 text-blue-600">
-                                   Crear primera auditoría
-                                </Button>
-                             </Link>
-                          </>
-                       )}
-                    </div>
-                 )}
-              </CardContent>
-           </Card>
+
         </div>
       </div>
     </div>
@@ -319,18 +262,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function AuditStatusBadge({ status }: { status: string }) {
-   // Simple mapping for audit statuses
-   const color = status === 'COMPLETADA' ? 'text-green-600 bg-green-50' : 
-                 status === 'APROBADA' ? 'text-blue-600 bg-blue-50' : 
-                 'text-amber-600 bg-amber-50';
-   
-   return (
-      <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide ${color}`}>
-         {status}
-      </span>
-   )
-}
+
 
 function CompanyDetailSkeleton() {
   return (

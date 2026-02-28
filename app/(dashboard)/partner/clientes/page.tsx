@@ -14,7 +14,6 @@ import {
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuLabel, 
-  DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { PartnerContractModal } from "@/components/partner/PartnerContractModal";
@@ -68,7 +67,7 @@ export default function PartnerCompaniesPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Mis Empresas</h1>
           <p className="text-slate-500 mt-1">
-            Gestiona tus clientes y sus expedientes de auditoría.
+            Gestiona tus clientes y sus expedientes.
           </p>
         </div>
         <Button 
@@ -166,7 +165,6 @@ export default function PartnerCompaniesPage() {
                     <th className="px-4 py-3">Empresa</th>
                     <th className="px-4 py-3">CIF</th>
                     <th className="px-4 py-3">Estado</th>
-                    <th className="px-4 py-3 text-center">Auditorías</th>
                     <th className="px-4 py-3 text-right">Acciones</th>
                   </tr>
                 </thead>
@@ -181,11 +179,6 @@ export default function PartnerCompaniesPage() {
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge status={empresa.status} />
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 rounded-full h-6 px-2 text-xs font-medium">
-                          {empresa.stats.totalAuditorias}
-                        </span>
                       </td>
                       <td className="px-4 py-3 text-right">
                         <DropdownMenu>
@@ -202,12 +195,7 @@ export default function PartnerCompaniesPage() {
                                 Ver Detalles
                               </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild>
-                              <Link href="/partner/auditorias/nueva" className="cursor-pointer text-blue-600">
-                                <Plus className="mr-2 h-4 w-4" /> Nueva Auditoría
-                              </Link>
-                            </DropdownMenuItem>
+
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>

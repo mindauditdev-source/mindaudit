@@ -131,7 +131,7 @@ export default function CreateClientPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Registrar Nuevo Cliente</h1>
           <p className="text-slate-500 text-sm">
-            Da de alta una nueva empresa para gestionar sus auditorías.
+            Da de alta una nueva empresa para gestionar sus expedientes.
           </p>
         </div>
       </div>
