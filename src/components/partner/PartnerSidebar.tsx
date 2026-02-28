@@ -13,6 +13,7 @@ import {
   MessageCircle,
   Clock,
   ReceiptEuro,
+  UserCircle,
 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,11 @@ const sidebarItems = [
     title: "Mis Comisiones",
     href: "/partner/comisiones",
     icon: FileText,
+  },
+  {
+    title: "Mi Perfil",
+    href: "/partner/perfil",
+    icon: UserCircle,
   },
 ];
 

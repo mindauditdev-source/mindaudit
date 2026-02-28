@@ -43,6 +43,7 @@ model Colaborador {
   companyName        String
   cif                String            @unique
   phone              String
+  iban               String?
   address            String?
   city               String?
   province           String?
