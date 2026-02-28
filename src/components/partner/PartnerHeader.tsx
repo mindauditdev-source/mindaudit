@@ -5,9 +5,10 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { NotificationPopover } from "@/components/shared/NotificationPopover";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function PartnerHeader() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   
   const initials = user?.name
     ? user.name.split(" ").map((n: string) => n[0]).join("").substring(0, 2).toUpperCase()
@@ -31,13 +32,26 @@ export function PartnerHeader() {
         
         <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
           <div className="hidden text-right md:block">
-            <p className="text-sm font-semibold text-slate-900">{user?.name || "Colaborador"}</p>
-            <p className="text-xs text-slate-500">{user?.email}</p>
+            {isLoading ? (
+              <div className="space-y-1">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+            ) : (
+              <>
+                <p className="text-sm font-semibold text-slate-900">{user?.name || "Colaborador"}</p>
+                <p className="text-xs text-slate-500">{user?.email}</p>
+              </>
+            )}
           </div>
-          <Avatar>
-            <AvatarImage src={user?.image || ""} alt={user?.name || "User"} />
-            <AvatarFallback className="bg-blue-100 text-blue-700 font-bold">{initials}</AvatarFallback>
-          </Avatar>
+          {isLoading ? (
+            <Skeleton className="h-10 w-10 rounded-full" />
+          ) : (
+            <Avatar>
+              <AvatarImage src={user?.image || ""} alt={user?.name || "User"} />
+              <AvatarFallback className="bg-blue-100 text-blue-700 font-bold">{initials}</AvatarFallback>
+            </Avatar>
+          )}
         </div>
       </div>
     </header>
