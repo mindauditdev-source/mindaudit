@@ -100,6 +100,9 @@ export default function PartnerCompaniesPage() {
         externalOpen={isContractOpen} 
         onOpenChange={setIsContractOpen} 
         profile={profile}
+        onStatusChange={() => {
+          PartnerApiService.getProfile().then(setProfile).catch(console.error);
+        }}
       />
 
       <Card className="shadow-sm border-slate-100">

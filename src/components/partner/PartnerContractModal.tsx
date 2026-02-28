@@ -67,14 +67,18 @@ export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChang
   }, [profile, externalOpen, externalProfile, internalOpen, setIsOpen]);
 
   const handleDismiss = async () => {
+    // Close modal instantly for better UX
+    setIsOpen(false);
+    
     setLoading(true);
     try {
-      await PartnerApiService.updateProfile({ dismissedPartnerPlanModal: true });
-      setIsOpen(false);
+      const updatedProfile = await PartnerApiService.updateProfile({ dismissedPartnerPlanModal: true });
+      if (!externalProfile) setInternalProfile(updatedProfile);
       onStatusChange?.();
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast.error("Error al actualizar preferencias");
+      // We don't show toast error here to avoid confusing the user after modal is closed,
+      // but we log it for debugging.
     } finally {
       setLoading(false);
     }
@@ -111,8 +115,8 @@ export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChang
               <Handshake className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold">Plan de Partners</h2>
-              <p className="text-blue-100 text-sm">Maximiza tus beneficios con MindAudit</p>
+              <h2 className="text-2xl font-bold">Plan de Partners Oficial</h2>
+              <p className="text-blue-100 text-sm">Maximiza los beneficios de unirte al Plan Partner de MindAudit®</p>
             </div>
           </div>
         </div>
@@ -127,7 +131,7 @@ export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChang
             <div className="space-y-6">
               <div className="space-y-2">
                 <p className="text-slate-600">
-                  Hola <span className="font-semibold text-slate-900">{profile.user.name}</span>, hemos notado que aún no formas parte de nuestro **Plan de Partners Oficial**.
+                  <span className="font-semibold text-slate-900">Maximiza los beneficios de unirte al Plan Partner de MindAudit®</span>.
                 </p>
                 <p className="text-slate-600">
                   Al unirte y firmar el acuerdo de colaboración, podrás acceder a beneficios exclusivos:
@@ -140,8 +144,8 @@ export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChang
                     <TrendingUp className="h-4 w-4 text-green-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-slate-900 text-sm">Comisiones Directas</h4>
-                    <p className="text-xs text-slate-500">Recibe comisiones por cada auditoría contratada por tus clientes.</p>
+                    <h4 className="font-semibold text-slate-900 text-sm">Programa de incentivos económicos</h4>
+                    <p className="text-xs text-slate-500">Recibe bonificaciones por el uso de los servicios integrales de auditoría</p>
                   </div>
                 </div>
 
@@ -150,7 +154,7 @@ export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChang
                     <ShieldCheck className="h-4 w-4 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-slate-900 text-sm">Respaldo Jurídico</h4>
+                    <h4 className="font-semibold text-slate-900 text-sm">Respaldo Técnico Profesional</h4>
                     <p className="text-xs text-slate-500">Acuerdo formal de colaboración que garantiza tus derechos como partner.</p>
                   </div>
                 </div>

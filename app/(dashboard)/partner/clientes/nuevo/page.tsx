@@ -93,6 +93,9 @@ export default function CreateClientPage() {
         externalOpen={isContractOpen} 
         onOpenChange={setIsContractOpen} 
         profile={profile}
+        onStatusChange={() => {
+          PartnerApiService.getProfile().then(setProfile).catch(console.error);
+        }}
       />
       
       {/* Confirmation Dialog */}
