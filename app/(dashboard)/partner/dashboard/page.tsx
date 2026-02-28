@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Building2, Plus, AlertCircle, ArrowRight, MessageCircle, Clock, Calendar } from "lucide-react";
 import { PartnerApiService, PartnerProfile } from "@/services/partner-api.service";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { CalendlyWidget } from "@/components/shared/CalendlyWidget";
 import { toast } from "sonner";
 
@@ -53,6 +54,8 @@ export default function PartnerDashboardPage() {
   if (loading) {
     return <DashboardSkeleton />;
   }
+
+  const canScheduleMeeting = (companiesStats?.totalEmpresas || 0) > 0 || (profile?.user.horasDisponibles || 0) > 0;
 
   return (
     <>
@@ -195,19 +198,33 @@ export default function PartnerDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-3">
-              <Button 
-                onClick={() => setCalendlyModalOpen(true)}
-                variant="outline" 
-                className="w-full justify-start bg-white hover:bg-emerald-50 h-auto py-3 border-emerald-200"
-              >
-                <div className="rounded-full bg-emerald-100 p-2 text-emerald-600 mr-3">
-                  <Calendar className="h-4 w-4" />
-                </div>
-                <div className="text-left">
-                  <p className="font-semibold text-slate-900">Agendar ahora</p>
-                  <p className="text-xs text-slate-500">Reservar sesión con el equipo</p>
-                </div>
-              </Button>
+              <TooltipProvider>
+                <Tooltip delayDuration={300}>
+                  <TooltipTrigger asChild>
+                    <div className="w-full">
+                      <Button 
+                        onClick={() => setCalendlyModalOpen(true)}
+                        disabled={!canScheduleMeeting}
+                        variant="outline" 
+                        className="w-full justify-start bg-white hover:bg-emerald-50 h-auto py-3 border-emerald-200 disabled:pointer-events-none"
+                      >
+                        <div className="rounded-full bg-emerald-100 p-2 text-emerald-600 mr-3">
+                          <Calendar className="h-4 w-4" />
+                        </div>
+                        <div className="text-left">
+                          <p className="font-semibold text-slate-900">Agendar reunión</p>
+                          <p className="text-xs text-slate-500">Reservar sesión con tu equipo Auditor</p>
+                        </div>
+                      </Button>
+                    </div>
+                  </TooltipTrigger>
+                  {!canScheduleMeeting && (
+                    <TooltipContent side="top" className="max-w-[250px] p-3">
+                      <p className="text-sm font-medium">Debe tener al menos una empresa registrada o saldo en horas de auditoría para agendar una reunión.</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
 
               <Link href="/partner/clientes/nuevo">
                 <Button variant="outline" className="w-full justify-start bg-white hover:bg-blue-50 h-auto py-3">
