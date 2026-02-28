@@ -50,10 +50,11 @@ export default function AuditorMetricasPage() {
   };
 
   const handlePay = async (id: string) => {
-    if (!confirm("¿Confirma la liquidación de esta comisión?")) return;
+    const referenciaPago = window.prompt("Introduzca la referencia del pago (ej: TRF-2024-001):");
+    if (!referenciaPago || !referenciaPago.trim()) return;
     try {
       setSubmitting(id);
-      await AdminApiService.payComision(id);
+      await AdminApiService.payComision(id, referenciaPago.trim());
       loadComisiones();
       toast.success("Comisión marcada como PAGADA");
     } catch (error) {
