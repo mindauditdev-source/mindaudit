@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { toast } from "sonner";
 import { 
   MapPin, 
   Mail, 
@@ -30,7 +31,7 @@ export function ContactContent() {
     e.preventDefault();
     
     if (!formData.privacidad) {
-      alert('Debe aceptar la política de privacidad');
+      toast.error('Debe aceptar la política de privacidad');
       return;
     }
 

@@ -26,6 +26,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { AdminApiService, Auditoria, SolicitudDocumento } from "@/services/admin-api.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatCurrency } from "@/lib/utils";
@@ -123,10 +124,10 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
       });
       setIsBudgetDialogOpen(false);
       loadAuditoria();
-      alert("Presupuesto enviado correctamente");
+      toast.success("Presupuesto enviado correctamente");
     } catch (err: unknown) {
       console.error(err);
-      alert("Error al enviar presupuesto");
+      toast.error("Error al enviar presupuesto");
     } finally {
       setSubmitting(false);
     }
@@ -145,10 +146,10 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
       setIsDocDialogOpen(false);
       setDocReqData({ title: "", description: "" });
       if (auditoria) loadDocRequests(auditoria.empresaId);
-      alert("Documento solicitado");
+      toast.success("Documento solicitado");
     } catch (err: unknown) {
       console.error(err);
-      alert("Error al solicitar documento");
+      toast.error("Error al solicitar documento");
     } finally {
       setSubmitting(false);
     }
@@ -171,10 +172,10 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
       });
       setIsReviewDialogOpen(false);
       if (auditoria) loadDocRequests(auditoria.empresaId);
-      alert(`Documento ${reviewStatus.toLowerCase()} correctamente.`);
+      toast.success(`Documento ${reviewStatus.toLowerCase()} correctamente.`);
     } catch (err: unknown) {
       console.error(err);
-      alert("Error al actualizar estado.");
+      toast.error("Error al actualizar estado.");
     } finally {
       setSubmitting(false);
     }
@@ -193,10 +194,10 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
       await AdminApiService.cancelSolicitudDocumento(selectedRequest.id, cancelReason);
       setIsCancelDialogOpen(false);
       if (auditoria) loadDocRequests(auditoria.empresaId);
-      alert("Solicitud cancelada correctamente.");
+      toast.success("Solicitud cancelada correctamente.");
     } catch (err: unknown) {
       console.error(err);
-      alert("Error al cancelar solicitud.");
+      toast.error("Error al cancelar solicitud.");
     } finally {
       setSubmitting(false);
     }
@@ -208,10 +209,10 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
       setSubmitting(true);
       await AdminApiService.completeAudit(id);
       loadAuditoria();
-      alert("Auditoría finalizada correctamente.");
+      toast.success("Auditoría finalizada correctamente.");
     } catch (err: unknown) {
       console.error(err);
-      alert("Error al finalizar auditoría.");
+      toast.error("Error al finalizar auditoría.");
     } finally {
       setSubmitting(false);
     }
@@ -223,10 +224,10 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
       setSubmitting(true);
       await AdminApiService.cancelAudit(id);
       loadAuditoria();
-      alert("Auditoría cancelada.");
+      toast.success("Auditoría cancelada.");
     } catch (err: unknown) {
       console.error(err);
-      alert("Error al cancelar auditoría.");
+      toast.error("Error al cancelar auditoría.");
     } finally {
       setSubmitting(false);
     }
@@ -250,11 +251,11 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
         auditoriaId: id,
         empresaId: auditoria?.empresaId
       });
-      alert("Documento subido correctamente");
+      toast.success("Documento subido correctamente");
       loadAuditoria();
     } catch (err: unknown) {
       console.error(err);
-      alert("Error al subir archivo");
+      toast.error("Error al subir archivo");
     } finally {
       setUploading(false);
     }
@@ -267,10 +268,10 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
               method: "POST",
           });
           loadAuditoria();
-          alert("Solicitud enviada al cliente.");
+          toast.success("Solicitud enviada al cliente.");
       } catch (err: unknown) {
           console.error(err);
-          alert("Error al solicitar reunión");
+          toast.error("Error al solicitar reunión");
       }
   };
 
@@ -283,10 +284,10 @@ export default function AuditorAuditDetailPage({ params }: { params: Promise<{ i
           });
           loadAuditoria();
           setIsMeetingLinkOpen(false);
-          alert("Enlace actualizado correctamente");
+          toast.success("Enlace actualizado correctamente");
       } catch (err: unknown) {
           console.error(err);
-          alert("Error al guardar enlace");
+          toast.error("Error al guardar enlace");
       } finally {
           setSubmitting(false);
       }

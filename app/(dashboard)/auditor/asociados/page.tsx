@@ -16,6 +16,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { AdminApiService, AdminColaborador } from "@/services/admin-api.service";
 import { formatCurrency, cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -110,9 +111,9 @@ export default function AuditorAsociadosPage() {
       await AdminApiService.approveColaborador(colabToApprove.id);
       setIsConfirmOpen(false);
       loadData();
-      alert("Asociado verificado y activado.");
+      toast.success("Asociado verificado y activado.");
     } catch {
-      alert("Error al aprobar");
+      toast.error("Error al aprobar");
     } finally {
       setSubmitting(false);
       setColabToApprove(null);
@@ -132,9 +133,9 @@ export default function AuditorAsociadosPage() {
         await AdminApiService.updateCommissionRate(selectedColab.id, newCommissionRate);
         setIsCommissionDialogOpen(false);
         loadData();
-        alert("Tasa de comisión actualizada.");
+        toast.success("Tasa de comisión actualizada.");
      } catch {
-        alert("Error al actualizar comisión");
+        toast.error("Error al actualizar comisión");
      } finally {
         setSubmitting(false);
      }
@@ -186,9 +187,9 @@ export default function AuditorAsociadosPage() {
       await AdminApiService.registerIncome(selectedColab.id, incomeForm.empresaId, Number(incomeForm.montoBase));
       setIsIncomeDialogOpen(false);
       loadData();
-      alert("Ingreso registrado y comisión generada exitosamente.");
+      toast.success("Ingreso registrado y comisión generada exitosamente.");
     } catch {
-      alert("Error al registrar el ingreso.");
+      toast.error("Error al registrar el ingreso.");
     } finally {
       setSubmitting(false);
     }

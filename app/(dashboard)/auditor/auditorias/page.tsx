@@ -16,6 +16,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { AdminApiService, Auditoria } from "@/services/admin-api.service";
 import { formatCurrency } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -93,9 +94,9 @@ export default function AuditorAuditoriasPage() {
        });
        setIsDialogOpen(false);
        loadAuditorias();
-       alert("Presupuesto enviado al cliente");
+       toast.success("Presupuesto enviado al cliente");
      } catch {
-       alert("Error al enviar presupuesto");
+       toast.error("Error al enviar presupuesto");
      } finally {
        setSubmitting(false);
      }
@@ -112,9 +113,9 @@ export default function AuditorAuditoriasPage() {
         auditoriaId: selectedAudit.id,
       });
       setIsDocDialogOpen(false);
-      alert("Documento solicitado correctamente");
+      toast.success("Documento solicitado correctamente");
     } catch {
-       alert("Error al solicitar documento");
+       toast.error("Error al solicitar documento");
     } finally {
        setSubmitting(false);
     }

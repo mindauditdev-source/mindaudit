@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { toast } from "sonner";
 import { 
   ArrowRight, 
   ChevronDown,
@@ -40,7 +41,7 @@ export default function PresupuestoContent() {
     e.preventDefault();
     
     if (!formData.privacidad) {
-      alert('Debe aceptar los términos de servicio');
+      toast.error('Debe aceptar los términos de servicio');
       return;
     }
 

@@ -21,6 +21,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { EmpresaApiService, EmpresaAuditoria } from "@/services/empresa-api.service";
 import { PresupuestoStatus } from "@prisma/client";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -144,12 +145,12 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
         solicitudId: solicitud.id
       });
 
-      alert("Archivo subido con éxito.");
+      toast.success("Archivo subido con éxito.");
       loadData();
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
       console.error("Error subiendo archivo:", err);
-      alert(`Error al subir: ${errorMessage}`);
+      toast.error(`Error al subir: ${errorMessage}`);
     } finally {
       setUploadingId(null);
     }
@@ -176,12 +177,12 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
          handleRetryPayment();
       } else if (decisionType === 'MEETING') {
          // Switch to Agenda tab logically? For now just alert
-         alert("Solicitud de reunión enviada. Revisa la pestaña Agenda.");
+         toast.success("Solicitud de reunión enviada. Revisa la pestaña Agenda.");
       } else {
-         alert("Valoración enviada al equipo de auditoría.");
+         toast.success("Valoración enviada al equipo de auditoría.");
       }
     } catch {
-      alert("Error al procesar la decisión");
+      toast.error("Error al procesar la decisión");
     } finally {
       setSubmitting(false);
     }
@@ -194,7 +195,7 @@ export default function EmpresaAuditoriaDetailPage({ params }: { params: Promise
       window.location.href = url;
     } catch (err) {
       console.error(err);
-      alert("Error al iniciar pasarela de pago");
+      toast.error("Error al iniciar pasarela de pago");
     } finally {
       setSubmitting(false);
     }

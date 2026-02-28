@@ -17,6 +17,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { AdminApiService } from "@/services/admin-api.service";
 import { formatCurrency } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -54,9 +55,9 @@ export default function AuditorMetricasPage() {
       setSubmitting(id);
       await AdminApiService.payComision(id);
       loadComisiones();
-      alert("Comisión marcada como PAGADA");
+      toast.success("Comisión marcada como PAGADA");
     } catch (error) {
-      alert("Error al procesar pago");
+      toast.error("Error al procesar pago");
     } finally {
       setSubmitting(null);
     }

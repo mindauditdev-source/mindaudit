@@ -18,6 +18,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { AdminApiService } from "@/services/admin-api.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
@@ -113,12 +114,12 @@ export default function AuditorClientesPage() {
         empresaId: selectedEmpresa.id,
         auditoriaId: docReq.auditoriaId || undefined
       });
-      alert("Solicitud enviada correctamente.");
+      toast.success("Solicitud enviada correctamente.");
       setIsDocDialogOpen(false);
       setDocReq({ title: "", description: "", auditoriaId: "" });
       loadEmpresaDocs(selectedEmpresa.id);
     } catch (error) {
-      alert("Error al enviar solicitud.");
+      toast.error("Error al enviar solicitud.");
     } finally {
       setSubmittingDoc(false);
     }
@@ -139,11 +140,11 @@ export default function AuditorClientesPage() {
         status: reviewStatus,
         feedback: reviewFeedback
       });
-      alert(`Documento ${reviewStatus.toLowerCase()} correctamente.`);
+      toast.success(`Documento ${reviewStatus.toLowerCase()} correctamente.`);
       setIsReviewDialogOpen(false);
       loadEmpresaDocs(selectedEmpresa.id);
     } catch (error) {
-      alert("Error al actualizar estado.");
+      toast.error("Error al actualizar estado.");
     } finally {
       setSubmittingDoc(false);
     }

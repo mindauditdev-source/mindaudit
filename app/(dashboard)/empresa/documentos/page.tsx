@@ -6,6 +6,7 @@ import { EmpresaApiService } from "@/services/empresa-api.service";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { Loader2, FileText, Upload, Clock, CheckCircle2, CloudUpload, Info, AlertCircle } from "lucide-react";
 import { cn, formatBytes } from "@/lib/utils";
 
@@ -62,11 +63,11 @@ export default function EmpresaDocumentsPage() {
         solicitudId: solicitud.id
       });
 
-      alert("Documento subido correctamente");
+      toast.success("Documento subido correctamente");
       loadData();
     } catch (error) {
       console.error(error);
-      alert("Error al subir archivo");
+      toast.error("Error al subir archivo");
     } finally {
       setUploadingId(null);
     }
