@@ -95,6 +95,16 @@ export function AdminSidebar() {
       </div>
 
       <div className="border-t border-slate-800 p-4">
+        <div className="flex justify-center mb-6">
+          <div className="relative h-8 w-32 opacity-50">
+            <Image
+              src="/logo/t-png.png"
+              alt="MindAudit Logo"
+              fill
+              className="object-contain brightness-0 invert"
+            />
+          </div>
+        </div>
         <Button
           variant="ghost"
           className="w-full justify-start text-slate-400 hover:bg-slate-800 hover:text-white"

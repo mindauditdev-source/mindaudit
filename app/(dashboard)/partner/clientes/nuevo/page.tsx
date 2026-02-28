@@ -129,7 +129,7 @@ export default function CreateClientPage() {
 
       <Card className="shadow-sm border-slate-100">
         <CardHeader>
-          <CardTitle>Información de la Empresa</CardTitle>
+          <CardTitle>Información de la entidad</CardTitle>
           <CardDescription>
             Los datos básicos para crear el perfil del cliente.
           </CardDescription>

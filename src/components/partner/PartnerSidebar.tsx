@@ -14,6 +14,7 @@ import {
   Clock,
   ReceiptEuro,
 } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 const sidebarItems = [
@@ -89,6 +90,16 @@ export function PartnerSidebar() {
       </div>
 
       <div className="border-t border-blue-800 p-4">
+        <div className="flex justify-center mb-6">
+          <div className="relative h-8 w-32 opacity-50">
+            <Image
+              src="/logo/t-png.png"
+              alt="MindAudit Logo"
+              fill
+              className="object-contain brightness-0 invert"
+            />
+          </div>
+        </div>
         <Button
           variant="ghost"
           className="w-full justify-start text-blue-200 hover:bg-blue-800 hover:text-white"

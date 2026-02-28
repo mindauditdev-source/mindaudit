@@ -153,7 +153,7 @@ export default function PresupuestoDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5 text-blue-600" />
-              Información de la Empresa
+              Información de la entidad
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">

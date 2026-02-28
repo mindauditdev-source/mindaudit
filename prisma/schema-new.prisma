@@ -141,7 +141,7 @@ model Empresa {
   // Origen de la empresa
   origen          EmpresaOrigen
   
-  // Información de la empresa
+  // Información de la entidad
   companyName     String
   cif             String         @unique
   contactName     String         // Persona de contacto

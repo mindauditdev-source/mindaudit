@@ -11,9 +11,11 @@ import {
   LogOut,
   Users
 } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 const sidebarItems = [
+// ... (lines 17-42)
   {
     title: "Dashboard",
     href: "/empresa/dashboard",
@@ -37,7 +39,7 @@ const sidebarItems = [
   {
     title: "Facturas",
     href: "/empresa/facturas",
-    icon: FileText, // Could use Receipt or FileText
+    icon: FileText,
   },
 ];
 
@@ -81,6 +83,16 @@ export function EmpresaSidebar() {
       </div>
 
       <div className="border-t border-[#2a4e55] p-4">
+        <div className="flex justify-center mb-6">
+          <div className="relative h-8 w-32 opacity-50">
+            <Image
+              src="/logo/t-png.png"
+              alt="MindAudit Logo"
+              fill
+              className="object-contain brightness-0 invert"
+            />
+          </div>
+        </div>
         <Button
           variant="ghost"
           className="w-full justify-start text-slate-300 hover:bg-[#2a4e55] hover:text-white"

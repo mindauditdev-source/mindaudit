@@ -84,7 +84,7 @@ mindaudit/
 
 ```
 /                           → Landing page principal
-/sobre-nosotros             → Información de la empresa
+/sobre-nosotros             → Información de la entidad
 /servicios                  → Lista completa de servicios
 /colaboradores              → Información para partners
 /trabaja-con-nosotros       → Página de empleo
