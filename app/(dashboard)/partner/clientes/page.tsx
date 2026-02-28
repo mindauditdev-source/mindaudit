@@ -103,6 +103,12 @@ export default function PartnerCompaniesPage() {
         onStatusChange={() => {
           PartnerApiService.getProfile().then(setProfile).catch(console.error);
         }}
+        onDismiss={() => {
+          router.push("/partner/clientes/nuevo");
+        }}
+        onContinue={() => {
+          router.push("/partner/clientes/nuevo");
+        }}
       />
 
       <Card className="shadow-sm border-slate-100">

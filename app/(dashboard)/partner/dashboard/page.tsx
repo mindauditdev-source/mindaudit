@@ -197,6 +197,21 @@ export default function PartnerDashboardPage() {
                   </span>
                 </div>
               </div>
+
+              <div className="flex items-center justify-between border-b border-slate-50 pb-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-bold text-slate-900">Bonificaciones Acumuladas</p>
+                  <p className="text-xs text-slate-500">Importe generado y pdte. de cobro</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-slate-900">
+                    {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(profile?.totalCommissions || 0)}
+                  </p>
+                  <p className="text-xs text-purple-600 font-medium">
+                      ({new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(profile?.pendingCommissions || 0)} pdte.)
+                  </p>
+                </div>
+              </div>
             </div>
             
             <div className="mt-6">

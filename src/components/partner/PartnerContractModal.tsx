@@ -23,9 +23,11 @@ interface PartnerContractModalProps {
   externalOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   profile?: PartnerProfile | null;
+  onDismiss?: () => void;
+  onContinue?: () => void;
 }
 
-export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChange, profile: externalProfile }: PartnerContractModalProps) {
+export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChange, profile: externalProfile, onDismiss, onContinue }: PartnerContractModalProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isOpen = externalOpen !== undefined ? externalOpen : internalOpen;
   const setIsOpen = onOpenChange !== undefined ? onOpenChange : setInternalOpen;
@@ -69,6 +71,7 @@ export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChang
   const handleDismiss = async () => {
     // Close modal instantly for better UX
     setIsOpen(false);
+    onDismiss?.();
     
     setLoading(true);
     try {
@@ -200,7 +203,10 @@ export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChang
                 Por favor, rírmalo digitalmente en nuestra plataforma para activar tus beneficios.
               </p>
               <Button 
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  onContinue?.();
+                }}
                 className="w-full bg-[#0a3a6b] mt-4"
               >
                 Entendido

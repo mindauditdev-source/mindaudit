@@ -96,8 +96,12 @@ async function apiFetch(endpoint: string, options: RequestInit = {}) {
   });
 
   if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-    throw new Error(error.message || "Error en la petición de administración");
+    const respData = await res.json().catch(() => ({}));
+    if (respData.details && Array.isArray(respData.details)) {
+      const detailsStr = respData.details.map((d: { message: string }) => d.message).join(", ");
+      throw new Error(`${respData.error}: ${detailsStr}`);
+    }
+    throw new Error(respData.error || respData.message || "Error en la petición de administración");
   }
 
   return res.json();

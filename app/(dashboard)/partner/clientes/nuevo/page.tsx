@@ -61,11 +61,11 @@ export default function CreateClientPage() {
   });
 
   async function onSubmit(data: CreateClientFormValues) {
+    setPendingData(data);
     if (profile && !profile.contractSignedAt) {
       setIsContractOpen(true);
       return;
     }
-    setPendingData(data);
     setIsConfirmOpen(true);
   }
 
@@ -95,6 +95,12 @@ export default function CreateClientPage() {
         profile={profile}
         onStatusChange={() => {
           PartnerApiService.getProfile().then(setProfile).catch(console.error);
+        }}
+        onDismiss={() => {
+          if (pendingData) setIsConfirmOpen(true);
+        }}
+        onContinue={() => {
+          if (pendingData) setIsConfirmOpen(true);
         }}
       />
       
