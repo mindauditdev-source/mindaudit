@@ -165,9 +165,10 @@ export const AdminApiService = {
     return response.data;
   },
   
-  payComision: async (id: string) => {
+  payComision: async (id: string, referenciaPago: string, notas?: string) => {
     return apiFetch(`/admin/comisiones/${id}/pay`, {
        method: "PATCH",
+       body: JSON.stringify({ referenciaPago, notas }),
     });
   },
 

@@ -83,6 +83,12 @@ export default function AuditorAsociadosPage() {
   const [incomeForm, setIncomeForm] = useState({ empresaId: "", montoBase: "" });
   const [companiesLoading, setCompaniesLoading] = useState(false);
 
+  // Pay Commission State
+  const [isPayDialogOpen, setIsPayDialogOpen] = useState(false);
+  const [commissionToPay, setCommissionToPay] = useState<string | null>(null);
+  const [referenciaPago, setReferenciaPago] = useState("");
+  const [payNotes, setPayNotes] = useState("");
+
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
@@ -195,6 +201,31 @@ export default function AuditorAsociadosPage() {
     }
   };
 
+  const handleOpenPayDialog = (commId: string) => {
+    setCommissionToPay(commId);
+    setReferenciaPago("");
+    setPayNotes("");
+    setIsPayDialogOpen(true);
+  };
+
+  const handlePayCommission = async () => {
+    if (!commissionToPay || !referenciaPago.trim()) return;
+    try {
+      setSubmitting(true);
+      await AdminApiService.payComision(commissionToPay, referenciaPago, payNotes || undefined);
+      setIsPayDialogOpen(false);
+      // Refresh the history
+      if (selectedColab) handleViewHistory(selectedColab);
+      // Reload partner list to update totals
+      loadData();
+      toast.success("Comisión marcada como pagada.");
+    } catch {
+      toast.error("Error al marcar la comisión como pagada.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -257,7 +288,7 @@ export default function AuditorAsociadosPage() {
                             <td className="px-6 py-4 font-bold text-slate-700">
                                <div className="flex flex-col">
                                   <span>{formatCurrency(c.totalCommissions)}</span>
-                                  <span className="text-[10px] text-amber-600">Pend: {formatCurrency(c.pendingCommissions)}</span>
+                                 
                                </div>
                             </td>
                             <td className="px-6 py-4 text-right">
@@ -551,15 +582,25 @@ export default function AuditorAsociadosPage() {
                                  </p>
                               </div>
                            </div>
-                           <div className="text-right">
-                              <p className="text-lg font-black text-slate-900">{formatCurrency(comm.montoComision)}</p>
-                              <Badge className={cn(
-                                 "text-[9px] font-black uppercase rounded-md shadow-none px-2",
-                                 comm.status === 'PAGADA' ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-amber-50 text-amber-700 border-amber-100"
-                              )}>
-                                 {comm.status}
-                              </Badge>
-                           </div>
+                            <div className="text-right">
+                               <p className="text-lg font-black text-slate-900">{formatCurrency(comm.montoComision)}</p>
+                               <Badge className={cn(
+                                  "text-[9px] font-black uppercase rounded-md shadow-none px-2",
+                                  comm.status === 'PAGADA' ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-amber-50 text-amber-700 border-amber-100"
+                               )}>
+                                  {comm.status}
+                               </Badge>
+                               {comm.status === 'PENDIENTE' && (
+                                 <Button
+                                   variant="ghost"
+                                   size="sm"
+                                   className="mt-2 h-7 text-xs font-bold text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg px-3"
+                                   onClick={() => handleOpenPayDialog(comm.id)}
+                                 >
+                                   Marcar pagada
+                                 </Button>
+                               )}
+                            </div>
                         </div>
                      ))}
                   </div>
@@ -577,6 +618,51 @@ export default function AuditorAsociadosPage() {
         onOpenChange={setIsContractOpen} 
         colaborador={selectedColab} 
       />
+
+      {/* Pay Commission Dialog */}
+      <Dialog open={isPayDialogOpen} onOpenChange={setIsPayDialogOpen}>
+         <DialogContent className="sm:max-w-[420px] rounded-2xl">
+            <DialogHeader>
+               <DialogTitle className="text-xl font-bold">Confirmar Pago de Comisión</DialogTitle>
+               <DialogDescription className="font-medium text-slate-500">
+                  Introduzca la referencia del pago para confirmar la liquidación.
+               </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-5 py-4">
+               <div className="grid gap-2">
+                  <Label htmlFor="refPago" className="font-bold text-slate-700">Referencia de Pago *</Label>
+                  <Input
+                     id="refPago"
+                     placeholder="Ej: TRF-2024-001"
+                     value={referenciaPago}
+                     onChange={(e) => setReferenciaPago(e.target.value)}
+                     className="h-11 rounded-xl border-slate-200"
+                  />
+               </div>
+               <div className="grid gap-2">
+                  <Label htmlFor="payNotes" className="font-bold text-slate-700">Notas (opcional)</Label>
+                  <Input
+                     id="payNotes"
+                     placeholder="Observaciones..."
+                     value={payNotes}
+                     onChange={(e) => setPayNotes(e.target.value)}
+                     className="h-11 rounded-xl border-slate-200"
+                  />
+               </div>
+            </div>
+            <DialogFooter>
+               <Button variant="ghost" onClick={() => setIsPayDialogOpen(false)} className="rounded-xl font-medium">Cancelar</Button>
+               <Button
+                  onClick={handlePayCommission}
+                  disabled={submitting || !referenciaPago.trim()}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl h-11 px-8 shadow-lg shadow-emerald-900/20"
+               >
+                  {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Confirmar Pago
+               </Button>
+            </DialogFooter>
+         </DialogContent>
+      </Dialog>
     </div>
   );
 }

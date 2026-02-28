@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, Download, ReceiptEuro, Wallet, Clock, Filter, CheckCircle2, XCircle } from "lucide-react";
+import { TrendingUp, ReceiptEuro, Wallet, Clock, CheckCircle2, XCircle } from "lucide-react";
 import { PartnerApiService, PartnerCommission, PartnerCommissionSummary } from "@/services/partner-api.service";
 import { formatCurrency } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
+
 
 export default function PartnerCommissionsPage() {
   const [loading, setLoading] = useState(true);
@@ -157,7 +157,6 @@ export default function PartnerCommissionsPage() {
                     <th className="px-4 py-3">Fecha</th>
                     <th className="px-4 py-3">Estado</th>
                     <th className="px-4 py-3 text-right">Monto</th>
-                    <th className="px-4 py-3 text-right">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -183,11 +182,6 @@ export default function PartnerCommissionsPage() {
                         <span className="block text-xs text-slate-400 font-normal">
                            {comision.porcentaje}%
                         </span>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-400 hover:text-blue-600"> 
-                          <Download className="h-4 w-4" />
-                        </Button>
                       </td>
                     </tr>
                   ))}
