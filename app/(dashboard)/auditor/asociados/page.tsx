@@ -37,6 +37,14 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ContractViewerModal } from "@/components/auditor/ContractViewerModal";
 
 export default function AuditorAsociadosPage() {
@@ -51,7 +59,14 @@ export default function AuditorAsociadosPage() {
 
   // Liquidation History State
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [comisionesHistorial, setComisionesHistorial] = useState<any[]>([]);
+  const [comisionesHistorial, setComisionesHistorial] = useState<{
+    id: string;
+    status: string;
+    montoBase: number;
+    porcentaje: number;
+    montoComision: number;
+    auditoria?: { tipoServicio?: string };
+  }[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
 
   // Confirmation State
@@ -61,13 +76,19 @@ export default function AuditorAsociadosPage() {
   // Contract View State
   const [isContractOpen, setIsContractOpen] = useState(false);
 
+  // Income Registration State
+  const [isIncomeDialogOpen, setIsIncomeDialogOpen] = useState(false);
+  const [selectedColabCompanies, setSelectedColabCompanies] = useState<{id: string; companyName: string; cif: string}[]>([]);
+  const [incomeForm, setIncomeForm] = useState({ empresaId: "", montoBase: "" });
+  const [companiesLoading, setCompaniesLoading] = useState(false);
+
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const data = await AdminApiService.getColaboradores();
       setColaboradores(data.colaboradores || []);
-    } catch (error) {
-      console.error("Error loading colaboradores:", error);
+    } catch (err) {
+      console.error("Error loading colaboradores:", err);
     } finally {
       setLoading(false);
     }
@@ -90,7 +111,7 @@ export default function AuditorAsociadosPage() {
       setIsConfirmOpen(false);
       loadData();
       alert("Asociado verificado y activado.");
-    } catch (error) {
+    } catch {
       alert("Error al aprobar");
     } finally {
       setSubmitting(false);
@@ -112,7 +133,7 @@ export default function AuditorAsociadosPage() {
         setIsCommissionDialogOpen(false);
         loadData();
         alert("Tasa de comisión actualizada.");
-     } catch (error) {
+     } catch {
         alert("Error al actualizar comisión");
      } finally {
         setSubmitting(false);
@@ -127,12 +148,50 @@ export default function AuditorAsociadosPage() {
      try {
         // Fetch only commissions for this specific collaborator
         const res = await AdminApiService.getComisiones(colab.id);
-        setComisionesHistorial(res.comisiones || []);
-     } catch (error) {
-        console.error("Error loading history:", error);
+        const typedComisiones = res.comisiones as {
+          id: string;
+          status: string;
+          montoBase: number;
+          porcentaje: number;
+          montoComision: number;
+          auditoria?: { tipoServicio?: string };
+        }[];
+        setComisionesHistorial(typedComisiones || []);
+     } catch (err) {
+        console.error("Error loading history:", err);
      } finally {
         setHistoryLoading(false);
      }
+  };
+
+  const handleOpenIncomeDialog = async (colab: AdminColaborador) => {
+     setSelectedColab(colab);
+     setIncomeForm({ empresaId: "", montoBase: "" });
+     setIsIncomeDialogOpen(true);
+     setCompaniesLoading(true);
+     try {
+       const res = await AdminApiService.getCompaniesByColaborador(colab.id);
+       setSelectedColabCompanies(res.empresas || []);
+     } catch (err) {
+       console.error("Error loading companies:", err);
+     } finally {
+       setCompaniesLoading(false);
+     }
+  };
+
+  const handleRegisterIncome = async () => {
+    if (!selectedColab || !incomeForm.empresaId || !incomeForm.montoBase) return;
+    try {
+      setSubmitting(true);
+      await AdminApiService.registerIncome(selectedColab.id, incomeForm.empresaId, Number(incomeForm.montoBase));
+      setIsIncomeDialogOpen(false);
+      loadData();
+      alert("Ingreso registrado y comisión generada exitosamente.");
+    } catch {
+      alert("Error al registrar el ingreso.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -214,6 +273,9 @@ export default function AuditorAsociadosPage() {
                                      </DropdownMenuItem>
                                      <DropdownMenuItem onClick={() => handleOpenCommissionEdit(c)} className="py-2.5 rounded-lg font-medium mx-1">
                                         <Settings className="mr-2 h-4 w-4 text-slate-400" /> Ajustar Comisión
+                                     </DropdownMenuItem>
+                                     <DropdownMenuItem onClick={() => handleOpenIncomeDialog(c)} className="py-2.5 rounded-lg font-medium mx-1">
+                                        <Euro className="mr-2 h-4 w-4 text-purple-400" /> Registrar Ingreso
                                      </DropdownMenuItem>
                                      <DropdownMenuItem onClick={() => handleViewHistory(c)} className="py-2.5 rounded-lg font-medium mx-1">
                                         <PieChart className="mr-2 h-4 w-4 text-blue-400" /> Ver Historial
@@ -336,13 +398,91 @@ export default function AuditorAsociadosPage() {
             </div>
             <DialogFooter>
                <Button variant="ghost" onClick={() => setIsCommissionDialogOpen(false)} className="rounded-xl font-medium">Cancelar</Button>
-               <Button 
+                <Button 
                   onClick={handleUpdateCommission} 
                   className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl h-11 px-8 shadow-lg shadow-blue-900/20"
                   disabled={submitting}
                >
                   {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Confirmar Tasa
+               </Button>
+            </DialogFooter>
+         </DialogContent>
+      </Dialog>
+
+      {/* Income Registration Dialog */}
+      <Dialog open={isIncomeDialogOpen} onOpenChange={setIsIncomeDialogOpen}>
+         <DialogContent className="sm:max-w-[425px] rounded-2xl">
+            <DialogHeader>
+               <DialogTitle className="text-xl font-bold">Registrar Ingreso de Cliente</DialogTitle>
+               <DialogDescription className="font-medium text-slate-500">
+                  Registre ingresos generados por los clientes de <b>{selectedColab?.companyName}</b> para calcular automáticamente su comisión del <span className="text-blue-600 font-bold">{selectedColab?.commissionRate}%</span>.
+               </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-5 py-4">
+               {companiesLoading ? (
+                 <div className="flex items-center justify-center p-4"><Loader2 className="h-6 w-6 animate-spin text-slate-400" /></div>
+               ) : (
+                 <>
+                   <div className="grid gap-2">
+                      <Label className="font-bold text-slate-700">Cliente (Empresa)</Label>
+                      <Select 
+                        value={incomeForm.empresaId} 
+                        onValueChange={(val) => setIncomeForm({ ...incomeForm, empresaId: val })}
+                      >
+                        <SelectTrigger className="h-12 rounded-xl text-base border-slate-200">
+                          <SelectValue placeholder="Seleccione un cliente" />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                          {selectedColabCompanies.length === 0 ? (
+                            <div className="p-4 text-sm text-center text-slate-500 italic">No tiene clientes registrados</div>
+                          ) : (
+                            <SelectGroup>
+                              {selectedColabCompanies.map((emp) => (
+                                <SelectItem key={emp.id} value={emp.id} className="py-3">
+                                  {emp.companyName} <span className="text-xs text-slate-400">({emp.cif})</span>
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          )}
+                        </SelectContent>
+                      </Select>
+                   </div>
+                   <div className="grid gap-2">
+                      <Label htmlFor="incomeAmount" className="font-bold text-slate-700">Monto Ingresado (Base Imponible)</Label>
+                      <div className="relative">
+                         <Input 
+                            id="incomeAmount"
+                            title="Ingresar Monto"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={incomeForm.montoBase}
+                            onChange={(e) => setIncomeForm({ ...incomeForm, montoBase: e.target.value })}
+                            className="h-12 rounded-xl text-xl font-black border-slate-200 focus:ring-blue-500"
+                            placeholder="0.00"
+                         />
+                         <span className="absolute right-4 top-3 text-slate-300 font-black text-xl">€</span>
+                      </div>
+                      {incomeForm.montoBase && selectedColab && (
+                        <p className="text-xs text-emerald-600 font-bold bg-emerald-50 p-3 rounded-lg border border-emerald-100 mt-2 flex items-center gap-2">
+                          <Euro className="h-3 w-3" />
+                          Comisión a generar: {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(Number(incomeForm.montoBase) * (selectedColab.commissionRate / 100))}
+                        </p>
+                      )}
+                   </div>
+                 </>
+               )}
+            </div>
+            <DialogFooter>
+               <Button variant="ghost" onClick={() => setIsIncomeDialogOpen(false)} className="rounded-xl font-medium">Cancelar</Button>
+               <Button 
+                  onClick={handleRegisterIncome} 
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl h-11 px-8 shadow-lg shadow-blue-900/20"
+                  disabled={submitting || companiesLoading || !incomeForm.empresaId || !incomeForm.montoBase || selectedColabCompanies.length === 0}
+               >
+                  {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Generar Comisión
                </Button>
             </DialogFooter>
          </DialogContent>
@@ -387,7 +527,14 @@ export default function AuditorAsociadosPage() {
                   </div>
                ) : (
                   <div className="space-y-4">
-                     {comisionesHistorial.map((comm: any) => (
+                     {comisionesHistorial.map((comm: {
+                        id: string;
+                        status: string;
+                        montoBase: number;
+                        porcentaje: number;
+                        montoComision: number;
+                        auditoria?: { tipoServicio?: string };
+                     }) => (
                         <div key={comm.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-blue-100 transition-colors">
                            <div className="flex items-center gap-4">
                               <div className={cn(

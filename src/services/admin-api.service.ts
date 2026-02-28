@@ -143,6 +143,18 @@ export const AdminApiService = {
     });
   },
 
+  getCompaniesByColaborador: async (colaboradorId: string): Promise<{ empresas: Empresa[] }> => {
+    const response = await apiFetch(`/admin/colaboradores/${colaboradorId}/empresas`);
+    return response.data;
+  },
+
+  registerIncome: async (colaboradorId: string, empresaId: string, montoBase: number) => {
+    return apiFetch(`/admin/colaboradores/${colaboradorId}/ingresos`, {
+      method: "POST",
+      body: JSON.stringify({ empresaId, montoBase }),
+    });
+  },
+
   getComisiones: async (colaboradorId?: string): Promise<{ comisiones: unknown[] }> => {
     const query = colaboradorId ? `?colaboradorId=${colaboradorId}` : "";
     const response = await apiFetch(`/admin/comisiones${query}`);

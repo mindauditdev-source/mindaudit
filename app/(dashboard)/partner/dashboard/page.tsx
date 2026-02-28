@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Building2, Plus, AlertCircle, ArrowRight, MessageCircle, Clock, Calendar } from "lucide-react";
+import { Building2, Plus, AlertCircle, ArrowRight, MessageCircle, Clock, Calendar, Euro } from "lucide-react";
 import { PartnerApiService, PartnerProfile } from "@/services/partner-api.service";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -85,7 +85,7 @@ export default function PartnerDashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Empresas Stats */}
         <Card className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -136,6 +136,24 @@ export default function PartnerDashboardPage() {
             </div>
             <p className="text-xs text-emerald-600 font-medium mt-1">
               Saldo para nuevas consultas
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Bonificaciones Stats */}
+        <Card className="border-l-4 border-l-purple-500 shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-slate-500">
+              Bonificaciones
+            </CardTitle>
+            <Euro className="h-4 w-4 text-purple-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-slate-900">
+              {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(profile?.totalCommissions || 0)}
+            </div>
+            <p className="text-xs text-purple-600 font-medium mt-1">
+              {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(profile?.pendingCommissions || 0)} pdtes. de cobro
             </p>
           </CardContent>
         </Card>
