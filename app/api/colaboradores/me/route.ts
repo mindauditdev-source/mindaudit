@@ -15,7 +15,7 @@ export async function GET() {
     requireColaborador(user)
 
     // Obtener perfil del colaborador y estadísticas en paralelo para evitar latencia de joins complejos
-    const [colaborador, consultasCount, statsCounts] = await Promise.all([
+    const [colaborador, consultasCount, statsCounts, comisionesAgg] = await Promise.all([
       // 1. Perfil básico
       prisma.colaborador.findUnique({
         where: { userId: user.id },
@@ -50,7 +50,13 @@ export async function GET() {
             },
           },
         }
-      })
+      }),
+      // 4. Suma de comisiones por estado (valores reales, no denormalizados)
+      prisma.comision.groupBy({
+        by: ['colaboradorId', 'status'],
+        where: { colaborador: { userId: user.id } },
+        _sum: { montoComision: true },
+      }),
     ])
 
     // DEBUG: Log status
@@ -62,6 +68,13 @@ export async function GET() {
       console.warn('[DEBUG] Profile not found for User:', user.id)
       return errorResponse('Perfil de colaborador no encontrado', 404)
     }
+
+    // Calcular totales reales de comisiones desde los registros (no campos denormalizados)
+    const totalCommissions = comisionesAgg.reduce((acc, row) =>
+      acc + (row._sum.montoComision?.toNumber() || 0), 0);
+    const pendingCommissions = comisionesAgg
+      .filter(row => row.status === 'PENDIENTE')
+      .reduce((acc, row) => acc + (row._sum.montoComision?.toNumber() || 0), 0);
 
     // Cast user to include _count with proper typing
 
@@ -79,8 +92,8 @@ export async function GET() {
         website: colaborador.website,
         status: colaborador.status,
         commissionRate: colaborador.commissionRate.toNumber(),
-        totalCommissions: colaborador.totalCommissions.toNumber(),
-        pendingCommissions: colaborador.pendingCommissions.toNumber(),
+        totalCommissions,
+        pendingCommissions,
         contractUrl: colaborador.contractUrl,
         contractSignedAt: colaborador.contractSignedAt,
         dismissedPartnerPlanModal: colaborador.user.dismissedPartnerPlanModal,
