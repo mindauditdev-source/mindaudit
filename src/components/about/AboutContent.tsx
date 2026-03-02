@@ -15,15 +15,20 @@ export function AboutContent() {
   return (
     <div className="flex flex-col w-full bg-white">
       {/* 1. Hero Section */}
-      <section className="relative pt-16 pb-24 lg:pt-24 lg:pb-32 overflow-hidden bg-slate-50">
+      <section
+        className="relative pt-16 pb-24 lg:pt-24 lg:pb-32 overflow-hidden bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/nosotros-image.webp')" }}
+      >
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-gray-900/70" />
         <div className="container relative z-10 mx-auto px-4 text-center">
-          <div className="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/5 px-4 py-1.5 text-xs font-bold text-blue-600 mb-8 tracking-widest uppercase">
+          <div className="inline-flex items-center rounded-full border border-blue-400/40 bg-blue-500/10 px-4 py-1.5 text-xs font-bold text-blue-300 mb-8 tracking-widest uppercase">
             Misión y Visión
           </div>
-          <h1 className="text-5xl lg:text-7xl font-extrabold text-slate-900 mb-8 tracking-tight">
+          <h1 className="text-5xl lg:text-7xl font-extrabold text-white mb-8 tracking-tight">
             Nuestra Identidad.
           </h1>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed mb-12">
+          <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-12">
             Somos una firma líder que integra profesionalismo en servicios de auditoría 
             para empresas de capital, impulsando la gran transparencia y la confianza en 
             nuestra región.
@@ -32,9 +37,9 @@ export function AboutContent() {
             <Link href="/servicios">Nuestra Experiencia</Link>
           </Button>
         </div>
-        {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" 
-          style={{ backgroundImage: 'radial-gradient(#0f4c81 1px, transparent 0)', backgroundSize: '40px 40px' }} 
+        {/* Decorative dot grid */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-[0.04] pointer-events-none" 
+          style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 0)', backgroundSize: '40px 40px' }} 
         />
       </section>
 
@@ -70,7 +75,7 @@ export function AboutContent() {
       </section>
 
       {/* 3. Liderazgo y Experiencia */}
-      <section className="py-24 bg-slate-50/50">
+       {/* <section className="py-24 bg-slate-50/50">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-20">
             <h2 className="text-4xl font-bold text-slate-900 mb-6 tracking-tight">Liderazgo y Experiencia</h2>
@@ -100,7 +105,7 @@ export function AboutContent() {
              />
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* 4. Hitos de nuestra Firma (Timeline) */}
       <section className="py-24 bg-white">

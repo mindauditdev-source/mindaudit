@@ -28,8 +28,11 @@ export function ServicesSection() {
   return (
     <div className="flex flex-col w-full bg-white">
       {/* Hero Section */}
-      <section className="bg-slate-900 text-white py-24 lg:py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
+      <section
+        className="text-white py-24 lg:py-32 relative overflow-hidden bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/services.webp')" }}
+      >
+        <div className="absolute inset-0 bg-gray-900/75" />
         <div className="container relative z-10 mx-auto px-4">
            <div className="max-w-4xl">
               <h1 className="text-4xl lg:text-6xl font-extrabold mb-8 leading-tight">

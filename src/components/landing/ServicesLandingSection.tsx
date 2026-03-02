@@ -9,11 +9,17 @@ export function ServicesLandingSection() {
   const featuredServices = auditServices.filter(s => s.featured).slice(0, 4);
 
   return (
-    <section className="bg-white py-20 lg:py-24">
-      <div className="container mx-auto px-4 md:px-6">
+    <section
+      className="relative py-20 lg:py-24 bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: "url('/services.webp')" }}
+    >
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-gray-900/75" />
+
+      <div className="relative z-10 container mx-auto px-4 md:px-6">
         <div className="mb-12">
-          <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide">NUESTRA EXPERIENCIA</span>
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mt-2">
+          <span className="text-sm font-semibold text-blue-400 uppercase tracking-wide">NUESTRA EXPERIENCIA</span>
+          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mt-2">
             Servicios de auditoría especializados
           </h2>
         </div>
@@ -23,7 +29,7 @@ export function ServicesLandingSection() {
             const IconComponent = (LucideIcons[service.icon as keyof typeof LucideIcons] as LucideIcon) || ShieldCheck;
             
             return (
-              <Card key={index} className="border-gray-100 shadow-sm hover:shadow-lg transition-shadow bg-gray-50/50 flex flex-col h-full hover:border-blue-100">
+              <Card key={index} className="border-gray-100 shadow-sm hover:shadow-lg transition-shadow bg-white flex flex-col h-full hover:border-blue-100">
                 <CardHeader className="pb-4 pt-8">
                   <div className="h-12 w-12 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 mb-4">
                     <IconComponent className="h-6 w-6" />
