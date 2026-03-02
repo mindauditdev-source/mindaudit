@@ -41,6 +41,7 @@ interface Presupuesto {
   numExpediente: string | null;
   esSociedadMatriz: boolean;
   elSocioMayoritarioTieneParticipacion: boolean;
+  fiscalYear: string | null;
 }
 
 export default function PresupuestoDetailPage() {
@@ -177,6 +178,10 @@ export default function PresupuestoDetailPage() {
               <div>
                 <Label className="text-xs text-slate-500">Núm. Trabajadores</Label>
                 <p className="font-semibold text-slate-900">{presupuesto.numTrabajadores || "N/A"}</p>
+              </div>
+              <div>
+                <Label className="text-xs text-slate-500">Año Fiscal / Ejercicio</Label>
+                <p className="font-semibold text-blue-600">{presupuesto.fiscalYear || "N/A"}</p>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-4 border-t pt-4">

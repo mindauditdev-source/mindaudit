@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { PartnerApiService } from "@/services/partner-api.service";
 import { ArrowLeft, Loader2, Building2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PartnerContractModal } from "@/components/partner/PartnerContractModal";
 import {
   Dialog,
@@ -30,7 +31,7 @@ const createClientSchema = z.object({
   contactEmail: z.string().email("Email inválido"),
   contactPhone: z.string().regex(/^(\+34|0034|34)?[6789]\d{8}$/, "Debe ser un número de teléfono válido de España"),
   revenue: z.coerce.number().optional(),
-  fiscalYear: z.coerce.number().optional(),
+  fiscalYear: z.string().optional(),
   employees: z.coerce.number().optional(),
 });
 
@@ -229,9 +230,19 @@ export default function CreateClientPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Año Fiscal</FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="2024" {...field} />
-                      </FormControl>
+                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccione ejercicio" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="2025">2025</SelectItem>
+                          <SelectItem value="2024">2024</SelectItem>
+                          <SelectItem value="2023">2023</SelectItem>
+                          <SelectItem value="Más de un ejercicio">Más de un ejercicio</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

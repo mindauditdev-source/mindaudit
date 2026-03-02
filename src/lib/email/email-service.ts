@@ -6,7 +6,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 interface AuditInfo {
   id: string;
   tipoServicio: string;
-  fiscalYear: number;
+  fiscalYear: string;
   urgente: boolean;
   presupuesto?: number | null;
 }
@@ -577,6 +577,7 @@ export class EmailService {
     numExpediente?: string | null;
     esSociedadMatriz?: boolean;
     elSocioMayoritarioTieneParticipacion?: boolean;
+    fiscalYear?: string | null;
   }) {
     const adminEmail = process.env.CONTACT_EMAIL_TO || 'admin@mindaudit.es';
     const fromName = process.env.CONTACT_EMAIL_FROM_NAME || 'MindAudit Spain';
@@ -676,6 +677,10 @@ export class EmailService {
                 <div class="field">
                   <div class="label">Número de Expediente (Sector Público)</div>
                   <div class="value">${data.numExpediente}</div>
+                </div>
+                <div class="field">
+                  <div class="label">Año Fiscal / Ejercicio</div>
+                  <div class="value"><strong>${data.fiscalYear || 'No especificado'}</strong></div>
                 </div>
                 ` : ''}
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">

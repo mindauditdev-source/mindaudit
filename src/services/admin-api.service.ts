@@ -51,7 +51,7 @@ export interface Auditoria {
   id: string;
   tipoServicio: string;
   status: string;
-  fiscalYear: number;
+  fiscalYear: string;
   description?: string | null;
   urgente: boolean;
   fechaSolicitud: string;

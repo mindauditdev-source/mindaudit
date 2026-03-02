@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { UserRole, EmpresaOrigen } from '@prisma/client'
 
 // ============================================
 // SCHEMAS DE AUTENTICACIÓN
@@ -148,12 +147,7 @@ export const registerEmpresaSchema = z.object({
     .number()
     .positive('Debe ser mayor a 0')
     .optional(),
-  fiscalYear: z
-    .number()
-    .int('Debe ser un año válido')
-    .min(2020, 'Año inválido')
-    .max(new Date().getFullYear() + 1, 'Año inválido')
-    .optional(),
+  fiscalYear: z.string().optional(),
   
   // Términos
   acceptTerms: z
@@ -216,12 +210,7 @@ export const createEmpresaSchema = z.object({
     .number()
     .positive('Debe ser mayor a 0')
     .optional(),
-  fiscalYear: z
-    .number()
-    .int('Debe ser un año válido')
-    .min(2020, 'Año inválido')
-    .max(new Date().getFullYear() + 1, 'Año inválido')
-    .optional(),
+  fiscalYear: z.string().optional(),
   notes: z.string().optional(),
 })
 
@@ -248,11 +237,7 @@ export const createAuditoriaSchema = z.object({
   ], {
     errorMap: () => ({ message: 'Debe seleccionar un tipo de servicio' }),
   }),
-  fiscalYear: z
-    .number()
-    .int('Debe ser un año válido')
-    .min(2020, 'Año inválido')
-    .max(new Date().getFullYear() + 1, 'Año inválido'),
+  fiscalYear: z.string().min(1, 'El año fiscal es obligatorio'),
   description: z.string().optional(),
   urgente: z.boolean().default(false),
 })

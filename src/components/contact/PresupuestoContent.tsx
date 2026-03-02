@@ -32,6 +32,7 @@ export default function PresupuestoContent() {
     numExpediente: '',
     esSociedadMatriz: false,
     elSocioMayoritarioTieneParticipacion: false,
+    fiscalYear: '',
     privacidad: false
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,6 +76,7 @@ export default function PresupuestoContent() {
           numExpediente: '',
           esSociedadMatriz: false,
           elSocioMayoritarioTieneParticipacion: false,
+          fiscalYear: '',
           privacidad: false
         });
       } else {
@@ -264,6 +266,24 @@ export default function PresupuestoContent() {
                               <option value="legalidad">Auditoría de cumplimiento de la legalidad</option>
                               <option value="operativa">Auditoría operativa</option>
                               <option value="otros">Otros Informes Especiales</option>
+                          </select>
+                          <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Año Fiscal / Ejercicio</label>
+                        <div className="relative">
+                          <select 
+                            value={formData.fiscalYear}
+                            onChange={(e) => setFormData({...formData, fiscalYear: e.target.value})}
+                            required
+                            className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-medium appearance-none cursor-pointer"
+                          >
+                              <option value="">Seleccione ejercicio...</option>
+                              <option value="2025">2025</option>
+                              <option value="2024">2024</option>
+                              <option value="2023">2023</option>
+                              <option value="Más de un ejercicio">Más de un ejercicio</option>
                           </select>
                           <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
                         </div>

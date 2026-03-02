@@ -37,7 +37,7 @@ interface CompanyDetail extends Omit<PartnerCompany, 'revenue'> {
   postalCode: string | null;
   website: string | null;
   employees: number | null;
-  fiscalYear: number | null;
+  fiscalYear: string | null;
   revenue: number | null; // Explicitly defined as number | null
   stats: {
     totalAuditorias: number;
@@ -47,7 +47,7 @@ interface CompanyDetail extends Omit<PartnerCompany, 'revenue'> {
   recentAuditorias: Array<{
     id: string;
     tipoServicio: string;
-    fiscalYear: number;
+    fiscalYear: string;
     status: string;
     createdAt: string;
   }>;

@@ -16,7 +16,7 @@ export interface EmpresaProfile {
   website: string | null;
   employees: number | null;
   revenue: number | null;
-  fiscalYear: number | null;
+  fiscalYear: string | null;
   status: EmpresaStatus;
   createdAt: string;
   updatedAt: string;
@@ -37,7 +37,7 @@ export interface EmpresaAuditoria {
   colaboradorId: string | null;
   tipoServicio: string;
   description: string | null;
-  fiscalYear: number;
+  fiscalYear: string;
   status: PresupuestoStatus;
   urgente: boolean;
   presupuesto: number | null;
@@ -108,7 +108,7 @@ export class EmpresaApiService {
   static async requestAuditoria(data: {
     empresaId: string;
     tipoServicio: string;
-    fiscalYear: number;
+    fiscalYear: string;
     description?: string;
     urgente?: boolean;
   }) {

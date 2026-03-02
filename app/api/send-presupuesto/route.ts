@@ -20,7 +20,8 @@ export async function POST(req: NextRequest) {
       cpAlmacenes,
       numExpediente,
       esSociedadMatriz,
-      elSocioMayoritarioTieneParticipacion
+      elSocioMayoritarioTieneParticipacion,
+      fiscalYear
     } = body;
 
     // Validación básica
@@ -49,6 +50,7 @@ export async function POST(req: NextRequest) {
         numExpediente,
         esSociedadMatriz,
         elSocioMayoritarioTieneParticipacion,
+        fiscalYear,
         status: 'PENDIENTE_PRESUPUESTAR'
       }
     });
@@ -70,7 +72,8 @@ export async function POST(req: NextRequest) {
       cpAlmacenes,
       numExpediente,
       esSociedadMatriz,
-      elSocioMayoritarioTieneParticipacion
+      elSocioMayoritarioTieneParticipacion,
+      fiscalYear
     });
 
     if (!emailResult.success) {

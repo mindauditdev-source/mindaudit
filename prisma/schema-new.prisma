@@ -156,7 +156,7 @@ model Empresa {
   // Información fiscal
   employees       Int?
   revenue         Decimal?       @db.Decimal(15, 2) // Facturación anual
-  fiscalYear      Int?           // Año fiscal actual
+  fiscalYear      String?        // Año fiscal actual
   
   // Estado
   status          EmpresaStatus  @default(PROSPECT)
@@ -215,7 +215,7 @@ model Auditoria {
   
   // Información del servicio
   tipoServicio      TipoServicio
-  fiscalYear        Int              // Año fiscal a auditar
+  fiscalYear        String           // Año fiscal a auditar
   description       String?          @db.Text
   urgente           Boolean          @default(false)
   

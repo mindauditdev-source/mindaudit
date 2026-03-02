@@ -126,7 +126,7 @@ export class PartnerApiService {
     contactEmail: string;
     contactPhone?: string;
     revenue?: number;
-    fiscalYear?: number;
+    fiscalYear?: string;
     employees?: number;
   }): Promise<PartnerCompany> {
     const response = await this.fetch("/empresas", {
@@ -191,7 +191,7 @@ export class PartnerApiService {
   static async createAuditoria(data: {
     empresaId: string;
     tipoServicio: string;
-    fiscalYear: number;
+    fiscalYear: string;
     description?: string;
     urgente?: boolean;
   }) {
@@ -205,7 +205,7 @@ export class PartnerApiService {
     auditorias: Array<{
       id: string;
       tipoServicio: string;
-      fiscalYear: number;
+      fiscalYear: string;
       status: string;
       createdAt: string;
       empresa: {

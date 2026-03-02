@@ -86,7 +86,7 @@ model Empresa {
   website       String?
   employees     Int?
   revenue       Decimal?             @db.Decimal(15, 2)
-  fiscalYear    Int?
+  fiscalYear    String?
   status        EmpresaStatus        @default(PROSPECT)
   notes         String?
   createdAt     DateTime             @default(now())
@@ -127,7 +127,7 @@ model Presupuesto {
   elSocioMayoritarioTieneParticipacion Boolean @default(false)
 
   tipoServicio           TipoServicio?
-  fiscalYear             Int?
+  fiscalYear             String?
   description            String?
   urgente                Boolean              @default(false)
   status                 PresupuestoStatus    @default(PENDIENTE_PRESUPUESTAR)
