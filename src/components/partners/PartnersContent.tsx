@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -8,14 +8,14 @@ import {
   Users, 
   Cloud, 
   ArrowRight, 
-  ChevronLeft, 
-  ChevronRight,
   UserCheck,
   FileCheck,
   Zap,
   Mail,
   Phone,
-  Calendar
+  Calendar,
+  Target,
+  TrendingUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,70 +23,38 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { CalendlyWidget } from '@/components/shared/CalendlyWidget';
 
 export function PartnersContent() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [itemsToShow, setItemsToShow] = useState(3);
   const [calendlyModalOpen, setCalendlyModalOpen] = useState(false);
 
-  const testimonials = [
+  const stats = [
     {
-      quote: "La plataforma tecnológica nos ha permitido reducir los tiempos de auditoría en un 40%. La integración fue impecable.",
-      name: "Carlos Méndez",
-      role: "Socio Director, CMA Auditores",
-      avatar: "/avatar-1.png"
+      label: "Incremento Eficiencia",
+      value: "40%",
+      description: "Reducción de tiempos en procesos de auditoría mediante nuestra plataforma digital",
+      icon: <Zap className="h-6 w-6" />,
+      color: "bg-blue-600"
     },
     {
-      quote: "Acceder a la red de expertos de <strong>MindAudit®</strong> nos ha permitido licitar y ganar proyectos en sectores donde antes no teníamos alcance.",
-      name: "Elena Ruiz",
-      role: "Auditora Senior, Global Finance",
-      avatar: "/avatar-2.png"
+      label: "Costes Estructurales",
+      value: "0€",
+      description: "Sin necesidad de inversión inicial ni costes fijos de mantenimiento normativo",
+      icon: <FileCheck className="h-6 w-6" />,
+      color: "bg-emerald-500"
     },
     {
-      quote: "Seguridad y profesionalidad. Desde el primer día sentimos que <strong>MindAudit®</strong> no es un proveedor, sino un socio real.",
-      name: "Roberto Gil",
-      role: "CEO, Gil Audit & Tax",
-      avatar: "/avatar-3.png"
+      label: "Alcance Sectorial",
+      value: "+10",
+      description: "Nuevas áreas de especialización disponibles para vuestros clientes de forma inmediata",
+      icon: <Target className="h-6 w-6" />,
+      color: "bg-orange-500"
     },
     {
-      quote: "La agilidad en la gestión de expedientes y la calidad del soporte técnico son diferenciales clave para nuestro crecimiento.",
-      name: "Marta Sánchez",
-      role: "Directora de Operaciones, Tech Audit",
-      avatar: "/avatar-4.png"
-    },
-    {
-      quote: "<strong>MindAudit®</strong> ha transformado nuestra forma de trabajar, aportando una capa tecnológica que antes era impensable en nuestro sector.",
-      name: "Javier López",
-      role: "Socio, López & Asociados",
-      avatar: "/avatar-5.png"
+      label: "Soporte Técnico",
+      value: "24h",
+      description: "Acceso preferente a nuestra red de expertos para resolución de consultas técnicas",
+      icon: <Users className="h-6 w-6" />,
+      color: "bg-purple-600"
     }
   ];
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setItemsToShow(1);
-      } else if (window.innerWidth < 1024) {
-        setItemsToShow(2);
-      } else {
-        setItemsToShow(3);
-      }
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex + itemsToShow >= testimonials.length ? 0 : prevIndex + 1
-    );
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? Math.max(0, testimonials.length - itemsToShow) : prevIndex - 1
-    );
-  };
 
   return (
     <div className="flex flex-col w-full bg-white">
@@ -134,8 +102,8 @@ confianza para potenciar el crecimiento de vuestro despacho profesional
                     <ShieldCheck className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="font-bold text-slate-900 text-sm">Certificación oficial</p>
-                    <p className="text-xs text-slate-500">Auditores certificados por el ROAC</p>
+                    <p className="font-bold text-slate-900 text-sm">Empresa Certificada en el R.O.A.C</p>
+                    <p className="text-xs text-slate-500">Nº S2711</p>
                   </div>
                 </div>
               </div>
@@ -152,9 +120,7 @@ confianza para potenciar el crecimiento de vuestro despacho profesional
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl font-bold text-slate-900 mb-4">¿Por qué colaborar con <strong>MindAudit®</strong>?</h2>
             <p className="text-lg text-slate-600">
-              Explora las ventajas de unirse al programa de partners para integrar servicios de auditoría
-              en vuestra firma sin inversión inicial y sin necesidad de cumplir con los requerimientos normativos.
-              Eso es cosa nuestra.
+              Explora las ventajas de unirse al programa de partners para integrar servicios de auditoría en vuestro despacho profesional. Sin Necesidad de inversión. Sin Obligaciones normativas
             </p>
           </div>
 
@@ -167,7 +133,7 @@ confianza para potenciar el crecimiento de vuestro despacho profesional
                 <h3 className="text-xl font-bold text-slate-900 mb-3">Enfoque 100% digital</h3>
                 <p className="text-slate-500 leading-relaxed text-sm">
                   Ofrecemos nuestros servicios
-De auditoría de manera digital a través de un portal propio
+de auditoría de manera digital a través de un portal propio
 Sin papeles. Ágil y en tiempo real
                 </p>
               </CardContent>
@@ -181,8 +147,7 @@ Sin papeles. Ágil y en tiempo real
                 <h3 className="text-xl font-bold text-slate-900 mb-3">Red de Expertos</h3>
                 <p className="text-slate-500 leading-relaxed text-sm">
                   Diferenciaos de la competencia mediante
-                  acceso inmediato a expertos consultores
-                  y auditores. Amplía tu alcance de servicio
+                  acceso inmediato a expertos auditores. Amplía tu alcance de servicio
                   sin aumentar los costes fijos estructurales
                 </p>
               </CardContent>
@@ -239,7 +204,7 @@ Sin papeles. Ágil y en tiempo real
                 <UserCheck className="h-6 w-6" />
               </div>
               <div className="flex-1 order-2 md:order-3 text-center md:text-left">
-                <h3 className="text-xl font-bold text-slate-900 mb-2">2. Revisión</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">2. Validación</h3>
                 <p className="text-slate-500 text-sm max-w-xs">
                   Revisamos tu solicitud y nos aseguramos de que se cumplen los requisitos mínimos para firmar el acuerdo de colaboración
                 </p>
@@ -267,59 +232,66 @@ Sin papeles. Ágil y en tiempo real
         </div>
       </section>
 
-      {/* 4. Testimonios */}
+      {/* 4. Infografía (Antes Testimonios) */}
       <section className="py-24 bg-slate-50/50 overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-end mb-16">
-            <div>
-              <h2 className="text-4xl font-bold text-slate-900 mb-4">Lo que dicen nuestros partners</h2>
-              <p className="text-lg text-slate-600">Profesionales que confían en <strong>MindAudit®</strong> para escalar sus servicios.</p>
-            </div>
-            <div className="hidden sm:flex gap-4">
-                <button
-                  onClick={prevSlide}
-                  className="h-12 w-12 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors shadow-sm"
-                >
-                  <ChevronLeft className="h-6 w-6" />
-                </button>
-                <button
-                  onClick={nextSlide}
-                  className="h-12 w-12 rounded-full bg-[#0f4c81] flex items-center justify-center text-white hover:bg-[#0d3d68] transition-colors shadow-lg"
-                >
-                  <ChevronRight className="h-6 w-6" />
-                </button>
-            </div>
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">MindAudit® en <span className="text-[#0f4c81]">Datos</span></h2>
+            <p className="text-lg text-slate-600">
+              Transformando el modelo de colaboración profesional mediante tecnología y especialización.
+            </p>
           </div>
 
-          <div className="relative max-w-7xl mx-auto">
-            <div className="overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {stats.map((stat, idx) => (
               <motion.div
-                className="flex gap-8"
-                animate={{ x: `calc(-${currentIndex * (100 / itemsToShow)}% - ${currentIndex * (32 / itemsToShow)}px)` }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                viewport={{ once: true }}
               >
-                {testimonials.map((testimonial, idx) => (
-                  <div
-                    key={idx}
-                    className="min-w-0 shrink-0"
-                    style={{ width: `calc((100% - ${(itemsToShow - 1) * 32}px) / ${itemsToShow})` }}
-                  >
-                    <TestimonialCard {...testimonial} />
-                  </div>
-                ))}
+                <Card className="border-none shadow-xl bg-white rounded-3xl overflow-hidden group hover:-translate-y-2 transition-transform duration-500">
+                  <div className={`h-2 w-full ${stat.color}`} />
+                  <CardContent className="p-8">
+                    <div className={`h-12 w-12 rounded-2xl ${stat.color} bg-opacity-10 flex items-center justify-center text-slate-900 mb-6`}>
+                      {stat.icon}
+                    </div>
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className="text-4xl font-black text-slate-900 tracking-tight">{stat.value}</span>
+                      <TrendingUp className="h-5 w-5 text-emerald-500" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900 mb-4">{stat.label}</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed">
+                      {stat.description}
+                    </p>
+                  </CardContent>
+                </Card>
               </motion.div>
-            </div>
+            ))}
+          </div>
 
-            {/* Mobile/Tablet Dots */}
-            <div className="flex justify-center gap-2 mt-12 sm:hidden">
-              {Array.from({ length: testimonials.length - itemsToShow + 1 }).map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentIndex(idx)}
-                  className={`h-2 w-2 rounded-full transition-colors ${currentIndex === idx ? 'bg-[#0f4c81]' : 'bg-slate-200'}`}
-                />
-              ))}
+          <div className="mt-16 bg-[#0f4c81] rounded-[2.5rem] p-8 md:p-12 text-white relative overflow-hidden">
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="max-w-xl">
+                <h3 className="text-2xl md:text-3xl font-bold mb-4">Impacto Real en vuestro Despacho</h3>
+                <p className="text-blue-100 text-lg">
+                  Nuestra tecnología no solo digitaliza el proceso, sino que libera tiempo de vuestro equipo para tareas de mayor valor añadido.
+                </p>
+              </div>
+              <div className="flex gap-8 items-center bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/20">
+                <div className="text-center">
+                  <p className="text-3xl font-black text-white">100%</p>
+                  <p className="text-blue-100 text-xs font-bold uppercase tracking-widest mt-1">Garantía</p>
+                </div>
+                <div className="h-12 w-px bg-white/20" />
+                <div className="text-center">
+                  <p className="text-3xl font-black text-white">+500</p>
+                  <p className="text-blue-100 text-xs font-bold uppercase tracking-widest mt-1">Auditados</p>
+                </div>
+              </div>
             </div>
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
           </div>
         </div>
       </section>
@@ -467,42 +439,5 @@ Sin papeles. Ágil y en tiempo real
       </Dialog>
 
     </div>
-  );
-}
-
-function TestimonialCard({ quote, name, role, avatar }: { quote: string, name: string, role: string, avatar: string }) {
-  return (
-    <Card className="border border-slate-100 shadow-sm bg-white rounded-4xl p-4 hover:shadow-xl transition-all duration-500">
-      <CardContent className="p-8 space-y-8">
-        <div className="text-blue-300">
-           <svg width="34" height="24" viewBox="0 0 34 24" fill="currentColor">
-              <path d="M14.6 15.6c0 3.3-2.7 6-6 6-4.4 0-8.6-3.8-8.6-8.4 0-7 6.4-12 13-13l1.2 2.4c-4.4 1-8.2 3.6-8.2 7.6 0 1.2.6 2.4 1.2 3 1.4-1.6 3.4-2.6 5.4-2.6 4.4 0 7.4 2.6 7.4 6a7.4 7.4 0 0 1-5.4 9c0-.2.2-.4.4-.6-.2-.2-.2-.2-.4-.2-.2 0-.2 0-.2-.2h.2zm19.4 0c0 3.3-2.7 6-6 6-4.4 0-8.6-3.8-8.6-8.4 0-7 6.4-12 13-13l1.2 2.4c-4.4 1-8.2 3.6-8.2 7.6 0 1.2.6 2.4 1.2 3 1.4-1.6 3.4-2.6 5.4-2.6 4.4 0 7.4 2.6 7.4 6a7.4 7.4 0 0 1-5.4 9c0-.2.2-.4.4-.6-.2-.2-.2-.2-.4-.2-.2 0-.2 0-.2-.2h.2z" />
-           </svg>
-        </div>
-        <p className="text-slate-600 italic leading-relaxed text-sm">
-          &quot;{quote}&quot;
-        </p>
-        <div className="flex items-center gap-4 pt-4 border-t border-slate-50">
-          <div className="h-12 w-12 rounded-full bg-slate-200 overflow-hidden shrink-0 relative">
-             <Image 
-              src={avatar} 
-              alt={name} 
-              fill 
-              className="object-cover"
-              onError={(e) => {
-                // Fallback for missing avatar
-                const target = e.target as HTMLDivElement;
-                target.style.display = 'none';
-              }}
-             />
-             <div className="h-full w-full flex items-center justify-center text-slate-400 font-bold bg-slate-100">{name[0]}</div>
-          </div>
-          <div>
-            <p className="font-bold text-slate-900 text-sm">{name}</p>
-            <p className="text-xs text-slate-400">{role}</p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
   );
 }

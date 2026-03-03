@@ -150,7 +150,8 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                     <div>
                       <h3 className="text-xl font-bold mb-4 text-white font-sans">Nuestro Compromiso</h3>
                       <p className="text-blue-100 mb-6 leading-relaxed">
-                        Garantizamos la máxima transparencia y el cumplimiento de todos los requisitos legales y técnicos vigentes, apoyándonos en la innovación constante de <strong>MindAudit®</strong>.
+                        Garantizamos la máxima transparencia y el cumplimiento de todos los requisitos legales y técnicos vigentes. Nos adaptamos a la cultura del despacho y discutimos las particularidades previas a cada
+encargo para garantizar que el cliente perciba unidad de criterios durante el desarrollo de la auditoría
                       </p>
                     </div>
                     <Link href="/contacto" className="text-white underline font-medium hover:text-blue-100 transition-colors inline-flex items-center gap-2">

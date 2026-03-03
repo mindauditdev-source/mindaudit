@@ -12,7 +12,7 @@ export function ServicesSection() {
       items: auditServices.filter(s => s.category === 'financial')
     },
     {
-      title: "Informes especializados",
+      title: "Informes Sectoriales",
       items: auditServices.filter(s => s.category === 'special')
     },
     {
@@ -36,11 +36,11 @@ export function ServicesSection() {
         <div className="container relative z-10 mx-auto px-4">
            <div className="max-w-4xl">
               <h1 className="text-4xl lg:text-6xl font-extrabold mb-8 leading-tight">
-                Servicios Integrales de auditoría <br />
-                <span className="text-blue-500">Complementa vuestra oferta de servicios sin necesidad de ampliar la plantilla y sin costes innecesarios</span>
+                Servicios Integrales de auditoría{" "}
+                <span className="text-blue-500">Aumenta la oferta de servicios sin necesidad de ampliar plantilla y sin asumir costes innecesarios</span>
               </h1>
               <p className="text-xl text-slate-400 leading-relaxed max-w-2xl">
-               Ofrecemos un catálogo completo que ayuda a la captación y retención de clientes para lanzar 🚀 vuestro despacho profesional al nivel de excelencia
+               Ofrecemos un catálogo completo que ayuda a la captación y retención de clientes para lanzar 🚀 vuestro despacho profesional hacia el nivel de excelencia
               </p>
            </div>
         </div>
@@ -56,6 +56,11 @@ export function ServicesSection() {
                   <span className="h-8 w-1.5 bg-blue-600 rounded-full"></span>
                   {category.title}
                 </h2>
+                {category.subtitle && (
+                  <p className="text-slate-500 text-sm -mt-6 ml-4.5 border-l-1.5 border-blue-100 pl-3">
+                    {category.subtitle}
+                  </p>
+                )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {category.items.map((item, i) => {
                     const IconComponent = (LucideIcons[item.icon as keyof typeof LucideIcons] as LucideIcon) || ShieldCheck;

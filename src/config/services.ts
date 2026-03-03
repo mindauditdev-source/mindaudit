@@ -37,10 +37,10 @@ export const auditServices: AuditService[] = [
   },
   {
     id: 'public-sector',
-    name: 'Auditoría de Cuentas de empresas del sector Público',
+    name: 'Auditoría de Cuentas de empresas del Sector Público',
     slug: 'auditoria-sector-publico',
     shortDescription: 'Auditoría especializada en entidades públicas',
-    description: 'Especializados en auditorías de entidades del sector público local y autonómico. Especialidad en auditorías de cumplimiento y operativas. Emitimos presupuestos para dar cumplimiento con la Ley de Contratos del sector público con el máximo de detalles y transparencia.',
+    description: 'Especializados en auditorías de entidades del sector público local, provincial y autonómico. Especialidad en auditorías de cumplimiento y operativas. Emitimos presupuestos para dar cumplimiento con la Ley de Contratos del sector público con el máximo de detalles y transparencia.',
     detailedDescription: 'En <strong>MindAudit®</strong> contamos con un equipo experto en la normativa específica que rige el sector público. Realizamos auditorías de cuentas, de cumplimiento y operativas para ayuntamientos, entidades locales y organismos autónomos. Nuestra metodología se alinea con los estándares de la Intervención General de la Administración del Estado (IGAE) y los órganos de control externo (OCEX), garantizando la transparencia y la fiscalización rigurosa de los recursos públicos.',
     icon: 'Building',
     featured: false,
@@ -73,7 +73,6 @@ export const auditServices: AuditService[] = [
     featured: false,
     category: 'financial',
     features: [
-      'Alcance adaptado de acuerdo con la norma internacional de encargos de revisión (NIER).',
       'Enfoque basado en riesgos y procedimientos analíticos avanzados.',
       'Informe de revisión con conclusiones claras sobre la fiabilidad de la información.',
       'Ideal para requerimientos bancarios o seguimiento interno de socios.'
@@ -103,7 +102,6 @@ export const auditServices: AuditService[] = [
       'Flexibilidad total en la definición de los procedimientos a ejecutar.',
       'Informes detallados con los hallazgos específicos encontrados.',
       'Útil para revisiones de cumplimiento de contratos o verificación de activos específicos.',
-      'Metodología basada en la norma internacional de servicios relacionados (NISR).'
     ],
     faqs: [
       {
@@ -182,12 +180,13 @@ export const auditServices: AuditService[] = [
     icon: 'Layers',
     featured: false,
     category: 'special',
-    features: [
+    features:[
       'Auditoría de ventas anuales y cálculo de cuotas de mantenimiento de reservas.',
       'Verificación física y documental de existencias de hidrocarburos.',
       'Informes específicos solicitados por la Corporación CORES.',
       'Conocimiento experto de la normativa del sector de hidrocarburos.'
-    ]
+    ],
+    images: ['/services/cores-1.png', '/services/cores-2.png']
   },
 
   // ========== INFORMES ESPECIALES Y MERCANTILES ==========
@@ -349,6 +348,23 @@ export const auditServices: AuditService[] = [
         q: "¿Qué perfil de empresa debería plantearse este servicio de forma preventiva?",
         a: "Es recomendable para: <br/><br/> • Empresas en crecimiento que acceden por primera vez a ayudas públicas<br/> • Sociedades que combinan varias subvenciones y pueden incurrir en doble financiación<br/> • Entidades que no disponen de contabilidad separada estructurada<br/> • Organizaciones con proyectos complejos o subcontrataciones relevantes<br/> • Clientes que han recibido requerimientos o controles en el pasado<br/><br/> En estos perfiles, un control financiero preventivo permite anticiparse a incidencias y reforzar la solidez del expediente ante cualquier revisión futura."
       }
+    ]
+  },
+  {
+    id: 'legal-compliance-report',
+    name: 'Informe Especial de cumplimiento de la legalidad',
+    slug: 'informe-especial-cumplimiento-legalidad',
+    shortDescription: 'Para empresas del Sector Público',
+    description: 'En colaboración con las entidades locales, autonómicas y Diputaciones, los informes de cumplimiento de la legalidad ofrecen transparencia en las entidades y organismos dependientes del sector público. Nuestros expertos en Sector Público ofrecen garantía y profesionalidad en la elaboración de sus informes.',
+    detailedDescription: 'En colaboración con las entidades locales, autonómicas y Diputaciones, los informes de cumplimiento de la legalidad ofrecen transparencia en las entidades y organismos dependientes del sector público. Nuestros expertos en Sector Público ofrecen garantía y profesionalidad en la elaboración de sus informes.',
+    icon: 'Gavel',
+    featured: false,
+    category: 'grants',
+    features: [
+      'Colaboración con entidades locales, autonómicas y Diputaciones.',
+      'Transparencia en entidades y organismos del sector público.',
+      'Expertos especializados en Sector Público.',
+      'Garantía y profesionalidad en la elaboración de informes.'
     ]
   }
 ];
