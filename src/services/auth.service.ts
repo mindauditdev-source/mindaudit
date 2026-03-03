@@ -5,8 +5,10 @@ import {
   RegisterEmpresaInput,
   LoginInput,
   ChangePasswordInput,
+  ResetPasswordInput,
 } from '@/validators/auth.validator'
 import { UserRole, UserStatus, ColaboradorStatus, EmpresaStatus, EmpresaOrigen } from '@prisma/client'
+import { EmailService } from '@/lib/email/email-service'
 
 // ============================================
 // TIPOS DE RESPUESTA
@@ -438,6 +440,111 @@ export async function verifyEmail(userId: string): Promise<AuthResult> {
     return {
       success: false,
       error: 'Error al verificar el email',
+    }
+  }
+}
+
+// ============================================
+// RECUPERACIÓN DE CONTRASEÑA
+// ============================================
+
+/**
+ * Solicita un restablecimiento de contraseña
+ */
+export async function requestPasswordReset(email: string): Promise<AuthResult> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    })
+
+    if (!user) {
+      // Por seguridad, no revelamos si el email existe o no
+      return { success: true }
+    }
+
+    // Generar token aleatorio (puedes usar crypto.randomBytes)
+    const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+    const expires = new Date(Date.now() + 3600000) // 1 hora desde ahora
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordResetToken: token,
+        passwordResetTokenExpires: expires,
+      },
+    })
+
+    const resetLink = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`
+
+    // Enviar email
+    await EmailService.sendPasswordResetEmail({
+      nombre: user.name,
+      email: user.email,
+      resetLink,
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error('Error en requestPasswordReset:', error)
+    return {
+      success: false,
+      error: 'Error al procesar la solicitud de restablecimiento.',
+    }
+  }
+}
+
+/**
+ * Restablece la contraseña usando un token
+ */
+export async function resetPassword(input: ResetPasswordInput): Promise<AuthResult> {
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        passwordResetToken: input.token,
+        passwordResetTokenExpires: {
+          gt: new Date(),
+        },
+      },
+    })
+
+    if (!user) {
+      return {
+        success: false,
+        error: 'El enlace de restablecimiento es inválido o ha expirado.',
+      }
+    }
+
+    // Hash de la nueva contraseña
+    const hashedPassword = await hash(input.password, 10)
+
+    // Actualizar contraseña y limpiar tokens
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        hashedPassword,
+        passwordResetToken: null,
+        passwordResetTokenExpires: null,
+      },
+    })
+
+    // Log de auditoría
+    await prisma.auditLog.create({
+      data: {
+        userId: user.id,
+        userRole: user.role,
+        action: 'UPDATE',
+        entity: 'User',
+        entityId: user.id,
+        description: 'Contraseña restablecida mediante token',
+      },
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error('Error en resetPassword:', error)
+    return {
+      success: false,
+      error: 'Error al restablecer la contraseña.',
     }
   }
 }

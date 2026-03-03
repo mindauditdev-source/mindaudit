@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,7 +19,7 @@ const requestAuditSchema = z.object({
   tipoServicio: z.enum(["AUDITORIA_CUENTAS_ANUALES", "AUDITORIA_VOLUNTARIA", "REVISION_LIMITADA", "OTROS"], {
     required_error: "Seleccione un tipo de servicio",
   }),
-  fiscalYear: z.coerce.number().min(2000, "Año inválido").max(2100, "Año inválido"),
+  fiscalYear: z.string().min(1, "El año fiscal es obligatorio"),
   description: z.string().optional(),
   urgente: z.boolean().default(false),
 });
@@ -36,7 +35,7 @@ export default function RequestAuditPage() {
     resolver: zodResolver(requestAuditSchema),
     defaultValues: {
       tipoServicio: "AUDITORIA_CUENTAS_ANUALES",
-      fiscalYear: new Date().getFullYear(),
+      fiscalYear: String(new Date().getFullYear()),
       description: "",
       urgente: false,
     },
@@ -66,9 +65,10 @@ export default function RequestAuditPage() {
       
       router.push("/empresa/auditorias");
       router.refresh();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Error al solicitar la auditoría";
       console.error(err);
-      setError(err.message || "Error al solicitar la auditoría");
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -136,9 +136,19 @@ export default function RequestAuditPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Ejercicio Fiscal</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} />
-                      </FormControl>
+                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccione ejercicio" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="2025">2025</SelectItem>
+                          <SelectItem value="2024">2024</SelectItem>
+                          <SelectItem value="2023">2023</SelectItem>
+                          <SelectItem value="Más de un ejercicio">Más de un ejercicio</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

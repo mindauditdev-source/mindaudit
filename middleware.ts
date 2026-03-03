@@ -12,6 +12,8 @@ export async function middleware(req: NextRequest) {
     '/',
     '/login',
     '/register',
+    '/forgot-password',
+    '/reset-password',
     '/servicios',
     '/sobre-nosotros',
     '/partners',

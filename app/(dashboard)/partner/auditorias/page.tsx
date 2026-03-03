@@ -19,7 +19,7 @@ import { PartnerApiService } from "@/services/partner-api.service";
 interface AuditListItem {
   id: string;
   tipoServicio: string;
-  fiscalYear: number;
+  fiscalYear: string;
   status: string;
   createdAt: string;
   empresa: {

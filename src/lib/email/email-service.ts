@@ -777,4 +777,66 @@ export class EmailService {
       `,
     });
   }
+
+  /**
+   * Notificación de Recuperación de Contraseña
+   */
+  static async sendPasswordResetEmail(data: {
+    nombre: string;
+    email: string;
+    resetLink: string;
+  }) {
+    const subject = `🔑 Restablecer tu contraseña - MindAudit® Spain`;
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #0f4c81 0%, #1e5a94 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center; }
+            .content { background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #e2e8f0; border-top: none; }
+            .button-container { text-align: center; margin: 30px 0; }
+            .button { background-color: #0f4c81; color: white !important; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; }
+            .footer { text-align: center; margin-top: 30px; color: #64748b; font-size: 12px; }
+            .note { font-size: 13px; color: #64748b; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1 style="margin: 0; font-size: 24px;">Restablecer Contraseña</h1>
+            </div>
+            <div class="content">
+              <p>Hola <strong>${data.nombre}</strong>,</p>
+              <p>Has solicitado restablecer la contraseña de tu cuenta en MindAudit® Spain. Pulsa el siguiente botón para continuar con el proceso:</p>
+              
+              <div class="button-container">
+                <a href="${data.resetLink}" class="button">Restablecer mi contraseña</a>
+              </div>
+
+              <p>O copia y pega el siguiente enlace en tu navegador:</p>
+              <p style="word-break: break-all; font-size: 12px; color: #64748b;">${data.resetLink}</p>
+              
+              <div class="note">
+                <p>Este enlace expirará en 1 hora. Si no has solicitado este cambio, puedes ignorar este correo de forma segura.</p>
+              </div>
+
+              <div class="footer">
+                <p>© 2026 MindAudit® Spain. Todos los derechos reservados.</p>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    return this.sendEmail({
+      to: data.email,
+      subject,
+      html
+    });
+  }
 }
