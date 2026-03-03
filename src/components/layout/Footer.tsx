@@ -115,15 +115,39 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Partnership Logos */}
+        <div className="flex flex-wrap items-center justify-center md:justify-start gap-8 mb-12 opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0 duration-500">
+          <div className="relative h-10 w-20">
+            <Image
+              src="/logo/accid-logo.jpg"
+              alt="ACCID"
+              fill
+              className="object-contain"
+            />
+          </div>
+          <div className="relative h-10 w-20">
+            <Image
+              src="/logo/catalunya-logo.png"
+              alt="Generalitat de Catalunya"
+              fill
+              className="object-contain"
+            />
+          </div>
+          <div className="relative h-10 w-20">
+            <Image
+              src="/logo/recc-logo.jpg"
+              alt="RECC"
+              fill
+              className="object-contain"
+            />
+          </div>
+        </div>
+
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-[10px] font-medium text-slate-400">
+        <div className="flex justify-center pt-8 border-t border-slate-50 ">
+          <p className="text-[10px] font-medium text-slate-400 text-center md:text-left">
             © 2024 <strong>MindAudit® Spain SLP</strong>. Todos los derechos reservados.
           </p>
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-green-500"></div>
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Sistemas Operativos</span>
-          </div>
         </div>
       </div>
     </footer>
