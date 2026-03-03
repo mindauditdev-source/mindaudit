@@ -9,18 +9,22 @@ export function ServicesSection() {
   const serviceCategories = [
     {
       title: "Auditoría de Cuentas",
+      subtitle: "",
       items: auditServices.filter(s => s.category === 'financial')
     },
     {
       title: "Informes Sectoriales",
+      subtitle: "",
       items: auditServices.filter(s => s.category === 'special')
     },
     {
-      title: "Informes Especiales",
+      title: "Informes de cumplimiento de la Legalidad y cumplimiento operativo",
+      subtitle: "Servicio de colaboración en actuaciones de auditoría de cuentas de entidades sujetas al RD 424/2017",
       items: auditServices.filter(s => s.category === 'grants')
     },
     {
       title: "Otros",
+      subtitle: "",
       items: auditServices.filter(s => s.category === 'other')
     }
   ];

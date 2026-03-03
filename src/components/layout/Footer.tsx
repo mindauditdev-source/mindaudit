@@ -110,6 +110,7 @@ export function Footer() {
                 businessunitId="699f36b07ac84e3c59224579"
                 token="a595f18e-ed5c-4857-b080-4c661aeeec77"
                 height="52px"
+                locale="en-US"
               />
             </div>
           </div>

@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 import { 
   ShieldCheck, 
   Users, 
@@ -13,9 +12,7 @@ import {
   Zap,
   Mail,
   Phone,
-  Calendar,
-  Target,
-  TrendingUp
+  Calendar
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -24,37 +21,6 @@ import { CalendlyWidget } from '@/components/shared/CalendlyWidget';
 
 export function PartnersContent() {
   const [calendlyModalOpen, setCalendlyModalOpen] = useState(false);
-
-  const stats = [
-    {
-      label: "Incremento Eficiencia",
-      value: "40%",
-      description: "Reducción de tiempos en procesos de auditoría mediante nuestra plataforma digital",
-      icon: <Zap className="h-6 w-6" />,
-      color: "bg-blue-600"
-    },
-    {
-      label: "Costes Estructurales",
-      value: "0€",
-      description: "Sin necesidad de inversión inicial ni costes fijos de mantenimiento normativo",
-      icon: <FileCheck className="h-6 w-6" />,
-      color: "bg-emerald-500"
-    },
-    {
-      label: "Alcance Sectorial",
-      value: "+10",
-      description: "Nuevas áreas de especialización disponibles para vuestros clientes de forma inmediata",
-      icon: <Target className="h-6 w-6" />,
-      color: "bg-orange-500"
-    },
-    {
-      label: "Soporte Técnico",
-      value: "24h",
-      description: "Acceso preferente a nuestra red de expertos para resolución de consultas técnicas",
-      icon: <Users className="h-6 w-6" />,
-      color: "bg-purple-600"
-    }
-  ];
 
   return (
     <div className="flex flex-col w-full bg-white">
@@ -232,66 +198,25 @@ Sin papeles. Ágil y en tiempo real
         </div>
       </section>
 
-      {/* 4. Infografía (Antes Testimonios) */}
-      <section className="py-24 bg-slate-50/50 overflow-hidden">
+      {/* 4. Reseñas (Antes Infografía) */}
+      <section className="py-24 bg-slate-50/50">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">MindAudit® en <span className="text-[#0f4c81]">Datos</span></h2>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">Lo que dicen de <span className="text-[#0f4c81]">MindAudit®</span></h2>
             <p className="text-lg text-slate-600">
-              Transformando el modelo de colaboración profesional mediante tecnología y especialización.
+              Nuestra reputación construida sobre el rigor y la confianza de nuestros partners.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card className="border-none shadow-xl bg-white rounded-3xl overflow-hidden group hover:-translate-y-2 transition-transform duration-500">
-                  <div className={`h-2 w-full ${stat.color}`} />
-                  <CardContent className="p-8">
-                    <div className={`h-12 w-12 rounded-2xl ${stat.color} bg-opacity-10 flex items-center justify-center text-slate-900 mb-6`}>
-                      {stat.icon}
-                    </div>
-                    <div className="flex items-baseline gap-2 mb-2">
-                      <span className="text-4xl font-black text-slate-900 tracking-tight">{stat.value}</span>
-                      <TrendingUp className="h-5 w-5 text-emerald-500" />
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-4">{stat.label}</h3>
-                    <p className="text-slate-500 text-sm leading-relaxed">
-                      {stat.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="mt-16 bg-[#0f4c81] rounded-[2.5rem] p-8 md:p-12 text-white relative overflow-hidden">
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="max-w-xl">
-                <h3 className="text-2xl md:text-3xl font-bold mb-4">Impacto Real en vuestro Despacho</h3>
-                <p className="text-blue-100 text-lg">
-                  Nuestra tecnología no solo digitaliza el proceso, sino que libera tiempo de vuestro equipo para tareas de mayor valor añadido.
-                </p>
-              </div>
-              <div className="flex gap-8 items-center bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/20">
-                <div className="text-center">
-                  <p className="text-3xl font-black text-white">100%</p>
-                  <p className="text-blue-100 text-xs font-bold uppercase tracking-widest mt-1">Garantía</p>
-                </div>
-                <div className="h-12 w-px bg-white/20" />
-                <div className="text-center">
-                  <p className="text-3xl font-black text-white">+500</p>
-                  <p className="text-blue-100 text-xs font-bold uppercase tracking-widest mt-1">Auditados</p>
-                </div>
-              </div>
+          <div className="max-w-5xl mx-auto relative rounded-[2.5rem] overflow-hidden shadow-2xl bg-white p-4 md:p-8">
+            <div className="relative aspect-video w-full">
+              <Image
+                src="/Reseñas MindAudit Editada.png"
+                alt="Reseñas MindAudit"
+                fill
+                className="object-cover"
+              />
             </div>
-            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
           </div>
         </div>
       </section>
