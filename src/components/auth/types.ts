@@ -15,7 +15,6 @@ export interface RegisterFormData {
   ciudad: string;
   codigoPostal: string;
   telefono: string;
-  web: string;
   // Paso 2 (Empresa fields)
   employees: string;
   revenue: string;

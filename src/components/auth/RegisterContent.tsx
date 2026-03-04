@@ -35,7 +35,6 @@ export function RegisterContent() {
     ciudad: "",
     codigoPostal: "",
     telefono: "",
-    web: "",
     // Step 2 (Empresa)
     employees: "",
     revenue: "",
@@ -84,9 +83,6 @@ export function RegisterContent() {
       case "codigoPostal":
          // Allows 4 or 5 digits
         if (!/^\d{4,5}$/.test(value)) error = "Debe tener 4 o 5 dígitos";
-        break;
-      case "web":
-        if (value && !/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(value)) error = "URL inválida";
         break;
       case "employees":
         if (formData.role === 'EMPRESA' && (!value || parseInt(value) <= 0)) error = "Número de empleados inválido";
@@ -153,7 +149,6 @@ export function RegisterContent() {
         address: formData.direccion,
         city: formData.ciudad,
         postalCode: formData.codigoPostal,
-        website: formData.web,
         acceptTerms: formData.terms
       };
 
@@ -203,7 +198,6 @@ export function RegisterContent() {
               if (fieldName === 'address') mappedName = 'direccion';
               if (fieldName === 'city') mappedName = 'ciudad';
               if (fieldName === 'postalCode') mappedName = 'codigoPostal';
-              if (fieldName === 'website') mappedName = 'web';
               if (fieldName === 'postal_code') mappedName = 'codigoPostal';
               
               newErrors[mappedName] = err.message;
@@ -211,7 +205,7 @@ export function RegisterContent() {
 
               // Determine step for auto-navigation
               const step1Fields = ['nombreCompleto', 'email', 'password', 'confirmPassword', 'empresa', 'cif', 'terms'];
-              const step2Fields = ['telefono', 'direccion', 'ciudad', 'codigoPostal', 'web'];
+              const step2Fields = ['telefono', 'direccion', 'ciudad', 'codigoPostal'];
 
               if (step1Fields.includes(mappedName)) {
                  if (firstErrorStep === null || firstErrorStep > 1) firstErrorStep = 1;
@@ -253,7 +247,7 @@ export function RegisterContent() {
             setTouched(prev => ({ ...prev, [mappedName!]: true }));
 
             const step1Fields = ["nombreCompleto", "email", "password", "confirmPassword", "empresa", "cif", "terms"];
-            const step2Fields = ["telefono", "direccion", "ciudad", "codigoPostal", "web"];
+            const step2Fields = ["telefono", "direccion", "ciudad", "codigoPostal"];
 
             if (step1Fields.includes(mappedName)) targetStep = 1;
             else if (step2Fields.includes(mappedName)) targetStep = 2;

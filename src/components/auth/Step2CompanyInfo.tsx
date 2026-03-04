@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { MapPin, Phone, Globe, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
+import { MapPin, Phone, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormInput } from "@/components/ui/form-input";
@@ -18,7 +18,7 @@ interface Step2Props {
 }
 
 export function Step2CompanyInfo({ formData, touched, errors, onChange, onNext, onBack, isSubmitting = false }: Step2Props) {
-  const isStepValid = !errors.direccion && !errors.ciudad && !errors.codigoPostal && !errors.telefono && !errors.web && 
+  const isStepValid = !errors.direccion && !errors.ciudad && !errors.codigoPostal && !errors.telefono && 
                       formData.direccion && formData.ciudad && formData.codigoPostal && formData.telefono;
 
   return (
@@ -80,18 +80,6 @@ export function Step2CompanyInfo({ formData, touched, errors, onChange, onNext, 
               onChange={onChange}
               touched={touched.telefono}
               error={errors.telefono}
-              disabled={isSubmitting}
-            />
-
-            <FormInput
-              label="Web Corporativa"
-              name="web"
-              placeholder="www.empresa.es"
-              icon={Globe}
-              value={formData.web}
-              onChange={onChange}
-              touched={touched.web}
-              error={errors.web}
               disabled={isSubmitting}
             />
           </div>

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { getFiscalYears } from '@/lib/utils';
 
 export default function PresupuestoContent() {
   const [formData, setFormData] = useState({
@@ -280,9 +281,9 @@ export default function PresupuestoContent() {
                             className="w-full px-5 py-4 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-medium appearance-none cursor-pointer"
                           >
                               <option value="">Seleccione ejercicio...</option>
-                              <option value="2025">2025</option>
-                              <option value="2024">2024</option>
-                              <option value="2023">2023</option>
+                              {getFiscalYears().map((year) => (
+                                <option key={year} value={year}>{year}</option>
+                              ))}
                               <option value="Más de un ejercicio">Más de un ejercicio</option>
                           </select>
                           <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />

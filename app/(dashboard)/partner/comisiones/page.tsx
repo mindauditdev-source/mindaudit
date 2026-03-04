@@ -44,7 +44,7 @@ export default function PartnerCommissionsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Mis Comisiones</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Mis Ingresos</h1>
         <p className="text-slate-500 mt-1">
           Seguimiento de tus ingresos por empresas referidas.
         </p>
@@ -142,9 +142,9 @@ export default function PartnerCommissionsPage() {
               <div className="rounded-full bg-slate-100 p-3 mb-4">
                 <ReceiptEuro className="h-6 w-6 text-slate-400" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900">No hay comisiones registradas</h3>
+              <h3 className="text-lg font-semibold text-slate-900">No hay ingresos registrados</h3>
               <p className="text-slate-500 max-w-sm mt-1 mb-6">
-                Las comisiones se generan automáticamente cuando tus clientes aprueban una auditoría.
+                Los ingresos se generan automáticamente cuando tus clientes aprueban una auditoría.
               </p>
             </div>
           ) : (
@@ -163,7 +163,7 @@ export default function PartnerCommissionsPage() {
                   {filteredComisiones.map((comision) => (
                     <tr key={comision.id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="px-4 py-3 font-medium text-slate-900">
-                         Comisión Auditoría
+                         Ingreso por Auditoría
                          <span className="block text-xs text-slate-500 font-normal">
                             {comision.auditoria.tipoServicio.replace(/_/g, " ")}
                          </span>

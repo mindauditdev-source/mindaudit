@@ -67,11 +67,6 @@ export const registerColaboradorSchema = z.object({
     .regex(/^\d{4,5}$/, 'El código postal debe tener 4 o 5 dígitos')
     .optional()
     .or(z.literal('')),
-  website: z
-    .string()
-    .url('URL inválida')
-    .optional()
-    .or(z.literal('')),
   
   // Términos
   acceptTerms: z
@@ -129,11 +124,6 @@ export const registerEmpresaSchema = z.object({
   postalCode: z
     .string()
     .regex(/^\d{4,5}$/, 'El código postal debe tener 4 o 5 dígitos')
-    .optional()
-    .or(z.literal('')),
-  website: z
-    .string()
-    .url('URL inválida')
     .optional()
     .or(z.literal('')),
   
@@ -196,11 +186,6 @@ export const createEmpresaSchema = z.object({
     .regex(/^\d{4,5}$/, 'El código postal debe tener 4 o 5 dígitos')
     .optional()
     .or(z.literal('')),
-  website: z
-    .string()
-    .url('URL inválida')
-    .optional()
-    .or(z.literal('')),
   employees: z
     .number()
     .int('Debe ser un número entero')
@@ -211,6 +196,8 @@ export const createEmpresaSchema = z.object({
     .positive('Debe ser mayor a 0')
     .optional(),
   fiscalYear: z.string().optional(),
+  serviceType: z.string().optional(),
+  serviceDescription: z.string().optional(),
   notes: z.string().optional(),
 })
 

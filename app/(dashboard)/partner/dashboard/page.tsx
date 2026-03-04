@@ -78,7 +78,7 @@ export default function PartnerDashboardPage() {
           <Link href="/partner/clientes/nuevo">
             <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
               <Building2 className="mr-2 h-4 w-4" />
-              Registrar Empresa
+              Registrar Encargo
             </Button>
           </Link>
         </div>
@@ -265,8 +265,8 @@ export default function PartnerDashboardPage() {
                     <Building2 className="h-4 w-4" />
                   </div>
                   <div className="text-left">
-                    <p className="font-semibold text-slate-900">Registrar Nuevo Cliente</p>
-                    <p className="text-xs text-slate-500">Dar de alta una nueva empresa</p>
+                    <p className="font-semibold text-slate-900">Registrar Nuevo Encargo</p>
+                    <p className="text-xs text-slate-500">Dar de alta un nuevo encargo</p>
                   </div>
                 </Button>
               </Link>

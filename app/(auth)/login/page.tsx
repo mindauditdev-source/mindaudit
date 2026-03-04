@@ -104,7 +104,7 @@ function LoginForm() {
               </div>
             </div>
             <p className="text-slate-500 font-medium text-lg pt-2 leading-none">
-              Acceso al Portal de Socios
+              Acceso al Portal de Partners
             </p>
           </div>
 

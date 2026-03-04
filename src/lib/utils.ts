@@ -23,3 +23,8 @@ export function formatBytes(bytes: number, decimals = 2) {
 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
+
+export function getFiscalYears(count = 3): string[] {
+  const currentYear = new Date().getFullYear();
+  return Array.from({ length: count }, (_, i) => (currentYear - i).toString());
+}

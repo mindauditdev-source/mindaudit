@@ -88,7 +88,7 @@ export default function PartnerPresupuestosPage() {
           Mis <span className="text-blue-600">Presupuestos</span>
         </h1>
         <p className="text-slate-500 font-medium pb-2 border-b border-slate-100">
-          Presupuestos asignados y comisiones
+          Presupuestos asignados e ingresos
         </p>
       </div>
 
@@ -108,7 +108,7 @@ export default function PartnerPresupuestosPage() {
 
         <Card className="border-none shadow-sm rounded-[24px] bg-linear-to-br from-green-50 to-emerald-50">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Comisiones Pagadas</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-600">Ingresos Pagados</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
@@ -120,7 +120,7 @@ export default function PartnerPresupuestosPage() {
 
         <Card className="border-none shadow-sm rounded-[24px] bg-linear-to-br from-amber-50 to-yellow-50">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Comisiones Pendientes</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-600">Ingresos Pendientes</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
@@ -167,7 +167,7 @@ export default function PartnerPresupuestosPage() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500 mb-1">Tu Comisión ({presupuesto.comisionRate || 10}%)</p>
+                    <p className="text-xs text-slate-500 mb-1">Tu Ingreso ({presupuesto.comisionRate || 10}%)</p>
                     <p className="text-lg font-bold text-green-600">
                       {presupuesto.comisionAmount ? `${presupuesto.comisionAmount.toFixed(2)} €` : "0.00 €"}
                     </p>
@@ -193,7 +193,7 @@ export default function PartnerPresupuestosPage() {
                 {presupuesto.status === "PAGADO" && (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                     <p className="text-sm text-green-700 font-semibold">
-                      ✓ Comisión pagada: {presupuesto.comisionAmount?.toFixed(2)} €
+                      ✓ Ingreso pagado: {presupuesto.comisionAmount?.toFixed(2)} €
                     </p>
                   </div>
                 )}
@@ -201,7 +201,7 @@ export default function PartnerPresupuestosPage() {
                 {presupuesto.status === "A_PAGAR" && (
                   <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
                     <p className="text-sm text-amber-700 font-semibold">
-                      ⏳ Comisión pendiente de pago: {presupuesto.comisionAmount?.toFixed(2)} €
+                      ⏳ Ingreso pendiente de pago: {presupuesto.comisionAmount?.toFixed(2)} €
                     </p>
                   </div>
                 )}

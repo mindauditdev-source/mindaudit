@@ -75,7 +75,6 @@ export async function registerColaborador(
             city: input.city,
             province: input.province,
             postalCode: input.postalCode,
-            website: input.website,
             status: ColaboradorStatus.PENDING_APPROVAL,
             commissionRate: 0, // El admin lo configurará después
           },
@@ -174,7 +173,6 @@ export async function registerEmpresa(
             city: input.city,
             province: input.province,
             postalCode: input.postalCode,
-            website: input.website,
             employees: input.employees,
             revenue: input.revenue,
             fiscalYear: input.fiscalYear,

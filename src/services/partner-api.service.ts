@@ -40,6 +40,8 @@ export interface PartnerCompany {
   cif: string;
   status: EmpresaStatus;
   revenue?: number;
+  serviceType?: string;
+  serviceDescription?: string;
   stats: {
     totalAuditorias: number;
     totalDocumentos: number;
@@ -128,6 +130,8 @@ export class PartnerApiService {
     revenue?: number;
     fiscalYear?: string;
     employees?: number;
+    serviceType?: string;
+    serviceDescription?: string;
   }): Promise<PartnerCompany> {
     const response = await this.fetch("/empresas", {
       method: "POST",

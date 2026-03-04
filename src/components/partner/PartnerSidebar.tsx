@@ -25,7 +25,7 @@ const sidebarItems = [
     icon: LayoutDashboard,
   },
   {
-    title: "Mis Empresas",
+    title: "Mis Encargos",
     href: "/partner/clientes",
     icon: Building2,
   },
@@ -45,7 +45,7 @@ const sidebarItems = [
     icon: ReceiptEuro, // Need to import this
   },
   {
-    title: "Mis Comisiones",
+    title: "Mis Ingresos",
     href: "/partner/comisiones",
     icon: FileText,
   },

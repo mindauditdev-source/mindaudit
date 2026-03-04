@@ -199,9 +199,13 @@ export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChang
               </div>
               <h3 className="text-xl font-bold text-slate-900">¡Solicitud recibida!</h3>
               <p className="text-slate-600 max-w-xs mx-auto">
-                Te hemos enviado el contrato de colaboración a **{profile.user.email}**. 
-                Por favor, rírmalo digitalmente en nuestra plataforma para activar tus beneficios.
+                Te hemos enviado el contrato de colaboración a <strong>{profile.user.email}</strong>.
+                Por favor, fírmalo digitalmente en nuestra plataforma para activar tus beneficios.
               </p>
+              <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5 text-sm text-amber-700 max-w-xs mx-auto">
+                <span className="text-base">📩</span>
+                <span>Si no lo ves en bandeja de entrada, revisa tu <strong>carpeta de Spam</strong>.</span>
+              </div>
               <Button 
                 onClick={() => {
                   setIsOpen(false);

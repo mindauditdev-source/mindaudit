@@ -19,9 +19,10 @@ export function RegisterSidebar() {
                 <Shield className="h-6 w-6" />
               </div>
               <div className="space-y-1">
-                <h4 className="text-[15px] font-extrabold text-slate-900">Máxima Seguridad</h4>
+                <h4 className="text-[15px] font-extrabold text-slate-900">Máxima Profesionalidad</h4>
                 <p className="text-xs text-slate-500 font-medium leading-relaxed">
-                  Protección de datos bajo estándares ISO y cumplimiento normativo estricto.
+                  Cumplimiento normativo con Rigor y transparencia. Profesionales altamente cualificados a disposición
+de vuestra firma
                 </p>
               </div>
             </div>
@@ -33,7 +34,7 @@ export function RegisterSidebar() {
               <div className="space-y-1">
                 <h4 className="text-[15px] font-extrabold text-slate-900">Red de Expertos</h4>
                 <p className="text-xs text-slate-500 font-medium leading-relaxed">
-                  Conéctese con una comunidad exclusiva de auditores certificados en España.
+                  Conéctese con una comunidad exclusiva de auditores ROAC en España
                 </p>
               </div>
             </div>

@@ -8,9 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building2, CreditCard, Mail, Trash2, Loader2, AlertTriangle } from "lucide-react";
+import { Building2, CreditCard, Mail, Trash2, Loader2, AlertTriangle, FileCheck2, Handshake, TrendingUp, ShieldCheck, Percent, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { signOut } from "next-auth/react";
+import { PartnerContractModal } from "@/components/partner/PartnerContractModal";
+import { PartnerApiService } from "@/services/partner-api.service";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +29,8 @@ export default function PartnerProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSendingContact, setIsSendingContact] = useState(false);
+  const [contractSignedAt, setContractSignedAt] = useState<string | null>(null);
+  const [isContractModalOpen, setIsContractModalOpen] = useState(false);
   
   const [fiscalData, setFiscalData] = useState({
     companyName: "",
@@ -54,7 +58,6 @@ export default function PartnerProfilePage() {
       const response = await fetch("/api/partner/profile");
       if (response.ok) {
         const data = await response.json();
-        // Replace nulls with empty strings to keep inputs controlled
         const sanitizedData = Object.keys(data).reduce((acc: Record<string, string>, key) => {
           acc[key] = data[key] || "";
           return acc;
@@ -71,6 +74,11 @@ export default function PartnerProfilePage() {
         };
         setFiscalData(sanitizedData);
       }
+      // Fetch contract status
+      try {
+        const partnerProfile = await PartnerApiService.getProfile();
+        setContractSignedAt(partnerProfile.contractSignedAt);
+      } catch { /* ignore */ }
     } catch (error) {
       console.error("Failed to fetch profile data:", error);
       toast.error("Error al cargar los datos del perfil");
@@ -188,7 +196,7 @@ Email: ${user?.email}
       </div>
 
       <Tabs defaultValue="datos" className="block w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:w-[600px] mb-8 bg-slate-100/50 p-1">
+        <TabsList className="grid w-full grid-cols-5 lg:w-[750px] mb-8 bg-slate-100/50 p-1">
           <TabsTrigger value="datos" className="flex items-center gap-2 data-[state=active]:shadow-sm">
             <Building2 className="w-4 h-4" />
             <span className="hidden sm:inline">Datos Fiscales</span>
@@ -201,10 +209,15 @@ Email: ${user?.email}
             <Mail className="w-4 h-4" />
             <span className="hidden sm:inline">Contacto</span>
           </TabsTrigger>
+          <TabsTrigger value="contrato" className="flex items-center gap-2 data-[state=active]:shadow-sm">
+            <FileCheck2 className="w-4 h-4" />
+            <span className="hidden sm:inline">Contrato</span>
+          </TabsTrigger>
           <TabsTrigger value="cuenta" className="flex items-center gap-2 data-[state=active]:shadow-sm text-red-600 data-[state=active]:text-red-700">
             <AlertTriangle className="w-4 h-4" />
             <span className="hidden sm:inline">Gestión Cuenta</span>
           </TabsTrigger>
+          
         </TabsList>
 
         <TabsContent value="datos" className="space-y-4">
@@ -309,8 +322,8 @@ Email: ${user?.email}
         <TabsContent value="bancarios" className="space-y-4">
           <Card className="border-slate-200/60 shadow-sm">
             <CardHeader className="bg-slate-50/50 border-b border-slate-100">
-              <CardTitle className="text-lg text-slate-800">Datos Bancarios para Comisiones</CardTitle>
-              <CardDescription>Introduce el IBAN donde deseas recibir el pago de tus comisiones.</CardDescription>
+              <CardTitle className="text-lg text-slate-800">Datos Bancarios para Ingresos</CardTitle>
+              <CardDescription>Introduce el IBAN donde deseas recibir el pago de tus ingresos.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
               <div className="space-y-4 max-w-xl">
@@ -411,7 +424,7 @@ Email: ${user?.email}
                     <DialogHeader>
                       <DialogTitle>¿Estás completamente seguro?</DialogTitle>
                       <DialogDescription>
-                        Esta acción marcará tu cuenta como inactiva. Dejarás de tener acceso a tus presupuestos, empresas y estado de comisiones. Si tienes comisiones pendientes, por favor, contáctanos antes de realizar esta acción.
+                        Esta acción marcará tu cuenta como inactiva. Dejarás de tener acceso a tus presupuestos, empresas y estado de ingresos. Si tienes ingresos pendientes, por favor, contáctanos antes de realizar esta acción.
                       </DialogDescription>
                     </DialogHeader>
                     <DialogFooter className="mt-4">
@@ -428,6 +441,102 @@ Email: ${user?.email}
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="contrato" className="space-y-4">
+          <PartnerContractModal
+            externalOpen={isContractModalOpen}
+            onOpenChange={setIsContractModalOpen}
+            onStatusChange={async () => {
+              const p = await PartnerApiService.getProfile();
+              setContractSignedAt(p.contractSignedAt);
+            }}
+          />
+
+          {contractSignedAt ? (
+            <Card className="border-green-200 shadow-sm">
+              <CardHeader className="bg-green-50/50 border-b border-green-100">
+                <CardTitle className="text-lg text-green-800 flex items-center gap-2">
+                  <FileCheck2 className="h-5 w-5" />
+                  Contrato de Colaboración Firmado
+                </CardTitle>
+                <CardDescription>Tu acuerdo de colaboración con MindAudit está activo.</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4 p-4 bg-green-50 border border-green-200 rounded-lg max-w-md">
+                  <div className="bg-green-100 p-3 rounded-full shrink-0">
+                    <FileCheck2 className="h-6 w-6 text-green-700" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-green-900">Firmado el</p>
+                    <p className="text-green-700 text-sm">
+                      {new Date(contractSignedAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-500 mt-4">
+                  Para cualquier consulta relacionada con el contrato, contáctanos desde la pestaña de Contacto.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-[#0a3a6b] p-8 text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 -ml-10 -mb-10 w-40 h-40 bg-blue-400/20 rounded-full blur-2xl" />
+                <div className="relative z-10 flex items-center gap-4">
+                  <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                    <Handshake className="h-8 w-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">Plan de Partners Oficial</h3>
+                    <p className="text-blue-100 text-sm">Aún no has firmado tu acuerdo de colaboración</p>
+                  </div>
+                </div>
+              </div>
+              <CardContent className="p-8 space-y-6">
+                <p className="text-slate-600">
+                  Firma el acuerdo de colaboración con MindAudit® para desbloquear todos los beneficios del programa Partner:
+                </p>
+                <div className="grid gap-4">
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
+                    <div className="mt-1 bg-green-100 p-1.5 rounded-full">
+                      <TrendingUp className="h-4 w-4 text-green-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900 text-sm">Programa de incentivos económicos</h4>
+                      <p className="text-xs text-slate-500">Recibe bonificaciones por el uso de los servicios integrales de auditoría</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
+                    <div className="mt-1 bg-blue-100 p-1.5 rounded-full">
+                      <ShieldCheck className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900 text-sm">Respaldo Técnico Profesional</h4>
+                      <p className="text-xs text-slate-500">Acuerdo formal de colaboración que garantiza tus derechos como partner.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
+                    <div className="mt-1 bg-purple-100 p-1.5 rounded-full">
+                      <Percent className="h-4 w-4 text-purple-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900 text-sm">Tarifas Preferenciales</h4>
+                      <p className="text-xs text-slate-500">Acceso a condiciones especiales para tus clientes referidos.</p>
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => setIsContractModalOpen(true)}
+                  className="w-full bg-[#0a3a6b] hover:bg-[#082e56] h-12 text-base shadow-lg"
+                >
+                  ¡Quiero firmar el contrato!
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
       </Tabs>

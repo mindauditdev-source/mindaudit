@@ -147,7 +147,7 @@ function PaquetesHorasContent() {
           Iguala de Consultas
         </h1>
         <p className="text-gray-600">
-          Suscríbete a un plan de consultas para recibir asesoría experta
+          Suscríbete a nuestros planes de consultas para recibir asesoramiento experto
         </p>
       </div>
 
@@ -208,11 +208,19 @@ function PaquetesHorasContent() {
       {/* Paquetes */}
       <div className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">
-          Paquetes Disponibles
+          Igualas Disponibles
         </h2>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {paquetes.map((paquete) => {
+          {(() => {
+            // Always place the "destacado" (most popular) package in the middle slot
+            const centered: Paquete[] = [];
+            const others: Paquete[] = [];
+            paquetes.forEach(p => (p.destacado ? centered : others).push(p));
+            const ordered = [...others];
+            ordered.splice(1, 0, ...centered); // insert destacado at index 1
+            return ordered;
+          })().map((paquete) => {
             const precioBase = Number(paquete.precio);
             const descuentoAplicado = paquete.descuento
               ? (precioBase * paquete.descuento) / 100
@@ -261,23 +269,23 @@ function PaquetesHorasContent() {
                       <div className="space-y-2">
                         <div className="flex items-center justify-center gap-2">
                           <span className="text-sm text-gray-400 line-through">
-                            €{precioBase.toFixed(2)}
+                            {precioBase.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
                           </span>
                           <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-none shadow-none">
                             -{paquete.descuento}%
                           </Badge>
                         </div>
                         <p className="text-4xl font-extrabold text-green-600">
-                          €{precioFinal.toFixed(2)}
+                          {precioFinal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
                         </p>
                       </div>
                     ) : (
                       <p className="text-4xl font-extrabold text-gray-900">
-                        €{precioBase.toFixed(2)}
+                        {precioBase.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
                       </p>
                     )}
                     <p className="text-xs text-gray-500 mt-2 font-medium bg-gray-50 py-1 px-2 rounded-full inline-block">
-                      €{(precioFinal / paquete.horas).toFixed(2)} / hora
+                      {(precioFinal / paquete.horas).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} € / hora
                     </p>
                   </div>
                 </div>
@@ -356,7 +364,7 @@ function PaquetesHorasContent() {
                         {compra.horas} horas
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        €{Number(compra.precio).toFixed(2)}
+                        €{Number(compra.precio).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {compra.status === "COMPLETADO" ? (

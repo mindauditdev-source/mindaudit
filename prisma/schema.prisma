@@ -86,10 +86,12 @@ model Empresa {
   province      String?
   postalCode    String?
   website       String?
-  employees     Int?
-  revenue       Decimal?             @db.Decimal(15, 2)
-  fiscalYear    String?
-  status        EmpresaStatus        @default(PROSPECT)
+  employees          Int?
+  revenue            Decimal?             @db.Decimal(15, 2)
+  fiscalYear         String?
+  serviceType        String?
+  serviceDescription String?
+  status             EmpresaStatus        @default(PROSPECT)
   notes         String?
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt

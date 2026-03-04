@@ -65,7 +65,7 @@ export default function PartnerCompaniesPage() {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Mis Empresas</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Mis Encargos</h1>
           <p className="text-slate-500 mt-1">
             Gestiona tus clientes y sus expedientes.
           </p>
@@ -74,7 +74,7 @@ export default function PartnerCompaniesPage() {
           className="bg-[#0a3a6b] hover:bg-[#082e56] shadow-md"
           disabled={isCheckingProfile}
           onClick={() => {
-            console.log("[DEBUG] Registrar Empresa click - Profile:", profile);
+            console.log("[DEBUG] Registrar Encargo click - Profile:", profile);
             if (!profile) {
               console.log("[DEBUG] Profile missing, navigating to create page forced");
               router.push("/partner/clientes/nuevo");
@@ -91,7 +91,7 @@ export default function PartnerCompaniesPage() {
           }}
         >
           {isCheckingProfile ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
-          Registrar Empresa
+          Registrar Encargo
         </Button>
       </div>
 
@@ -154,7 +154,7 @@ export default function PartnerCompaniesPage() {
                 }}
               >
                 {isCheckingProfile && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Registrar Empresa
+                Registrar Encargo
               </Button>
             </div>
           ) : (
@@ -223,7 +223,7 @@ function StatusBadge({ status }: { status: string }) {
   const labels: Record<string, string> = {
     ACTIVE: "Activa",
     INACTIVE: "Inactiva",
-    PROSPECT: "Prospecto",
+    PROSPECT: "Pendiente",
     IN_AUDIT: "En Auditoría",
     AUDITED: "Auditada",
   };

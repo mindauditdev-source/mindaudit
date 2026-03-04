@@ -14,6 +14,7 @@ import { PartnerApiService } from "@/services/partner-api.service";
 import { ArrowLeft, Loader2, Building2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PartnerContractModal } from "@/components/partner/PartnerContractModal";
+import { getFiscalYears } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +34,8 @@ const createClientSchema = z.object({
   revenue: z.coerce.number().optional(),
   fiscalYear: z.string().optional(),
   employees: z.coerce.number().optional(),
+  serviceType: z.string().optional(),
+  serviceDescription: z.string().optional(),
 });
 
 type CreateClientFormValues = z.infer<typeof createClientSchema>;
@@ -58,6 +61,8 @@ export default function CreateClientPage() {
       contactName: "",
       contactEmail: "",
       contactPhone: "",
+      serviceType: "",
+      serviceDescription: "",
     },
   });
 
@@ -130,7 +135,7 @@ export default function CreateClientPage() {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Registrar Nuevo Cliente</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Registrar Nuevo Encargo</h1>
           <p className="text-slate-500 text-sm">
             Da de alta una nueva empresa para gestionar sus expedientes.
           </p>
@@ -237,9 +242,9 @@ export default function CreateClientPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="2025">2025</SelectItem>
-                          <SelectItem value="2024">2024</SelectItem>
-                          <SelectItem value="2023">2023</SelectItem>
+                          {getFiscalYears().map((year) => (
+                            <SelectItem key={year} value={year}>{year}</SelectItem>
+                          ))}
                           <SelectItem value="Más de un ejercicio">Más de un ejercicio</SelectItem>
                         </SelectContent>
                       </Select>
@@ -275,6 +280,56 @@ export default function CreateClientPage() {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="serviceType"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>Tipo de Servicio a realizar</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccione tipo de servicio" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent position="popper" className="max-h-60 overflow-y-auto">
+                          <SelectItem value="Informe de auditoría de cuentas empresa individual">Informe de auditoría de cuentas empresa individual</SelectItem>
+                          <SelectItem value="Informe de Auditoría de cuentas grupo consolidable">Informe de Auditoría de cuentas grupo consolidable</SelectItem>
+                          <SelectItem value="Informe de Auditoría de empresas del Sector Público">Informe de Auditoría de empresas del Sector Público</SelectItem>
+                          <SelectItem value="Revisión Limitada">Revisión Limitada</SelectItem>
+                          <SelectItem value="Auditoría de Procedimientos Acordados">Auditoría de Procedimientos Acordados</SelectItem>
+                          <SelectItem value="Informe Ecoembes">Informe Ecoembes</SelectItem>
+                          <SelectItem value="Informes Banco de España">Informes Banco de España</SelectItem>
+                          <SelectItem value="Informe SICBIOS">Informe SICBIOS</SelectItem>
+                          <SelectItem value="Informe CORES">Informe CORES</SelectItem>
+                          <SelectItem value="Informe de Mayorías (Ley Concursal)">Informe de Mayorías (Ley Concursal)</SelectItem>
+                          <SelectItem value="Informes especiales de aumento/reducción de Capital Social">Informes especiales de aumento/reducción de Capital Social</SelectItem>
+                          <SelectItem value="Informe de Cumplimiento de la legalidad/operativo (Sólo Emp. Sector Público)">Informe de Cumplimiento de la legalidad/operativo (Sólo Emp. Sector Público)</SelectItem>
+                          <SelectItem value="Due Diligence">Due Diligence</SelectItem>
+                          <SelectItem value="Revisión contable">Revisión contable</SelectItem>
+                          <SelectItem value="Justificación de Subvenciones">Justificación de Subvenciones</SelectItem>
+                          <SelectItem value="Otro">Otro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="serviceDescription"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>Breve Descripción del trabajo a realizar</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Describa brevemente el trabajo..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <div className="flex justify-end gap-4 pt-4 border-t border-slate-100">
@@ -284,7 +339,7 @@ export default function CreateClientPage() {
                 <Button type="submit" className="bg-[#0a3a6b] hover:bg-[#082e56]" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   <Building2 className="mr-2 h-4 w-4" />
-                  Registrar Empresa
+                  Registrar Encargo
                 </Button>
               </div>
             </form>
