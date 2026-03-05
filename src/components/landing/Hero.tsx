@@ -36,8 +36,8 @@ export function Hero() {
       </div>
 
       <div className="container relative z-10 mx-auto px-4 md:px-6 pt-20 pb-32 lg:pb-40 lg:pt-32">
-        {/* TrustBox repositioned to top right */}
-        <div className="absolute top-8 right-4 md:right-6 lg:top-12 z-20 max-w-[180px] sm:max-w-[220px]">
+        {/* TrustBox: top-right on mobile, bottom-right on desktop, adjusted for tablet wrapping */}
+        <div className="absolute top-8 right-4 sm:top-auto sm:right-6 sm:bottom-24 md:bottom-72 lg:bottom-36 z-20 max-w-[180px] sm:max-w-[220px]">
           <TrustBox 
             templateId="56278e9abfbbba0bdcd568bc"
             businessunitId="699f36b07ac84e3c59224579"

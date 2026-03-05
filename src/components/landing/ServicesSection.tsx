@@ -18,7 +18,7 @@ export function ServicesSection() {
       items: auditServices.filter(s => s.category === 'special')
     },
     {
-      title: "Informes de cumplimiento de la Legalidad y cumplimiento operativo",
+      title: "Informes Especiales de reducción de Capital Social",
       subtitle: "Servicio de colaboración en actuaciones de auditoría de cuentas de entidades sujetas al RD 424/2017",
       items: auditServices.filter(s => s.category === 'grants')
     },
@@ -38,10 +38,10 @@ export function ServicesSection() {
       >
         <div className="absolute inset-0 bg-gray-900/75" />
         <div className="container relative z-10 mx-auto px-4">
-           <div className="max-w-4xl">
-              <h1 className="text-4xl lg:text-6xl font-extrabold mb-8 leading-tight">
-                Servicios Integrales de auditoría{" "}
-                <span className="text-blue-500">Aumenta la oferta de servicios sin necesidad de ampliar plantilla y sin asumir costes innecesarios</span>
+           <div className="w-full ">
+              <h1 className="text-4xl lg:text-5xl font-extrabold mb-8 leading-tight">
+                Servicios Integrales de auditoría{" "} <br /> 
+                <span className="text-blue-500">Aumenta la oferta de Servicios sin necesidad de <br /> Ampliar  plantilla y sin asumir <br /> Costes innecesarios</span>
               </h1>
               <p className="text-xl text-slate-400 leading-relaxed max-w-2xl">
                Ofrecemos un catálogo completo que ayuda a la captación y retención de clientes para lanzar 🚀 vuestro despacho profesional hacia el nivel de excelencia

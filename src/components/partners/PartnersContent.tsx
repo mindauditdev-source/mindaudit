@@ -209,12 +209,12 @@ Sin papeles. Ágil y en tiempo real
           </div>
 
           <div className="max-w-5xl mx-auto relative rounded-[2.5rem] overflow-hidden shadow-2xl bg-white p-4 md:p-8">
-            <div className="relative aspect-video w-full">
+            <div className="relative aspect-square w-full">
               <Image
                 src="/Reseñas MindAudit Editada.png"
                 alt="Reseñas MindAudit"
                 fill
-                className="object-cover"
+                className="object-contain"
               />
             </div>
           </div>
