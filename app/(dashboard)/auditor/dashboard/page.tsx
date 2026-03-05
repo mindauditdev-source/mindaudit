@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminApiService, AdminStats } from "@/services/admin-api.service";
-import { formatCurrency, cn } from "@/lib/utils";
+import { formatCurrency, formatNumber, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 export default function AuditorDashboardPage() {
@@ -50,7 +50,7 @@ export default function AuditorDashboardPage() {
     },
     {
       title: "Solicitudes Landing",
-      value: stats?.pendingBudgets || 0,
+      value: formatNumber(stats?.pendingBudgets || 0),
       description: "Pendientes presupuestar",
       icon: MessageCircle,
       color: "text-blue-600",
@@ -60,7 +60,7 @@ export default function AuditorDashboardPage() {
     },
     {
       title: "Consultas",
-      value: stats?.totalConsultas || 0,
+      value: formatNumber(stats?.totalConsultas || 0),
       description: "Solicitudes técnicas",
       icon: Package,
       color: "text-indigo-600",
@@ -70,7 +70,7 @@ export default function AuditorDashboardPage() {
     },
     {
       title: "Colaboradores",
-      value: stats?.activeColaboradores || 0,
+      value: formatNumber(stats?.activeColaboradores || 0),
       description: "Partners activos",
       icon: Users,
       color: "text-amber-600",
@@ -130,7 +130,7 @@ export default function AuditorDashboardPage() {
                        </div>
                     </div>
                     <div className="text-right relative z-10">
-                       <span className="text-4xl font-black text-slate-900 tabular-nums">{stats?.pendingBudgets || 0}</span>
+                       <span className="text-4xl font-black text-slate-900 tabular-nums">{formatNumber(stats?.pendingBudgets || 0)}</span>
                     </div>
                  </div>
 
@@ -145,7 +145,7 @@ export default function AuditorDashboardPage() {
                        </div>
                     </div>
                     <div className="text-right">
-                       <span className="text-3xl font-black text-slate-900 tabular-nums">{stats?.acceptedBudgets || 0}</span>
+                       <span className="text-3xl font-black text-slate-900 tabular-nums">{formatNumber(stats?.acceptedBudgets || 0)}</span>
                     </div>
                  </div>
               </CardContent>

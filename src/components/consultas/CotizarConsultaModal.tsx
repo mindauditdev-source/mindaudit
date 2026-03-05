@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { formatNumber } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -178,7 +179,7 @@ export function CotizarConsultaModal({
           {horasAsignadas > 0 && (
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <p className="text-sm text-gray-600 mb-1">Horas que se asignarán:</p>
-              <p className="text-3xl font-bold text-blue-600">{horasAsignadas}</p>
+              <p className="text-3xl font-bold text-blue-600">{formatNumber(horasAsignadas)}</p>
             </div>
           )}
 

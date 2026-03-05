@@ -12,6 +12,10 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+export function formatNumber(value: number): string {
+  return new Intl.NumberFormat("es-ES").format(value);
+}
+
 export function formatBytes(bytes: number, decimals = 2) {
   if (!+bytes) return '0 Bytes'
 

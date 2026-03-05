@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Mail, Phone, Building2, Calendar, Clock } from "lucide-react";
+import { FileText, Mail, Phone, Building2, Calendar } from "lucide-react";
 import Link from "next/link";
+import { formatNumber } from "@/lib/utils";
 
 interface Presupuesto {
   id: string;
@@ -93,21 +94,21 @@ export default function PresupuestosPage() {
           onClick={() => setFilter("pending")}
           className="rounded-xl"
         >
-          Pendientes ({presupuestos.filter(p => p.status === "PENDIENTE_PRESUPUESTAR").length})
+          Pendientes ({formatNumber(presupuestos.filter(p => p.status === "PENDIENTE_PRESUPUESTAR").length)})
         </Button>
         <Button
           variant={filter === "in_progress" ? "default" : "outline"}
           onClick={() => setFilter("in_progress")}
           className="rounded-xl"
         >
-          En Curso ({presupuestos.filter(p => p.status === "EN_CURSO").length})
+          En Curso ({formatNumber(presupuestos.filter(p => p.status === "EN_CURSO").length)})
         </Button>
         <Button
           variant={filter === "all" ? "default" : "outline"}
           onClick={() => setFilter("all")}
           className="rounded-xl"
         >
-          Todos ({presupuestos.length})
+          Todos ({formatNumber(presupuestos.length)})
         </Button>
       </div>
 

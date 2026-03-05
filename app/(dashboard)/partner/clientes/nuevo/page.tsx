@@ -14,11 +14,10 @@ import { PartnerApiService } from "@/services/partner-api.service";
 import { ArrowLeft, Loader2, Building2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PartnerContractModal } from "@/components/partner/PartnerContractModal";
-import { getFiscalYears } from "@/lib/utils";
+import { getFiscalYears, formatNumber, formatCurrency } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -116,10 +115,34 @@ export default function CreateClientPage() {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>¿Confirmar registro de empresa?</DialogTitle>
-            <DialogDescription>
-              Estás a punto de dar de alta a <strong>{pendingData?.companyName}</strong> como cliente. 
-              Asegúrate de que los datos son correctos.
-            </DialogDescription>
+            <div className="text-sm text-slate-500 mt-2">
+              <div className="space-y-4">
+                <p>
+                  Estás a punto de dar de alta a <strong>{pendingData?.companyName}</strong> como cliente. 
+                  Asegúrate de que los datos son correctos.
+                </p>
+                {pendingData && (
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2 mt-4 text-xs font-medium text-slate-600">
+                    <div className="flex justify-between border-b pb-1">
+                      <span>CIF:</span>
+                      <span className="text-slate-900">{pendingData.cif}</span>
+                    </div>
+                    {pendingData.employees && (
+                      <div className="flex justify-between border-b pb-1">
+                        <span>Empleados:</span>
+                        <span className="text-slate-900">{formatNumber(pendingData.employees)}</span>
+                      </div>
+                    )}
+                    {pendingData.revenue && (
+                      <div className="flex justify-between">
+                        <span>Facturación:</span>
+                        <span className="text-slate-900">{formatCurrency(pendingData.revenue)}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="ghost" onClick={() => setIsConfirmOpen(false)}>

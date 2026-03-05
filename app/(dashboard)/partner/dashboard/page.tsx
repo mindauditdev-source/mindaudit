@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Building2, Plus, AlertCircle, ArrowRight, MessageCircle, Clock, Calendar, Euro } from "lucide-react";
 import { PartnerApiService, PartnerProfile } from "@/services/partner-api.service";
+import { formatCurrency, formatNumber } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { CalendlyWidget } from "@/components/shared/CalendlyWidget";
@@ -96,10 +97,10 @@ export default function PartnerDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
-              {companiesStats?.totalEmpresas || 0}
+              {formatNumber(companiesStats?.totalEmpresas || 0)}
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              {companiesStats?.empresasActivas || 0} activas
+              {formatNumber(companiesStats?.empresasActivas || 0)} activas
             </p>
           </CardContent>
         </Card>
@@ -114,7 +115,7 @@ export default function PartnerDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
-              {profile?.stats?.totalConsultas || 0}
+              {formatNumber(profile?.stats?.totalConsultas || 0)}
             </div>
             <p className="text-xs text-slate-500 mt-1">
               Total de consultas realizadas
@@ -132,7 +133,7 @@ export default function PartnerDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
-              {profile?.user.horasDisponibles || 0}h
+              {formatNumber(profile?.user.horasDisponibles || 0)}h
             </div>
             <p className="text-xs text-emerald-600 font-medium mt-1">
               Saldo para nuevas consultas
@@ -150,10 +151,10 @@ export default function PartnerDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
-              {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(profile?.totalCommissions || 0)}
+              {formatCurrency(profile?.totalCommissions || 0)}
             </div>
             <p className="text-xs text-purple-600 font-medium mt-1">
-              {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(profile?.pendingCommissions || 0)} pdtes. de cobro
+              {formatCurrency(profile?.pendingCommissions || 0)} pdtes. de cobro
             </p>
           </CardContent>
         </Card>
@@ -205,10 +206,10 @@ export default function PartnerDashboardPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-bold text-slate-900">
-                    {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(profile?.totalCommissions || 0)}
+                    {formatCurrency(profile?.totalCommissions || 0)}
                   </p>
                   <p className="text-xs text-purple-600 font-medium">
-                      ({new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(profile?.pendingCommissions || 0)} pdte.)
+                      ({formatCurrency(profile?.pendingCommissions || 0)} pdte.)
                   </p>
                 </div>
               </div>

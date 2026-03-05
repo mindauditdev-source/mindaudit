@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Building2, Mail, Phone, Calendar, Euro, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { formatCurrency } from "@/lib/utils";
 import { toast } from "sonner"; // Use sonner consistently if possible, or fix hook
 
 interface Presupuesto {
@@ -316,10 +317,10 @@ export default function PresupuestoDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-black text-green-600">
-                  {(parseFloat(precio) * 0.1).toFixed(2)} €
+                  {formatCurrency(parseFloat(precio) * 0.1)}
                 </p>
                 <p className="text-xs text-slate-500 mt-1">
-                  Basado en el precio de {parseFloat(precio).toFixed(2)} €
+                  Basado en el precio de {formatCurrency(parseFloat(precio))}
                 </p>
               </CardContent>
             </Card>

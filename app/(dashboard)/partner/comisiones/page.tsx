@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, ReceiptEuro, Wallet, Clock, CheckCircle2, XCircle } from "lucide-react";
 import { PartnerApiService, PartnerCommission, PartnerCommissionSummary } from "@/services/partner-api.service";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatNumber } from "@/lib/utils";
 
 
 export default function PartnerCommissionsPage() {
@@ -64,7 +64,7 @@ export default function PartnerCommissionsPage() {
               {formatCurrency(summary?.totalPendiente || 0)}
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              {summary?.comisionesPendientes || 0} facturas pendientes
+              {formatNumber(summary?.comisionesPendientes || 0)} facturas pendientes
             </p>
           </CardContent>
         </Card>
@@ -81,7 +81,7 @@ export default function PartnerCommissionsPage() {
               {formatCurrency(summary?.totalPagado || 0)}
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              {summary?.comisionesPagadas || 0} facturas pagadas
+              {formatNumber(summary?.comisionesPagadas || 0)} facturas pagadas
             </p>
           </CardContent>
         </Card>
