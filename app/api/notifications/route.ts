@@ -88,6 +88,13 @@ interface PresupuestoAdminPaid {
   razonSocial?: string | null;
 }
 
+interface ColaboradorSigned {
+  id: string;
+  companyName: string;
+  contractSignedAt: Date | null;
+  user: { name: string };
+}
+
 export async function GET(request: Request) {
   try {
     const user = await getAuthenticatedUser();
@@ -181,6 +188,16 @@ export async function GET(request: Request) {
             },
             include: { empresa: { select: { companyName: true } } },
             orderBy: { updatedAt: 'desc' },
+            take: limit,
+            skip
+          }),
+          prisma.colaborador.findMany({
+            where: {
+              contractSignedAt: { not: null },
+              createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } // Last 30 days
+            },
+            include: { user: { select: { name: true } } },
+            orderBy: { contractSignedAt: 'desc' },
             take: limit,
             skip
           })
@@ -329,13 +346,15 @@ export async function GET(request: Request) {
           requestedAudits,
           meetingAudits,
           submittedDocs,
-          paidAudits
+          paidAudits,
+          signedContracts
         ] = results as [
           ConsultaAdmin[],
           PresupuestoAdminRequested[],
           PresupuestoAdminMeeting[],
           SolicitudDocumentoAdminSubmitted[],
-          PresupuestoAdminPaid[]
+          PresupuestoAdminPaid[],
+          ColaboradorSigned[]
         ];
 
         roleSpecificConsultas.forEach((c) => {
@@ -418,6 +437,18 @@ export async function GET(request: Request) {
           });
         });
 
+        signedContracts.forEach((colab) => {
+          notifications.push({
+            id: `contract-${colab.id}`,
+            type: 'CONTRACT_SIGNED',
+            title: 'Contrato Firmado',
+            message: `${colab.companyName} (${colab.user.name}) ha firmado el contrato de colaboración.`,
+            link: `/auditor/asociados`,
+            severity: 'HIGH',
+            date: colab.contractSignedAt || new Date()
+          });
+        });
+
       } else { // COLABORADOR
         const [
           roleSpecificConsultas,
@@ -443,7 +474,7 @@ export async function GET(request: Request) {
             message: c.status === 'COTIZADA' 
               ? `Tu consulta "${c.titulo}" ya tiene presupuesto.`
               : `La consulta "${c.titulo}" ha sido marcada como completada.`,
-            link: `/colaborador/consultas/${c.id}`,
+            link: `/partner/consultas/${c.id}`,
             severity: c.status === 'COTIZADA' ? 'HIGH' : 'MEDIUM',
             date: c.status === 'COTIZADA' ? (c.respondidaAt || c.updatedAt) : c.updatedAt
           });
@@ -455,7 +486,7 @@ export async function GET(request: Request) {
             type: 'AUDIT_REQUESTED',
             title: 'Nueva Solicitud',
             message: `${audit.empresa?.companyName || audit.razonSocial || 'Cliente'} ha solicitado una auditoría.`,
-            link: `/auditor/auditorias/${audit.id}`,
+            link: `/partner/presupuestos`,
             severity: 'HIGH',
             date: audit.createdAt
           });
@@ -467,7 +498,7 @@ export async function GET(request: Request) {
             type: 'MEETING_REQUESTED',
             title: 'Reunión Solicitada',
             message: `${audit.empresa?.companyName || audit.razonSocial || 'Cliente'} quiere agendar una reunión.`,
-            link: `/auditor/auditorias/${audit.id}`,
+            link: `/partner/presupuestos`,
             severity: 'MEDIUM',
             date: audit.updatedAt
           });
@@ -479,7 +510,7 @@ export async function GET(request: Request) {
             type: 'DOC_REVIEW',
              title: 'Documento Entregado',
              message: `${doc.empresa?.companyName || 'Cliente'} ha subido "${doc.title}".`,
-             link: `/auditor/presupuestos/${doc.presupuestoId}`,
+             link: `/partner/presupuestos`,
              severity: 'MEDIUM',
             date: doc.updatedAt
           });
@@ -491,7 +522,7 @@ export async function GET(request: Request) {
             type: 'PAYMENT_CONFIRMED',
             title: 'Pago Recibido',
             message: `${audit.empresa?.companyName || audit.razonSocial || 'Cliente'} ha pagado. El expediente está en marcha.`,
-            link: `/auditor/auditorias/${audit.id}`,
+            link: `/partner/presupuestos`,
             severity: 'HIGH',
             date: audit.updatedAt
           });

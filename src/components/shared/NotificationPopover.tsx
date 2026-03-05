@@ -78,6 +78,7 @@ export function NotificationPopover() {
       case 'CONSULTA_ACEPTADA': return <CheckCircle2 className="h-5 w-5 text-emerald-500" />;
       case 'CONSULTA_RECHAZADA': return <XCircle className="h-5 w-5 text-red-500" />;
       case 'CONSULTA_COMPLETADA': return <CheckCircle2 className="h-5 w-5 text-emerald-500" />;
+      case 'CONTRACT_SIGNED': return <FileText className="h-5 w-5 text-indigo-500" />;
       default: return <Bell className="h-5 w-5 text-slate-500" />;
     }
   };
