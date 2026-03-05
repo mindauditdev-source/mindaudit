@@ -9,14 +9,13 @@ import { Button } from "@/components/ui/button";
 import { PartnerApiService, PartnerProfile } from "@/services/partner-api.service";
 import { 
   Handshake, 
-  Mail, 
   ArrowRight,
   ShieldCheck,
   TrendingUp,
   Percent
 } from "lucide-react";
 
-import { toast } from "sonner";
+
 
 interface PartnerContractModalProps {
   onStatusChange?: () => void;
@@ -34,7 +33,7 @@ export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChang
   const [internalProfile, setInternalProfile] = useState<PartnerProfile | null>(null);
   const profile = externalProfile !== undefined ? externalProfile : internalProfile;
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<"invitation" | "success">("invitation");
+
 
   useEffect(() => {
     const checkStatus = async () => {
@@ -87,22 +86,6 @@ export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChang
     }
   };
 
-  const handleAccept = async () => {
-    setLoading(true);
-    try {
-      console.log("[DEBUG] PartnerContractModal - Requesting contract...");
-      await PartnerApiService.requestContract();
-      toast.success("¡Excelente decisión! Te enviaremos el contrato a tu email.");
-      setStep("success");
-      onStatusChange?.();
-    } catch (error) {
-      console.error("Error accepting partner plan:", error);
-      toast.error("Error al procesar la solicitud");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // REMOVED: if (!profile) return null; to allow Dialog to render even while loading
 
   return (
@@ -130,14 +113,14 @@ export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChang
               <div className="h-8 w-8 border-4 border-slate-200 border-t-[#0a3a6b] rounded-full animate-spin" />
               <p className="text-slate-500 text-sm animate-pulse">Cargando perfil...</p>
             </div>
-          ) : step === "invitation" ? (
+          ) : (
             <div className="space-y-6">
               <div className="space-y-2">
                 <p className="text-slate-600">
                   <span className="font-semibold text-slate-900">Maximiza los beneficios de unirte al Plan Partner de MindAudit®</span>.
                 </p>
                 <p className="text-slate-600">
-                  Al unirte y firmar el acuerdo de colaboración, podrás acceder a beneficios exclusivos:
+                  Al unirte y firmar el acuerdo de colaboración (PDF), podrás acceder a beneficios exclusivos:
                 </p>
               </div>
 
@@ -175,12 +158,28 @@ export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChang
 
               <div className="pt-4 flex flex-col sm:flex-row gap-3">
                 <Button 
-                  onClick={handleAccept} 
-                  className="flex-1 bg-[#0a3a6b] hover:bg-[#082e56] h-12 text-base shadow-lg transition-all active:scale-95"
+                  onClick={() => {
+                    setLoading(true);
+                    onContinue?.();
+                    // Redirigir directamente a la página de firma con PDF
+                    setTimeout(() => {
+                      window.location.href = "/partner/contract/sign";
+                    }, 300);
+                  }} 
+                  className="flex-1 bg-[#0a3a6b] hover:bg-[#082e56] h-12 text-base shadow-lg transition-all active:scale-95 disabled:opacity-70"
                   disabled={loading}
                 >
-                  ¡Sí, quiero unirme!
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  {loading ? (
+                    <>
+                      Redirigiendo...
+                      <div className="ml-2 h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    </>
+                  ) : (
+                    <>
+                      ¡Sí, quiero unirme!
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
                 </Button>
                 <Button 
                   variant="ghost" 
@@ -191,30 +190,6 @@ export function PartnerContractModal({ onStatusChange, externalOpen, onOpenChang
                   Ahora no, gracias
                 </Button>
               </div>
-            </div>
-          ) : (
-            <div className="py-6 text-center space-y-4">
-              <div className="inline-flex items-center justify-center bg-green-100 p-4 rounded-full mb-2">
-                <Mail className="h-10 w-10 text-green-600" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900">¡Solicitud recibida!</h3>
-              <p className="text-slate-600 max-w-xs mx-auto">
-                Te hemos enviado el contrato de colaboración a <strong>{profile.user.email}</strong>.
-                Por favor, fírmalo digitalmente en nuestra plataforma para activar tus beneficios.
-              </p>
-              <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5 text-sm text-amber-700 max-w-xs mx-auto">
-                <span className="text-base">📩</span>
-                <span>Si no lo ves en bandeja de entrada, revisa tu <strong>carpeta de Spam</strong>.</span>
-              </div>
-              <Button 
-                onClick={() => {
-                  setIsOpen(false);
-                  onContinue?.();
-                }}
-                className="w-full bg-[#0a3a6b] mt-4"
-              >
-                Entendido
-              </Button>
             </div>
           )}
         </div>

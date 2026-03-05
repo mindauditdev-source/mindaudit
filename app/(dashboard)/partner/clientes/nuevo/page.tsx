@@ -106,7 +106,8 @@ export default function CreateClientPage() {
           if (pendingData) setIsConfirmOpen(true);
         }}
         onContinue={() => {
-          if (pendingData) setIsConfirmOpen(true);
+          // No longer opening confirm dialog here because the modal redirects to /sign
+          setIsContractOpen(false);
         }}
       />
       

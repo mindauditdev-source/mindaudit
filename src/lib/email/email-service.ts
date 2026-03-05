@@ -839,4 +839,35 @@ export class EmailService {
       html
     });
   }
+
+  /**
+   * Notifica al Admin que un Partner ha subido su contrato firmado
+   */
+  static async notifyContractSignedToAdmin(
+    partner: { name: string; email: string; companyName: string },
+    contractUrl: string,
+    fileContent: Buffer,
+    filename: string
+  ) {
+    const adminEmail = process.env.CONTACT_EMAIL_TO || 'admin@mindaudit.es';
+    
+    return this.sendEmail({
+      to: adminEmail,
+      subject: `🖋️ Contrato de Partner Firmado: ${partner.companyName}`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2 style="color: #0c3a6b;">Nuevo Contrato de Partner Recibido</h2>
+          <p>El colaborador <strong>${partner.name}</strong> (${partner.email}) de la empresa <strong>${partner.companyName}</strong> ha subido el contrato de colaboración firmado.</p>
+          <p>Se adjunta una copia de este email para su archivo. También puedes acceder al documento mediante el siguiente enlace:</p>
+          <a href="${contractUrl}" style="background: #0c3a6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Ver Contrato en Storage</a>
+        </div>
+      `,
+      attachments: [
+        {
+          filename: filename,
+          content: fileContent
+        }
+      ]
+    });
+  }
 }

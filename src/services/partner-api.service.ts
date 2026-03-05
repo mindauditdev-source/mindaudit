@@ -80,12 +80,18 @@ export interface PartnerCommission {
 
 export class PartnerApiService {
   private static async fetch(endpoint: string, options: RequestInit = {}) {
+    const headers = { ...options.headers } as Record<string, string>;
+    
+    // If Content-Type is explicitly empty, we delete it to let the browser set it (for FormData)
+    if (headers["Content-Type"] === "") {
+      delete headers["Content-Type"];
+    } else if (!headers["Content-Type"]) {
+      headers["Content-Type"] = "application/json";
+    }
+
     const res = await fetch(`/api${endpoint}`, {
       ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
+      headers,
     });
 
     if (!res.ok) {
@@ -239,10 +245,14 @@ export class PartnerApiService {
     });
   }
 
-  static async signContract(signatureData: string): Promise<void> {
+  static async signContract(data: FormData): Promise<void> {
     await this.fetch("/colaboradores/me/sign-contract", {
       method: "POST",
-      body: JSON.stringify({ signatureData }),
+      body: data, // Fetch will automatically set content-type for FormData
+      headers: {
+        // Remove content-type to let the browser set it with the boundary
+        "Content-Type": "",
+      }
     });
   }
 }

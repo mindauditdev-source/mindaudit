@@ -3,7 +3,6 @@
 import { 
   Dialog, 
   DialogContent, 
-  DialogHeader,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { AdminColaborador } from "@/services/admin-api.service";
@@ -20,10 +19,20 @@ export function ContractViewerModal({ isOpen, onOpenChange, colaborador }: Contr
   if (!colaborador) return null;
 
   const handleDownloadPDF = () => {
+    if (!colaborador) return;
+
+    // IF it's a direct PDF from the new flow, just open/download it
+    if (colaborador.contractUrl?.toLowerCase().endsWith(".pdf")) {
+      window.open(colaborador.contractUrl, "_blank");
+      return;
+    }
+
+    // LEGACY FLOW: Generate on the fly
     const doc = new jsPDF();
     const date = colaborador.contractSignedAt ? new Date(colaborador.contractSignedAt).toLocaleDateString() : new Date().toLocaleDateString();
     
     // Header
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
     doc.setTextColor(10, 58, 107); // #0a3a6b
     doc.text("CONTRATO DE COLABORACIÓN COMERCIAL", 105, 20, { align: "center" });
@@ -62,7 +71,7 @@ export function ContractViewerModal({ isOpen, onOpenChange, colaborador }: Contr
       "PRIMERA. - Naturaleza jurídica y objeto: El presente acuerdo tiene por objeto regular la colaboración comercial entre MindAudit y el Colaborador para la canalización de clientes interesados en servicios de auditoría prestados por MindAudit. La presente relación tiene carácter estrictamente mercantil y no constituye sociedad, agencia, franquicia, joint venture ni relación laboral alguna entre las partes. Cada parte mantiene plena autonomía jurídica, organizativa y funcional. MindAudit actúa como firma de auditoría independiente, siendo la única responsable de la prestación de los servicios de auditoría, de la emisión del informe y del cumplimiento de la normativa profesional aplicable. La utilización de la plataforma tecnológica de MindAudit tiene como única finalidad facilitar la gestión del flujo de información comercial y no implica integración estructural ni constituye red en el sentido previsto en la Ley 22/2015. En todo caso, la normativa reguladora de la actividad de auditoría prevalecerá sobre cualquier estipulación contractual.",
       "SEGUNDA. - Régimen económico e incentivos de colaboración: Como contraprestación por la canalización efectiva de clientes cuyo contrato principal de auditoría haya sido formalizado y el trabajo finalizado, el colaborador tendrá derecho a un incentivo económico calculado sobre los honorarios facturados por MindAudit correspondientes exclusivamente al contrato inicial de auditoría: 9% hasta 18.000€, 12% entre 18.000€ y 40.000€, 15% a partir de 40.000€. El incentivo se liquidará el 30 de septiembre de cada año. No generarán incentivo las sucesivas renovaciones ni servicios adicionales directos. En caso de honorarios inferiores a 5.000€ o 2.000€ al año, el incentivo se compensará con bonos de horas de consulta técnica. MindAudit se reserva el derecho de regularizar incentivos si los honorarios resultan incobrables. Si la facturación derivada de un colaborador supera el 25% del total de MindAudit, los nuevos contratos no generarán incentivo para preservar la independencia.",
       "TERCERA. - Duración del contrato: El presente contrato tendrá una duración inicial de 1 año desde la fecha de su firma, prorrogable tácitamente por períodos anuales sucesivos, salvo denuncia expresa con 15 días de antelación. La extinción no genera derecho a indemnización.",
-      "CUARTA. - Independencia profesional, incompatibilidades y no constitución de red: MindAudit desarrollará su actividad con plena sujeción a la Ley 22/2015, manteniendo su independencia. La relación es estrictamente mercantil y no constituye red. Las partes no comparten costes, beneficios, recursos ni políticas de control de calidad comunes.",
+      "QUARTA. - Independencia profesional, incompatibilidades y no constitución de red: MindAudit desarrollará su actividad con plena sujeción a la Ley 22/2015, manteniendo su independencia. La relación es estrictamente mercantil y no constituye red. Las partes no comparten costes, beneficios, recursos ni políticas de control de calidad comunes.",
       "QUINTA. - Declaración anual de independencia: El colaborador se obliga a suscribir anualmente una declaración formal de independencia. Cualquier circunstancia que afecte a la misma deberá ser comunicada de inmediato para evaluar salvaguardas.",
       "SEXTA. - Compromiso de las partes: Las partes actuarán bajo principios de buena fe y diligencia. El colaborador se compromete a facilitar información veraz, no influir en honorarios, no realizar actos que amenacen la independencia y no utilizar la marca MindAudit de forma engañosa.",
       "SÉPTIMA. - Causas de resolución: Incumplimiento grave de independencia o integridad, conductas contrarias a la buena fe, incompatibilidades, dependencia económica (>25%) o inactividad prolongada en la plataforma.",
@@ -81,26 +90,23 @@ export function ContractViewerModal({ isOpen, onOpenChange, colaborador }: Contr
       currentY += (splitClause.length * 5) + 3;
     });
     
-    // Signatures
+    // Signature
     if (currentY + 40 > 280) {
       doc.addPage();
       currentY = 20;
     }
     
     doc.line(20, currentY + 20, 90, currentY + 20);
-    doc.line(120, currentY + 20, 190, currentY + 20);
     
     doc.setFontSize(8);
     doc.setTextColor(150);
-    doc.text("Por MindAudit Spain, S.L.P.", 20, currentY + 25);
-    doc.text("Emilio José Silva Fernández", 20, currentY + 30);
+    doc.text(`FIRMADO POR: ${colaborador.companyName.toUpperCase()}`, 20, currentY + 25);
+    doc.text(colaborador.user.name, 20, currentY + 30);
     
-    doc.text("Por el Colaborador", 120, currentY + 25);
-    doc.text(colaborador.user.name, 120, currentY + 30);
-    
-    if (colaborador.contractUrl) {
+    // Only attempt signature image if it's NOT a PDF
+    if (colaborador.contractUrl && !colaborador.contractUrl.toLowerCase().endsWith(".pdf")) {
       try {
-        doc.addImage(colaborador.contractUrl, 'PNG', 120, currentY + 35, 40, 15);
+        doc.addImage(colaborador.contractUrl, 'PNG', 20, currentY + 35, 40, 15);
       } catch (e) {
         console.error("Could not add signature image to PDF", e);
       }
@@ -279,34 +285,39 @@ export function ContractViewerModal({ isOpen, onOpenChange, colaborador }: Contr
               </div>
             </section>
 
-            <div className="mt-16 pt-12 border-t border-slate-100">
-              <div className="grid grid-cols-2 gap-12">
-                <div className="space-y-4">
-                  <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest text-center">Por MindAudit Spain, S.L.P.:</p>
-                  <div className="h-32 flex flex-col items-center justify-center bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-100">
-                    <span className="text-slate-300 italic text-xs mb-1">Firmado Digitalmente</span>
-                    <span className="font-black text-[#0a3a6b]">Emilio José Silva Fernández</span>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest text-center">Por el Colaborador:</p>
-                  <div className="h-32 flex items-center justify-center bg-emerald-50/30 rounded-3xl border-2 border-emerald-100 overflow-hidden relative">
-                    {colaborador.contractUrl ? (
-                      <img src={colaborador.contractUrl} alt="Firma del partner" className="h-[80%] object-contain mix-blend-multiply transition-transform hover:scale-110 duration-500" />
-                    ) : (
-                      <span className="text-amber-500 font-bold italic text-sm">Pendiente de firma</span>
-                    )}
-                    {colaborador.contractSignedAt && (
-                      <div className="absolute top-2 right-2 bg-emerald-500 text-white p-1 rounded-full shadow-lg">
-                        <FileText className="h-3 w-3" />
+            <div className="mt-16 pt-12 border-t border-slate-100 flex justify-center">
+              <div className="w-full max-w-md space-y-4">
+                <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest text-center">FIRMADO POR {colaborador.companyName}:</p>
+                <div className="h-32 flex items-center justify-center bg-emerald-50/30 rounded-3xl border-2 border-emerald-100 overflow-hidden relative">
+                  {colaborador.contractUrl ? (
+                    colaborador.contractUrl.toLowerCase().endsWith(".pdf") ? (
+                      <div className="flex flex-col items-center gap-2 p-4">
+                        <FileText className="h-10 w-10 text-emerald-600" />
+                        <span className="text-xs font-bold text-emerald-700">Contrato PDF Cargado</span>
+                        <Button 
+                          variant="link" 
+                          size="sm" 
+                          className="text-[10px] h-auto p-0 text-emerald-600 font-bold"
+                          onClick={() => window.open(colaborador.contractUrl!, "_blank")}
+                        >
+                          Ver Archivo Original
+                        </Button>
                       </div>
-                    )}
-                  </div>
-                  <p className="text-center text-[10px] font-bold text-slate-400 italic">
-                    {colaborador.contractSignedAt ? `Firmado el ${new Date(colaborador.contractSignedAt).toLocaleString()}` : 'Aún no firmado'}
-                  </p>
+                    ) : (
+                      <img src={colaborador.contractUrl} alt="Firma del partner" className="h-[80%] object-contain mix-blend-multiply transition-transform hover:scale-110 duration-500" />
+                    )
+                  ) : (
+                    <span className="text-amber-500 font-bold italic text-sm">Pendiente de firma</span>
+                  )}
+                  {colaborador.contractSignedAt && (
+                    <div className="absolute top-2 right-2 bg-emerald-500 text-white p-1 rounded-full shadow-lg">
+                      <FileText className="h-3 w-3" />
+                    </div>
+                  )}
                 </div>
+                <p className="text-center text-[10px] font-bold text-slate-400 italic">
+                  {colaborador.contractSignedAt ? `Firmado el ${new Date(colaborador.contractSignedAt).toLocaleString()}` : 'Aún no firmado'}
+                </p>
               </div>
             </div>
           </div>

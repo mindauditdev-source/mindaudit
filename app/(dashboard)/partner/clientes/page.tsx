@@ -103,10 +103,10 @@ export default function PartnerCompaniesPage() {
           PartnerApiService.getProfile().then(setProfile).catch(console.error);
         }}
         onDismiss={() => {
-          router.push("/partner/clientes/nuevo");
+          setIsContractOpen(false);
         }}
         onContinue={() => {
-          router.push("/partner/clientes/nuevo");
+          setIsContractOpen(false);
         }}
       />
 
