@@ -110,7 +110,7 @@ Sin papeles. Ágil y en tiempo real
                 <div className="h-14 w-14 bg-blue-50 rounded-2xl flex items-center justify-center text-[#0f4c81] mb-8 group-hover:bg-[#0f4c81] group-hover:text-white transition-colors duration-300">
                   <Users className="h-7 w-7" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">Red de Expertos</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-3">Equipo de expertos</h3>
                 <p className="text-slate-500 leading-relaxed text-sm">
                   Diferenciaos de la competencia mediante
                   acceso inmediato a expertos auditores. Amplía tu alcance de servicio
@@ -172,7 +172,7 @@ Sin papeles. Ágil y en tiempo real
               <div className="flex-1 order-2 md:order-3 text-center md:text-left">
                 <h3 className="text-xl font-bold text-slate-900 mb-2">2. Validación</h3>
                 <p className="text-slate-500 text-sm max-w-xs">
-                  Revisamos tu solicitud y nos aseguramos de que se cumplen los requisitos mínimos para firmar el acuerdo de colaboración
+                Requisitos mínimos de independencia y no constitución de red para firmar el acuerdo de colaboración
                 </p>
               </div>
               {/* Line Connector */}

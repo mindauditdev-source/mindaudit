@@ -29,13 +29,10 @@ export function AboutContent() {
             Nuestra Identidad.
           </h1>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-12">
-            Somos una firma líder que integra profesionalismo en servicios de auditoría 
-            para empresas de capital, impulsando la gran transparencia y la confianza en 
-            nuestra región.
-          </p>
-          <Button asChild className="bg-[#0f4c81] hover:bg-[#0d3d68] text-white px-10 h-14 rounded-xl text-lg font-bold shadow-lg">
-            <Link href="/servicios">Nuestra Experiencia</Link>
-          </Button>
+            Somos una firma joven y disruptiva en el sector de los despachos profesionales. Integramos
+            profesionalidad y experiencia en nuestra colaboraciones agregando valor y conocimientos a todo tipo de
+            despachos          </p>
+         
         </div>
         {/* Decorative dot grid */}
         <div className="absolute top-0 left-0 w-full h-full opacity-[0.04] pointer-events-none" 
@@ -74,93 +71,59 @@ export function AboutContent() {
         </div>
       </section>
 
-      {/* 3. Liderazgo y Experiencia */}
-       {/* <section className="py-24 bg-slate-50/50">
+      {/* 3. El Equipo */}
+      <section className="py-24 bg-slate-50/50">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-4xl font-bold text-slate-900 mb-6 tracking-tight">Liderazgo y Experiencia</h2>
+            <div className="inline-flex items-center rounded-full border border-blue-600/20 bg-blue-50 px-4 py-1.5 text-xs font-bold text-blue-600 mb-6 tracking-widest uppercase">
+              Nuestro Talento
+            </div>
+            <h2 className="text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">Equipo MindAudit</h2>
             <p className="text-lg text-slate-600 leading-relaxed">
-                El equipo directivo está formado por profesionales con amplia experiencia en firmas de auditoría internacionales.
+              Un grupo multidisciplinar de profesionales comprometidos con la excelencia técnica, la innovación y la cercanía en el servicio de auditoría.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
              <TeamCard 
-                name="Alejandro V. Ramírez"
-                role="Socio Director - Auditoría Fiscal"
-                description="Ex-auditor senior en Big Four con más de 12 años de trayectoria en empresas internacionales."
-                imageUrl="/team_person_1_alejandro_1768237078983.png"
+                name="EMILIO SILVA"
+                role="CEO - SOCIO DIRECTOR ESPAÑA"
+                description="Responsable de la supervisión técnica de todos los trabajos de auditoría realizados por la firma. Garantiza que cada encargo se ejecute conforme a las Normas Internacionales de Auditoría adaptadas para España (NIA-ES)."
+                imageUrl="https://fastly.picsum.photos/id/237/536/354.jpg?hmac=i0yVXW1ORpyCZpQ-CknuyV-jbtU7_x9EBQVhvT5aRr0"
              />
              <TeamCard 
-                name="Dra. Elena Martínez"
-                role="Socia de Cumplimiento Normativo"
-                description="Especialista en derecho financiero y mercantil con amplia experiencia en regulaciones europeas."
-                imageUrl="/team_person_2_elena_1768237098923.png"
+                name="ALBERT CURTO"
+                role="COORDINACIÓN DE CONSULTAS TÉCNICAS"
+                description="Responsable de las auditorías a través de Odoo. Centraliza, supervisa y canaliza todas las consultas técnicas de los despachos colaboradores asegurando una respuesta rigurosa y coherente."
+                imageUrl="https://fastly.picsum.photos/id/237/536/354.jpg?hmac=i0yVXW1ORpyCZpQ-CknuyV-jbtU7_x9EBQVhvT5aRr0"
              />
              <TeamCard 
-                name="Marc Bonet"
-                role="Socio de Innovación Digital"
-                description="Responsable de la transformación digital y del desarrollo del portal de auditoría propietaria."
-                imageUrl="/team_person_3_marc_1768237120388.png"
+                name="ELENA ORTEGA"
+                role="RESPONSABLE COMERCIAL"
+                description="Coordina la generación de oportunidades comerciales y el seguimiento de contactos profesionales. Presenta el modelo de colaboración a asesorías y firmas de servicios profesionales."
+                imageUrl="https://fastly.picsum.photos/id/237/536/354.jpg?hmac=i0yVXW1ORpyCZpQ-CknuyV-jbtU7_x9EBQVhvT5aRr0"
+             />
+             <TeamCard 
+                name="ANNA GRÍFOLS"
+                role="RECURSOS HUMANOS Y REDES SOCIALES"
+                description="Encargada de atraer, desarrollar y coordinar el talento de la organización, así como de impulsar la presencia digital de la firma en los canales profesionales."
+                imageUrl="https://fastly.picsum.photos/id/237/536/354.jpg?hmac=i0yVXW1ORpyCZpQ-CknuyV-jbtU7_x9EBQVhvT5aRr0"
+             />
+             <TeamCard 
+                name="VIRGINIA GARCIA"
+                role="ATENCIÓN AL CLIENTE"
+                description="Orienta a clientes y colaboradores. Coordina la primera toma de información de los encargos potenciales, registrando consultas y derivándolas al departamento correspondiente."
+                imageUrl="https://fastly.picsum.photos/id/237/536/354.jpg?hmac=i0yVXW1ORpyCZpQ-CknuyV-jbtU7_x9EBQVhvT5aRr0"
+             />
+             <TeamCard 
+                name="JESÚS HURTADO"
+                role="CTO"
+                description="Responsable de la estrategia tecnológica y de garantizar que la infraestructura digital permita ofrecer servicios de auditoría de forma segura y funcional."
+                imageUrl="https://fastly.picsum.photos/id/237/536/354.jpg?hmac=i0yVXW1ORpyCZpQ-CknuyV-jbtU7_x9EBQVhvT5aRr0"
              />
           </div>
         </div>
-      </section> */}
-
-      {/* 4. Hitos de nuestra Firma (Timeline) */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold text-slate-900 tracking-tight">Hitos de nuestra Firma</h2>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-             <div className="space-y-0 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-linear-to-b before:from-transparent before:via-slate-200 before:to-transparent">
-                
-                {/* 2012 */}
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group py-8">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-50 group-hover:bg-[#0f4c81] group-hover:text-white text-slate-300 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 transition-colors duration-500 font-bold text-sm">
-                        
-                    </div>
-                    <div className="w-[calc(100%-4rem)] md:w-[45%] p-4 rounded-2xl border border-slate-50 bg-white shadow-sm group-hover:shadow-md transition-shadow">
-                        <div className="flex items-center justify-between space-x-2 mb-1">
-                            <div className="font-bold text-slate-900">Fundación de la Firma</div>
-                            <time className="font-mono text-xs font-bold text-blue-600">2012</time>
-                        </div>
-                        <div className="text-slate-500 text-sm">Inicio de operaciones en Barcelona centrados en auditoría para pymes locales de alto potencial.</div>
-                    </div>
-                </div>
-
-                {/* 2017 */}
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group py-8">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-50 group-hover:bg-[#0f4c81] group-hover:text-white text-slate-300 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 transition-colors duration-500">
-                    </div>
-                    <div className="w-[calc(100%-4rem)] md:w-[45%] p-4 rounded-2xl border border-slate-50 bg-white shadow-sm group-hover:shadow-md transition-shadow">
-                        <div className="flex items-center justify-between space-x-2 mb-1">
-                            <div className="font-bold text-slate-900">Registro Oficial ROAC</div>
-                            <time className="font-mono text-xs font-bold text-blue-600">2017</time>
-                        </div>
-                        <div className="text-slate-500 text-sm">Obtención de la licencia nº S2348, consolidándonos como firma oficial inscrita para auditoría de cuentas.</div>
-                    </div>
-                </div>
-
-                {/* 2022 */}
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group py-8">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-50 group-hover:bg-[#0f4c81] group-hover:text-white text-slate-300 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 transition-colors duration-500">
-                    </div>
-                    <div className="w-[calc(100%-4rem)] md:w-[45%] p-4 rounded-2xl border border-slate-50 bg-white shadow-sm group-hover:shadow-md transition-shadow">
-                        <div className="flex items-center justify-between space-x-2 mb-1">
-                            <div className="font-bold text-slate-900">Expansión Digital</div>
-                            <time className="font-mono text-xs font-bold text-blue-600">2022</time>
-                        </div>
-                        <div className="text-slate-500 text-sm">Lanzamiento de nuestro portal propietario para auditoría 100% cloud, permitiendo una colaboración fluida a nivel nacional.</div>
-                    </div>
-                </div>
-
-             </div>
-          </div>
-        </div>
-      </section>
+      </section> 
 
       {/* 5. Cultura y Stats */}
       <section className="py-24 bg-slate-900 text-white overflow-hidden relative">
@@ -185,7 +148,7 @@ export function AboutContent() {
                  <div>
                     <h2 className="text-4xl font-bold mb-6 tracking-tight">Cultura de Colaboración y Excelencia</h2>
                     <p className="text-blue-100/60 leading-relaxed text-lg">
-                        Nuestro entorno de trabajo está diseñado para fomentar el crecimiento continuo y el intercambio de conocimientos técnico, asegurando que cada cliente reciba el mejor asesoramiento posible.
+                        Nuestro entorno de trabajo está diseñado para fomentar el crecimiento continuo y el intercambio de conocimientos técnicos, asegurando que cada cliente reciba el mejor asesoramiento posible.
                     </p>
                  </div>
 
@@ -212,10 +175,10 @@ export function AboutContent() {
            <div className="bg-[#0f4c81] rounded-[2.5rem] p-12 lg:p-20 text-center text-white relative overflow-hidden">
               <div className="relative z-10 max-w-3xl mx-auto space-y-8">
                 <h2 className="text-4xl lg:text-5xl font-extrabold tracking-tight">
-                    ¿Listo para elevar sus estándares financieros?
+                   ¿Listo para este nuevo proyecto?
                 </h2>
                 <p className="text-xl text-blue-100/70">
-                    Agende una consulta hoy mismo y descubra cómo podemos ayudarle a consolidar su transparencia y cumplimiento.
+                    Agende una reunión hoy mismo y descubra cómo MindAudit® puede ayudar a crecer su firma
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                     <Button asChild className="bg-white text-[#0f4c81] hover:bg-blue-50 px-10 h-14 rounded-xl font-bold">
@@ -258,19 +221,23 @@ function ValueCard({ icon, title, description }: { icon: React.ReactNode, title:
 function TeamCard({ name, role, description, imageUrl }: { name: string, role: string, description: string, imageUrl: string }) {
   return (
     <div className="group cursor-default">
-       <div className="relative aspect-3/4 rounded-4xl overflow-hidden mb-6 shadow-lg group-hover:shadow-2xl transition-all duration-500">
+       <div className="relative aspect-4/5 rounded-4xl overflow-hidden mb-8 shadow-md group-hover:shadow-2xl transition-all duration-500 bg-slate-200">
           <Image 
             src={imageUrl} 
             alt={name} 
             fill 
-            className="object-cover group-hover:scale-105 transition-transform duration-700"
+            className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           />
-          <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-slate-900/80 via-transparent to-transparent h-1/2 opacity-60" />
+          {/* Subtle overlay gradient */}
+          <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-slate-900/60 via-transparent to-transparent h-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
        </div>
-       <div className="space-y-1">
-          <h3 className="text-xl font-bold text-slate-900 group-hover:text-[#0f4c81] transition-colors">{name}</h3>
-          <p className="text-blue-600 text-sm font-bold uppercase tracking-wider">{role}</p>
-          <p className="text-slate-500 text-sm leading-relaxed pt-2 max-w-xs">
+       <div className="space-y-3 px-2">
+          <div className="space-y-1">
+            <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors duration-300">{name}</h3>
+            <p className="text-blue-600 text-[0.7rem] font-black uppercase tracking-[0.15em]">{role}</p>
+          </div>
+          <div className="h-px w-8 bg-blue-600/30 group-hover:w-16 transition-all duration-500" />
+          <p className="text-slate-500 text-sm leading-relaxed pt-1">
             {description}
           </p>
        </div>

@@ -73,17 +73,34 @@ function LoginForm() {
         />
         <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]" />
 
-        <div className="relative z-10 max-w-lg space-y-6 text-white pb-12">
+        <div className="relative z-10 max-w-lg space-y-8 text-white pb-12">
+          {/* Logo */}
+          <div className="relative h-12 w-48 mb-4">
+            <Image
+              src="/logo/t-png.png"
+              alt="MindAudit Logo"
+              fill
+              className="object-contain brightness-0 invert"
+              priority
+            />
+          </div>
+
+          {/* La rallita blanca */}
           <div className="w-12 h-1 bg-white mb-8" />
-          <h1 className="text-6xl font-bold tracking-tight leading-tight">
-            Rigor y<br />
-            Transparencia
-          </h1>
-          <p className="text-xl text-slate-100 leading-relaxed font-medium">
-            Excelencia en servicios de auditoría para socios estratégicos.
-            Nuestra plataforma garantiza la integridad de sus procesos
-            financieros con tecnología de vanguardia.
-          </p>
+
+          {/* Título */}
+          <div className="space-y-4">
+            <h1 className="text-5xl font-extrabold tracking-tight leading-tight">
+              Plataforma <br />
+              Partners <br />
+              estratégicos
+            </h1>
+            
+            {/* Subtítulo */}
+            <p className="text-xl text-slate-100/90 leading-relaxed font-medium">
+              Servicios Integrales de Auditoría.
+            </p>
+          </div>
         </div>
       </div>
 

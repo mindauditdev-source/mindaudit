@@ -18,8 +18,8 @@ export function ServicesSection() {
       items: auditServices.filter(s => s.category === 'special')
     },
     {
-      title: "Informes Especiales de reducción de Capital Social",
-      subtitle: "Servicio de colaboración en actuaciones de auditoría de cuentas de entidades sujetas al RD 424/2017",
+      title: "Informes Especiales",
+      subtitle: "",
       items: auditServices.filter(s => s.category === 'grants')
     },
     {
