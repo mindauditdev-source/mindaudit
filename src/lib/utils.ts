@@ -32,3 +32,11 @@ export function getFiscalYears(count = 3): string[] {
   const currentYear = new Date().getFullYear();
   return Array.from({ length: count }, (_, i) => (currentYear - i).toString());
 }
+
+export function formatDate(date: string | Date): string {
+  return new Intl.DateTimeFormat("es-ES", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(date));
+}

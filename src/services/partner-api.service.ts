@@ -23,6 +23,7 @@ export interface PartnerProfile {
   commissionRate: number;
   totalCommissions: number;
   pendingCommissions: number;
+  contractUrl: string | null;
   contractSignedAt: string | null;
   stats: PartnerStats;
   user: {

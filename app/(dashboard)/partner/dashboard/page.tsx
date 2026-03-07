@@ -5,12 +5,13 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Building2, Plus, AlertCircle, ArrowRight, MessageCircle, Clock, Calendar, Euro } from "lucide-react";
+import { Building2, Plus, AlertCircle, ArrowRight, MessageCircle, Clock, Calendar, Euro, Eye, FileText } from "lucide-react";
 import { PartnerApiService, PartnerProfile } from "@/services/partner-api.service";
-import { formatCurrency, formatNumber } from "@/lib/utils";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { formatCurrency, formatNumber, formatDate } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { CalendlyWidget } from "@/components/shared/CalendlyWidget";
+import { PartnerContractModal } from "@/components/partner/PartnerContractModal";
 import { toast } from "sonner";
 
 export default function PartnerDashboardPage() {
@@ -18,26 +19,28 @@ export default function PartnerDashboardPage() {
   const [profile, setProfile] = useState<PartnerProfile | null>(null);
   const [companiesStats, setCompaniesStats] = useState<{ totalEmpresas: number; empresasActivas: number; totalAuditorias: number } | null>(null);
   const [calendlyModalOpen, setCalendlyModalOpen] = useState(false);
+  const [contractModalOpen, setContractModalOpen] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      // Fetch all data in parallel
+      const [profileData, companiesData] = await Promise.all([
+        PartnerApiService.getProfile(),
+        PartnerApiService.getEmpresas(),
+      ]);
+
+      setProfile(profileData);
+      setCompaniesStats(companiesData.stats);
+    } catch (error) {
+      console.error("Error loading dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadDashboardData = async () => {
-      try {
-        setLoading(true);
-        // Fetch all data in parallel
-        const [profileData, companiesData] = await Promise.all([
-          PartnerApiService.getProfile(),
-          PartnerApiService.getEmpresas(),
-        ]);
-
-        setProfile(profileData);
-        setCompaniesStats(companiesData.stats);
-      } catch (error) {
-        console.error("Error loading dashboard data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadDashboardData();
   }, []);
 
@@ -201,6 +204,50 @@ export default function PartnerDashboardPage() {
 
               <div className="flex items-center justify-between border-b border-slate-50 pb-4">
                 <div className="space-y-1">
+                  <p className="text-sm font-bold text-slate-900">Contrato de Colaboración</p>
+                  <p className="text-xs text-slate-500">Estado de firma del acuerdo legal</p>
+                </div>
+                <div>
+                  {profile?.contractSignedAt ? (
+                    <div className="flex flex-col items-end gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-800">
+                          Firmado
+                        </span>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 text-[#0a3a6b] hover:text-[#082e56] hover:bg-slate-100 font-bold text-xs flex items-center gap-1.5"
+                          onClick={() => setIsPreviewModalOpen(true)}
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                          Ver contrato
+                        </Button>
+                      </div>
+                      <p className="text-[10px] text-slate-400 font-medium mr-1">
+                        {formatDate(profile.contractSignedAt)}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-800">
+                        Pendiente de Firma
+                      </span>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 font-bold text-xs"
+                        onClick={() => setContractModalOpen(true)}
+                      >
+                        Firmar ahora
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between border-b border-slate-50 pb-4">
+                <div className="space-y-1">
                   <p className="text-sm font-bold text-slate-900">Bonificaciones Acumuladas</p>
                   <p className="text-xs text-slate-500">Importe generado y pdte. de cobro</p>
                 </div>
@@ -323,6 +370,78 @@ export default function PartnerDashboardPage() {
                   Contacta a soporte técnico para asistencia manual.
                 </p>
               </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Contract Modal */}
+      <PartnerContractModal 
+        profile={profile}
+        externalOpen={contractModalOpen}
+        onOpenChange={setContractModalOpen}
+        onStatusChange={() => {
+          loadDashboardData();
+          setContractModalOpen(false);
+        }}
+      />
+
+      {/* Contract Preview Modal */}
+      <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
+        <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden rounded-3xl border-none shadow-2xl bg-white flex flex-col">
+          <DialogHeader className="p-6 bg-[#0a3a6b] text-white shrink-0">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white/10 rounded-lg">
+                  <FileText className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-bold">Acuerdo de Colaboración</DialogTitle>
+                  <p className="text-blue-100/70 text-xs font-medium mt-0.5">MindAudit España - Documento Oficial</p>
+                </div>
+              </div>
+            </div>
+          </DialogHeader>
+          
+          <div className="flex-1 bg-slate-100 p-4 md:p-8 flex items-center justify-center overflow-hidden">
+            {profile?.contractUrl ? (
+              <div className="w-full h-full bg-white rounded-xl shadow-inner border border-slate-200 overflow-hidden relative">
+                <iframe 
+                  src={`${profile.contractUrl}#toolbar=0&navpanes=0`}
+                  className="w-full h-full border-none"
+                  title="Vista previa del contrato"
+                />
+              </div>
+            ) : (
+              <div className="text-center space-y-4">
+                <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 max-w-sm mx-auto">
+                  <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+                  <p className="text-slate-900 font-bold">Documento no disponible</p>
+                  <p className="text-slate-500 text-sm mt-2 leading-relaxed">
+                    No se ha podido localizar la URL del contrato firmado. Por favor, contacte con soporte técnico.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="p-4 bg-white border-t border-slate-100 flex justify-end gap-3 shrink-0">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsPreviewModalOpen(false)}
+              className="px-6 rounded-xl font-bold"
+            >
+              Cerrar
+            </Button>
+            {profile?.contractUrl && (
+              <Button 
+                asChild
+                className="bg-[#0a3a6b] hover:bg-[#082e56] text-white px-6 rounded-xl font-bold shadow-lg shadow-blue-900/10"
+              >
+                <a href={profile.contractUrl} target="_blank" rel="noopener noreferrer">
+                  Descargar PDF
+                </a>
+              </Button>
             )}
           </div>
         </DialogContent>
