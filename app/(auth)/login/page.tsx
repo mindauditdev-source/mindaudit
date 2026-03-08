@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, Eye, EyeOff, ArrowRight, Loader2, AlertCircle } from "lucide-react";
+import { Mail, Eye, EyeOff, ArrowRight, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -75,7 +75,7 @@ function LoginForm() {
 
         <div className="relative z-10 max-w-lg space-y-8 text-white pb-12">
           {/* Logo */}
-          <div className="relative h-12 w-48 mb-4">
+          <Link href="/" className="block relative h-12 w-48 mb-4 hover:opacity-80 transition-opacity cursor-pointer">
             <Image
               src="/logo/t-png.png"
               alt="MindAudit Logo"
@@ -83,7 +83,7 @@ function LoginForm() {
               className="object-contain brightness-0 invert"
               priority
             />
-          </div>
+          </Link>
 
           {/* La rallita blanca */}
           <div className="w-12 h-1 bg-white mb-8" />
@@ -105,12 +105,23 @@ function LoginForm() {
       </div>
 
       {/* Right Column: Login Form */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center p-8 md:p-12 lg:p-24">
+      <div className="relative flex w-full lg:w-1/2 items-center justify-center p-8 md:p-12 lg:p-24">
+        {/* Back to Home Link */}
+        <div className="absolute top-8 left-8 lg:top-12 lg:left-12">
+          <Link
+            href="/"
+            className="group flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-[#0f4c81] transition-all cursor-pointer"
+          >
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+            Volver al inicio
+          </Link>
+        </div>
+
         <div className="w-full max-w-md space-y-10">
           {/* Logo and Mobile Branding */}
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="relative h-12 w-48">
+              <Link href="/" className="relative h-12 w-48 hover:opacity-80 transition-opacity cursor-pointer">
                 <Image
                   src="/logo/t-png.png"
                   alt="MindAudit Logo"
@@ -118,7 +129,7 @@ function LoginForm() {
                   className="object-contain"
                   priority
                 />
-              </div>
+              </Link>
             </div>
             <p className="text-slate-500 font-medium text-lg pt-2 leading-none">
               Acceso al Portal de Partners

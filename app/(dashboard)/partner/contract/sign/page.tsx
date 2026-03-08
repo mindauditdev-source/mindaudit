@@ -35,14 +35,19 @@ export default function SignContractPage() {
     fetchProfile();
   }, []);
 
-  const handleDownload = () => {
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownload = async () => {
     if (!profile) return;
+    setIsDownloading(true);
     try {
-      generatePartnerContractPDF(profile);
-      toast.success("Contrato generado y descargado con éxito");
+      await generatePartnerContractPDF(profile);
+      toast.success("Contrato descargado con éxito");
     } catch (error) {
       console.error("Error generating PDF:", error);
       toast.error("Error al generar el PDF del contrato");
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -140,9 +145,9 @@ export default function SignContractPage() {
               <Button 
                 onClick={handleDownload} 
                 className="w-full bg-white text-[#0a3a6b] border-2 border-[#0a3a6b] hover:bg-[#0a3a6b] hover:text-white transition-all"
-                disabled={loadingProfile}
+                disabled={loadingProfile || isDownloading}
               >
-                {loadingProfile ? <Loader2 className="animate-spin h-4 w-4" /> : "Descargar PDF"}
+                {loadingProfile || isDownloading ? <Loader2 className="animate-spin h-4 w-4" /> : "Descargar PDF"}
               </Button>
             </div>
 
