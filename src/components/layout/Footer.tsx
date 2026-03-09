@@ -118,7 +118,7 @@ export function Footer() {
 
         {/* Partnership Logos */}
         <div className="flex flex-wrap items-center justify-center md:justify-start gap-8 mb-12 opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0 duration-500">
-          <div className="relative h-10 w-20">
+          <div className="relative h-16 w-36 md:h-24 md:w-48">
             <Image
               src="/logo/accid-logo.jpg"
               alt="ACCID"
@@ -126,15 +126,15 @@ export function Footer() {
               className="object-contain"
             />
           </div>
-          <div className="relative h-10 w-20">
+          <div className="relative h-16 w-36 md:h-24 md:w-48">
             <Image
-              src="/logo/catalunya-logo.png"
-              alt="Generalitat de Catalunya"
+              src="/logo/membre-collegi.jpg"
+              alt="Col·legi de Censors Jurats de Comptes de Catalunya"
               fill
               className="object-contain"
             />
           </div>
-          <div className="relative h-10 w-20">
+          <div className="relative h-16 w-36 md:h-24 md:w-48">
             <Image
               src="/logo/recc-logo.jpg"
               alt="RECC"

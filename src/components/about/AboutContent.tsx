@@ -89,37 +89,37 @@ export function AboutContent() {
                 name="EMILIO SILVA"
                 role="CEO - SOCIO DIRECTOR ESPAÑA"
                 description="Responsable de la supervisión técnica de todos los trabajos de auditoría realizados por la firma. Garantiza que cada encargo se ejecute conforme a las Normas Internacionales de Auditoría adaptadas para España (NIA-ES)."
-                imageUrl="https://fastly.picsum.photos/id/237/536/354.jpg?hmac=i0yVXW1ORpyCZpQ-CknuyV-jbtU7_x9EBQVhvT5aRr0"
+                imageUrl="/images/Emilio Silva.webp"
              />
              <TeamCard 
                 name="ALBERT CURTO"
                 role="COORDINACIÓN DE CONSULTAS TÉCNICAS"
                 description="Responsable de las auditorías a través de Odoo. Centraliza, supervisa y canaliza todas las consultas técnicas de los despachos colaboradores asegurando una respuesta rigurosa y coherente."
-                imageUrl="https://fastly.picsum.photos/id/237/536/354.jpg?hmac=i0yVXW1ORpyCZpQ-CknuyV-jbtU7_x9EBQVhvT5aRr0"
+                imageUrl="/images/Albert Curto.webp"
              />
              <TeamCard 
                 name="ELENA ORTEGA"
                 role="RESPONSABLE COMERCIAL"
                 description="Coordina la generación de oportunidades comerciales y el seguimiento de contactos profesionales. Presenta el modelo de colaboración a asesorías y firmas de servicios profesionales."
-                imageUrl="https://fastly.picsum.photos/id/237/536/354.jpg?hmac=i0yVXW1ORpyCZpQ-CknuyV-jbtU7_x9EBQVhvT5aRr0"
+                imageUrl="/images/Elena Orte ha.webp"
              />
              <TeamCard 
                 name="ANNA GRÍFOLS"
                 role="RECURSOS HUMANOS Y REDES SOCIALES"
                 description="Encargada de atraer, desarrollar y coordinar el talento de la organización, así como de impulsar la presencia digital de la firma en los canales profesionales."
-                imageUrl="https://fastly.picsum.photos/id/237/536/354.jpg?hmac=i0yVXW1ORpyCZpQ-CknuyV-jbtU7_x9EBQVhvT5aRr0"
+                imageUrl="/images/Anna Grifols.webp"
              />
              <TeamCard 
                 name="VIRGINIA GARCIA"
                 role="ATENCIÓN AL CLIENTE"
                 description="Orienta a clientes y colaboradores. Coordina la primera toma de información de los encargos potenciales, registrando consultas y derivándolas al departamento correspondiente."
-                imageUrl="https://fastly.picsum.photos/id/237/536/354.jpg?hmac=i0yVXW1ORpyCZpQ-CknuyV-jbtU7_x9EBQVhvT5aRr0"
+                imageUrl="/images/Virginia Garcia.webp"
              />
              <TeamCard 
                 name="JESÚS HURTADO"
                 role="CTO"
                 description="Responsable de la estrategia tecnológica y de garantizar que la infraestructura digital permita ofrecer servicios de auditoría de forma segura y funcional."
-                imageUrl="https://fastly.picsum.photos/id/237/536/354.jpg?hmac=i0yVXW1ORpyCZpQ-CknuyV-jbtU7_x9EBQVhvT5aRr0"
+                imageUrl="/images/Jesus Hurtado.webp"
              />
           </div>
         </div>
