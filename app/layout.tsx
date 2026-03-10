@@ -26,6 +26,9 @@ const satoshi = localFont({
 export const metadata: Metadata = {
   title: 'MindAudit® Spain SLP - Auditoría Profesional',
   description: 'Firma boutique de auditoría que combina rigor profesional con tecnología moderna.',
+  verification: {
+    google: 'LZMGo4YLYC1RUvn1FqB_6NXhPqTJ__23G25jvQeq_kk',
+  },
 };
 
 export default function RootLayout({
