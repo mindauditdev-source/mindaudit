@@ -253,7 +253,7 @@ export function CareersSection() {
                             </div>
                           ) : (
                             <div className="flex items-center gap-2">
-                              Enviar Postulación
+                              Enviar
                               <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                             </div>
                           )}
