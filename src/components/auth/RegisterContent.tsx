@@ -32,6 +32,7 @@ export function RegisterContent() {
     terms: false,
     // Step 2
     direccion: "",
+    provincia: "",
     ciudad: "",
     codigoPostal: "",
     telefono: "",
@@ -80,6 +81,9 @@ export function RegisterContent() {
       case "ciudad":
         if (value.length < 2) error = "Ciudad no válida";
         break;
+      case "provincia":
+        if (!value) error = "Debe seleccionar una provincia";
+        break;
       case "codigoPostal":
          // Allows 4 or 5 digits
         if (!/^\d{4,5}$/.test(value)) error = "Debe tener 4 o 5 dígitos";
@@ -100,8 +104,9 @@ export function RegisterContent() {
     return error;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    const checked = type === "checkbox" ? (e.target as HTMLInputElement).checked : false;
     // Handle password dependency for confirmPassword validation
     if (name === 'password' && formData.confirmPassword) {
       const confirmError = value !== formData.confirmPassword ? "Las contraseñas no coinciden" : "";
@@ -147,6 +152,7 @@ export function RegisterContent() {
         cif: formData.cif,
         phone: formData.telefono,
         address: formData.direccion,
+        province: formData.provincia,
         city: formData.ciudad,
         postalCode: formData.codigoPostal,
         acceptTerms: formData.terms
@@ -196,6 +202,7 @@ export function RegisterContent() {
               if (fieldName === 'companyName') mappedName = 'empresa';
               if (fieldName === 'acceptTerms' || fieldName === 'terms') mappedName = 'terms';
               if (fieldName === 'address') mappedName = 'direccion';
+              if (fieldName === 'province') mappedName = 'provincia';
               if (fieldName === 'city') mappedName = 'ciudad';
               if (fieldName === 'postalCode') mappedName = 'codigoPostal';
               if (fieldName === 'postal_code') mappedName = 'codigoPostal';
@@ -247,7 +254,7 @@ export function RegisterContent() {
             setTouched(prev => ({ ...prev, [mappedName!]: true }));
 
             const step1Fields = ["nombreCompleto", "email", "password", "confirmPassword", "empresa", "cif", "terms"];
-            const step2Fields = ["telefono", "direccion", "ciudad", "codigoPostal"];
+            const step2Fields = ["telefono", "direccion", "provincia", "ciudad", "codigoPostal"];
 
             if (step1Fields.includes(mappedName)) targetStep = 1;
             else if (step2Fields.includes(mappedName)) targetStep = 2;

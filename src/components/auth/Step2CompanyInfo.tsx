@@ -1,25 +1,27 @@
 "use client";
 
 import * as React from "react";
-import { MapPin, Phone, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
+import { MapPin, Phone, ArrowRight, ArrowLeft, Loader2, Landmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormInput } from "@/components/ui/form-input";
+import { FormSelect } from "@/components/ui/form-select";
 import { RegisterFormData, RegisterTouched, RegisterErrors } from "./types";
+import { PROVINCIAS_ESPANOLAS } from "@/constants/provincias";
 
 interface Step2Props {
   formData: RegisterFormData;
   touched: RegisterTouched;
   errors: RegisterErrors;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onNext: () => void;
   onBack: () => void;
   isSubmitting?: boolean;
 }
 
 export function Step2CompanyInfo({ formData, touched, errors, onChange, onNext, onBack, isSubmitting = false }: Step2Props) {
-  const isStepValid = !errors.direccion && !errors.ciudad && !errors.codigoPostal && !errors.telefono && 
-                      formData.direccion && formData.ciudad && formData.codigoPostal && formData.telefono;
+  const isStepValid = !errors.direccion && !errors.provincia && !errors.ciudad && !errors.codigoPostal && !errors.telefono && 
+                      formData.direccion && formData.provincia && formData.ciudad && formData.codigoPostal && formData.telefono;
 
   return (
     <Card className="border-none shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white">
@@ -47,6 +49,19 @@ export function Step2CompanyInfo({ formData, touched, errors, onChange, onNext, 
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <FormSelect
+              label="Provincia"
+              name="provincia"
+              placeholder="Seleccione provincia"
+              icon={Landmark}
+              value={formData.provincia}
+              onChange={onChange}
+              touched={touched.provincia}
+              error={errors.provincia}
+              disabled={isSubmitting}
+              options={PROVINCIAS_ESPANOLAS.map(p => ({ label: p, value: p }))}
+            />
+
             <FormInput
               label="Ciudad"
               name="ciudad"
@@ -57,7 +72,9 @@ export function Step2CompanyInfo({ formData, touched, errors, onChange, onNext, 
               error={errors.ciudad}
               disabled={isSubmitting}
             />
-            
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <FormInput
               label="Código Postal"
               name="codigoPostal"
@@ -68,9 +85,7 @@ export function Step2CompanyInfo({ formData, touched, errors, onChange, onNext, 
               error={errors.codigoPostal}
               disabled={isSubmitting}
             />
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <FormInput
               label="Teléfono de Contacto"
               name="telefono"

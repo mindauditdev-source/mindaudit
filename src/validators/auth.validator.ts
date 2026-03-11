@@ -59,9 +59,9 @@ export const registerColaboradorSchema = z.object({
     .string()
     .min(1, 'El teléfono es obligatorio')
     .regex(/^(\+34)?[6-9][0-9]{8}$/, 'Formato de teléfono español inválido'),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  province: z.string().optional(),
+  address: z.string().min(1, 'La dirección es obligatoria'),
+  city: z.string().min(1, 'La ciudad es obligatoria'),
+  province: z.string().min(1, 'La provincia es obligatoria'),
   postalCode: z
     .string()
     .regex(/^\d{4,5}$/, 'El código postal debe tener 4 o 5 dígitos')
@@ -118,9 +118,9 @@ export const registerEmpresaSchema = z.object({
     .string()
     .min(1, 'El teléfono es obligatorio')
     .regex(/^(\+34)?[6-9][0-9]{8}$/, 'Formato de teléfono español inválido'),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  province: z.string().optional(),
+  address: z.string().min(1, 'La dirección es obligatoria'),
+  city: z.string().min(1, 'La ciudad es obligatoria'),
+  province: z.string().min(1, 'La provincia es obligatoria'),
   postalCode: z
     .string()
     .regex(/^\d{4,5}$/, 'El código postal debe tener 4 o 5 dígitos')

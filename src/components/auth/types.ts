@@ -12,6 +12,7 @@ export interface RegisterFormData {
   terms: boolean;
   // Paso 2
   direccion: string;
+  provincia: string;
   ciudad: string;
   codigoPostal: string;
   telefono: string;
