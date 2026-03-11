@@ -38,7 +38,7 @@ export default function AuditorDashboardPage() {
   }
 
   const statCards = [
-     {
+    {
       title: "Volumen Negocio",
       value: formatCurrency(stats?.totalRevenue || 0),
       description: "Operaciones aprobadas",
@@ -46,7 +46,8 @@ export default function AuditorDashboardPage() {
       color: "text-emerald-600",
       bg: "bg-emerald-50/50",
       border: "border-emerald-100",
-      highlight: "from-emerald-500/10 to-transparent"
+      highlight: "from-emerald-500/10 to-transparent",
+      href: "/auditor/finanzas"
     },
     {
       title: "Solicitudes Landing",
@@ -56,7 +57,8 @@ export default function AuditorDashboardPage() {
       color: "text-blue-600",
       bg: "bg-blue-50/50",
       border: "border-blue-100",
-      highlight: "from-blue-500/10 to-transparent"
+      highlight: "from-blue-500/10 to-transparent",
+      href: "/auditor/presupuestos"
     },
     {
       title: "Consultas",
@@ -66,7 +68,8 @@ export default function AuditorDashboardPage() {
       color: "text-indigo-600",
       bg: "bg-indigo-50/50",
       border: "border-indigo-100",
-      highlight: "from-indigo-500/10 to-transparent"
+      highlight: "from-indigo-500/10 to-transparent",
+      href: "/auditor/consultas"
     },
     {
       title: "Colaboradores",
@@ -76,7 +79,8 @@ export default function AuditorDashboardPage() {
       color: "text-amber-600",
       bg: "bg-amber-50/50",
       border: "border-amber-100",
-      highlight: "from-amber-500/10 to-transparent"
+      highlight: "from-amber-500/10 to-transparent",
+      href: "/auditor/asociados"
     },
   ];
 
@@ -91,24 +95,26 @@ export default function AuditorDashboardPage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {statCards.map((stat, i) => (
-          <Card key={i} className={cn(
-             "border-none shadow-sm relative overflow-hidden group hover:shadow-xl transition-all duration-500 rounded-[24px]",
-             "bg-white"
-          )}>
-            <div className={cn("absolute inset-0 bg-linear-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500", stat.highlight)} />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{stat.title}</CardTitle>
-              <div className={`${stat.bg} ${stat.color} p-2.5 rounded-[12px] border ${stat.border} group-hover:scale-110 transition-transform duration-500`}>
-                <stat.icon className="h-5 w-5" />
-              </div>
-            </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-black text-slate-900 tracking-tight">{stat.value}</div>
-              <p className="text-xs text-slate-400 mt-1 font-bold flex items-center gap-1 uppercase tracking-wider">
-                 {stat.description}
-              </p>
-            </CardContent>
-          </Card>
+          <Link key={i} href={stat.href} className="group block h-full">
+            <Card className={cn(
+              "border-none shadow-sm relative overflow-hidden transition-all duration-500 rounded-[24px] h-full",
+              "bg-white group-hover:shadow-xl group-hover:scale-[1.02] group-hover:-translate-y-1 active:scale-[0.98]"
+            )}>
+              <div className={cn("absolute inset-0 bg-linear-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500", stat.highlight)} />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+                <CardTitle className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{stat.title}</CardTitle>
+                <div className={`${stat.bg} ${stat.color} p-2.5 rounded-[12px] border ${stat.border} group-hover:scale-110 transition-transform duration-500`}>
+                  <stat.icon className="h-5 w-5" />
+                </div>
+              </CardHeader>
+              <CardContent className="relative z-10">
+                <div className="text-3xl font-black text-slate-900 tracking-tight">{stat.value}</div>
+                <p className="text-xs text-slate-400 mt-1 font-bold flex items-center gap-1 uppercase tracking-wider">
+                  {stat.description}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
 
@@ -119,7 +125,7 @@ export default function AuditorDashboardPage() {
                 <CardTitle className="text-xl font-black text-slate-900">Gestión de Presupuestos</CardTitle>
               </CardHeader>
               <CardContent className="p-8 space-y-5">
-                 <div className="group flex items-center justify-between p-6 bg-slate-50/50 rounded-2xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/20 transition-all cursor-default overflow-hidden relative">
+                 <Link href="/auditor/presupuestos" className="group flex items-center justify-between p-6 bg-slate-50/50 rounded-2xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/20 transition-all overflow-hidden relative active:scale-[0.98]">
                     <div className="flex items-center gap-5 relative z-10">
                        <div className="p-3 bg-white shadow-sm border border-blue-100 rounded-xl group-hover:rotate-12 transition-transform">
                           <MessageCircle className="h-6 w-6 text-blue-500" />
@@ -132,9 +138,9 @@ export default function AuditorDashboardPage() {
                     <div className="text-right relative z-10">
                        <span className="text-4xl font-black text-slate-900 tabular-nums">{formatNumber(stats?.pendingBudgets || 0)}</span>
                     </div>
-                 </div>
+                 </Link>
 
-                 <div className="group flex items-center justify-between p-6 bg-slate-50/50 rounded-2xl border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/20 transition-all cursor-default">
+                 <Link href="/auditor/presupuestos" className="group flex items-center justify-between p-6 bg-slate-50/50 rounded-2xl border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/20 transition-all active:scale-[0.98]">
                     <div className="flex items-center gap-5">
                        <div className="p-3 bg-white shadow-sm border border-indigo-100 rounded-xl group-hover:rotate-12 transition-transform">
                           <ClipboardList className="h-6 w-6 text-indigo-500" />
@@ -147,7 +153,7 @@ export default function AuditorDashboardPage() {
                     <div className="text-right">
                        <span className="text-3xl font-black text-slate-900 tabular-nums">{formatNumber(stats?.acceptedBudgets || 0)}</span>
                     </div>
-                 </div>
+                 </Link>
               </CardContent>
            </Card>
         </div>

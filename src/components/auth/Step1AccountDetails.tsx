@@ -112,7 +112,7 @@ export function Step1AccountDetails({ formData, touched, errors, onChange, onNex
               className="size-5 rounded border-slate-300 text-[#0f4c81] focus:ring-[#0f4c81] cursor-pointer"
             />
             <label htmlFor="terms" className="text-sm font-semibold text-slate-600 cursor-pointer">
-              Acepto los <Link href="/terminos" className="text-blue-600 hover:underline">Términos de Uso</Link> y la <Link href="/privacidad" className="text-blue-600 hover:underline">Política de Privacidad</Link> de MindAudit Spain SLP.
+              Acepto los <Link href="/legal/terminos" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Términos de Uso</Link> y la <Link href="/legal/privacidad" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Política de Privacidad</Link> de MindAudit Spain SLP.
             </label>
           </div>
 
