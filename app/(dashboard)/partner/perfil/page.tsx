@@ -42,6 +42,10 @@ export default function PartnerProfilePage() {
     postalCode: "",
     website: "",
     iban: "",
+    primerApellido: "",
+    segundoApellido: "",
+    dniParticular: "",
+    mandato: "",
   });
 
   const [contactForm, setContactForm] = useState({
@@ -71,6 +75,10 @@ export default function PartnerProfilePage() {
           postalCode: string;
           website: string;
           iban: string;
+          primerApellido: string;
+          segundoApellido: string;
+          dniParticular: string;
+          mandato: string;
         };
         setFiscalData(sanitizedData);
       }
@@ -259,14 +267,52 @@ Email: ${user?.email}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="website">Página Web</Label>
+                  <Label htmlFor="primerApellido">Primer Apellido</Label>
                   <Input 
-                    id="website" 
-                    name="website" 
-                    value={fiscalData.website} 
+                    id="primerApellido" 
+                    name="primerApellido" 
+                    value={fiscalData.primerApellido} 
                     onChange={handleFiscalDataChange} 
                     className="bg-slate-50 border-slate-200"
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="segundoApellido">Segundo Apellido</Label>
+                  <Input 
+                    id="segundoApellido" 
+                    name="segundoApellido" 
+                    value={fiscalData.segundoApellido} 
+                    onChange={handleFiscalDataChange} 
+                    className="bg-slate-50 border-slate-200"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="dniParticular">DNI Particular</Label>
+                  <Input 
+                    id="dniParticular" 
+                    name="dniParticular" 
+                    value={fiscalData.dniParticular} 
+                    onChange={handleFiscalDataChange} 
+                    className="bg-slate-50 border-slate-200"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="mandato">Cargo / Mandato</Label>
+                  <select
+                    id="mandato"
+                    name="mandato"
+                    value={fiscalData.mandato}
+                    onChange={(e: any) => handleFiscalDataChange(e as any)}
+                    className="flex h-10 w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Selecciona un cargo</option>
+                    <option value="Socio">Socio</option>
+                    <option value="Administrador">Administrador</option>
+                    <option value="Apoderado">Apoderado</option>
+                    <option value="En representación propia (sólo p. física)">
+                      En representación propia (sólo p. física)
+                    </option>
+                  </select>
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="address">Dirección</Label>
