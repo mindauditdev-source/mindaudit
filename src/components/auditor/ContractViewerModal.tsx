@@ -50,7 +50,9 @@ export function ContractViewerModal({ isOpen, onOpenChange, colaborador }: Contr
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     const textReunidosMind = `De una parte, MIND AUDIT SPAIN, S.L.P., sociedad profesional inscrita en el Registro Oficial de Auditores de Cuentas (ROAC) S2711, con domicilio en Gran Vía Carles III nº 98 10ª Planta 08028 Barcelona, NIF B22980593, representada por D. Emilio José Silva Fernández.`;
-    const addressStr = colaborador.address ? `${colaborador.address}, ${colaborador.postalCode || ""} ${colaborador.city || ""} (${colaborador.province || ""})` : "---";
+    const addressParts = [colaborador.address, colaborador.postalCode, colaborador.city].filter(Boolean);
+    const addressLine = addressParts.join(", ");
+    const addressStr = addressLine ? (colaborador.province ? `${addressLine} (${colaborador.province})` : addressLine) : "---";
     const textReunidosColab = `Y de otra parte, el COLABORADOR: ${colaborador.companyName}, con CIF ${colaborador.cif}, domicilio en ${addressStr}, representado por ${colaborador.user.name}.`;
     
     let currentY = 52;
@@ -172,7 +174,11 @@ export function ContractViewerModal({ isOpen, onOpenChange, colaborador }: Contr
                   <div className="col-span-2">
                     <span className="text-slate-400 font-bold uppercase text-[10px] block mb-1">Domicilio Social</span>
                     <span className="font-black text-slate-900">
-                      {colaborador.address ? `${colaborador.address}, ${colaborador.postalCode || ""} ${colaborador.city || ""} (${colaborador.province || ""})` : "---"}
+                      {(() => {
+                        const parts = [colaborador.address, colaborador.postalCode, colaborador.city].filter(Boolean);
+                        const line = parts.join(", ");
+                        return line ? (colaborador.province ? `${line} (${colaborador.province})` : line) : "---";
+                      })()}
                     </span>
                   </div>
                   <div>

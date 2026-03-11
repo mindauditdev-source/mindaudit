@@ -16,7 +16,9 @@ export const generatePartnerContractPDF = async (profile: PartnerProfile) => {
 
   const today = new Date().toLocaleDateString("es-ES");
   const companyName = profile.companyName.toUpperCase();
-  const addressBlock = `${profile.address || ""}, ${profile.postalCode || ""} ${profile.city || ""} (${profile.province || ""})`;
+  const addressParts = [profile.address, profile.postalCode, profile.city].filter(Boolean);
+  const addressLine = addressParts.join(", ");
+  const addressBlock = profile.province ? `${addressLine} (${profile.province})` : addressLine;
 
   // Helper functions for content layout
   const addText = (text: string, isBold: boolean = false, align: "left" | "center" | "right" = "left", indentX: number = 0, fontSize: number = 10) => {
