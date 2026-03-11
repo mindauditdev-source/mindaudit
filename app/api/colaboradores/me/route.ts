@@ -90,6 +90,10 @@ export async function GET() {
         province: colaborador.province,
         postalCode: colaborador.postalCode,
         website: colaborador.website,
+        primerApellido: colaborador.primerApellido,
+        segundoApellido: colaborador.segundoApellido,
+        dniParticular: colaborador.dniParticular,
+        mandato: colaborador.mandato,
         status: colaborador.status,
         commissionRate: colaborador.commissionRate.toNumber(),
         totalCommissions,
@@ -128,7 +132,20 @@ export async function PATCH(request: NextRequest) {
 
     // Parsear body
     const body = await request.json()
-    const { companyName, phone, address, city, province, postalCode, website, dismissedPartnerPlanModal } = body
+    const { 
+      companyName, 
+      phone, 
+      address, 
+      city, 
+      province, 
+      postalCode, 
+      website, 
+      primerApellido,
+      segundoApellido,
+      dniParticular,
+      mandato,
+      dismissedPartnerPlanModal 
+    } = body
 
     // Actualizar colaborador
     const colaborador = await prisma.colaborador.update({
@@ -141,6 +158,10 @@ export async function PATCH(request: NextRequest) {
         ...(province !== undefined && { province }),
         ...(postalCode !== undefined && { postalCode }),
         ...(website !== undefined && { website }),
+        ...(primerApellido !== undefined && { primerApellido }),
+        ...(segundoApellido !== undefined && { segundoApellido }),
+        ...(dniParticular !== undefined && { dniParticular }),
+        ...(mandato !== undefined && { mandato }),
         // Update User model
         ...(dismissedPartnerPlanModal !== undefined && {
           user: {
@@ -184,6 +205,10 @@ export async function PATCH(request: NextRequest) {
           province: colaborador.province,
           postalCode: colaborador.postalCode,
           website: colaborador.website,
+          primerApellido: colaborador.primerApellido,
+          segundoApellido: colaborador.segundoApellido,
+          dniParticular: colaborador.dniParticular,
+          mandato: colaborador.mandato,
           updatedAt: colaborador.updatedAt,
         },
       },

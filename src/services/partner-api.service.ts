@@ -19,6 +19,10 @@ export interface PartnerProfile {
   province: string | null;
   postalCode: string | null;
   website: string | null;
+  primerApellido: string | null;
+  segundoApellido: string | null;
+  dniParticular: string | null;
+  mandato: string | null;
   status: ColaboradorStatus;
   commissionRate: number;
   totalCommissions: number;
@@ -155,6 +159,10 @@ export class PartnerApiService {
     province: string;
     postalCode: string;
     website: string;
+    primerApellido: string;
+    segundoApellido: string;
+    dniParticular: string;
+    mandato: string;
     dismissedPartnerPlanModal: boolean;
   }>): Promise<PartnerProfile> {
     const response = await this.fetch("/colaboradores/me", {

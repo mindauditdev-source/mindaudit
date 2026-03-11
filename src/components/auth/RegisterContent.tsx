@@ -36,6 +36,11 @@ export function RegisterContent() {
     ciudad: "",
     codigoPostal: "",
     telefono: "",
+    // Representative details
+    primerApellido: "",
+    segundoApellido: "",
+    dniParticular: "",
+    mandato: "",
     // Step 2 (Empresa)
     employees: "",
     revenue: "",
@@ -51,7 +56,20 @@ export function RegisterContent() {
     let error = "";
     switch (name) {
       case "nombreCompleto":
-        if (value.length < 3) error = "El nombre debe tener al menos 3 caracteres";
+        if (value.length < 2) error = "El nombre es obligatorio";
+        break;
+      case "primerApellido":
+        if (value.length < 2) error = "El primer apellido es obligatorio";
+        break;
+      case "segundoApellido":
+        if (value.length < 2) error = "El segundo apellido es obligatorio";
+        break;
+      case "dniParticular":
+        const dniRegex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/i;
+        if (!dniRegex.test(value)) error = "DNI no válido (ej: 12345678A)";
+        break;
+      case "mandato":
+        if (!value) error = "Debe seleccionar su cargo/mandato";
         break;
       case "email":
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -155,6 +173,10 @@ export function RegisterContent() {
         province: formData.provincia,
         city: formData.ciudad,
         postalCode: formData.codigoPostal,
+        primerApellido: formData.primerApellido,
+        segundoApellido: formData.segundoApellido,
+        dniParticular: formData.dniParticular,
+        mandato: formData.mandato,
         acceptTerms: formData.terms
       };
 

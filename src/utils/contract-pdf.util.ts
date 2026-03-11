@@ -55,7 +55,12 @@ export const generatePartnerContractPDF = async (profile: PartnerProfile) => {
   addText("MIND AUDIT SPAIN, S.L.P., sociedad profesional inscrita en el Registro Oficial de Auditores de Cuentas, con número ROAC S2711, con domicilio social en Gran Vía Carles III nº 98 10ª Planta 08028 Barcelona , NIF B22980593, debidamente representada en este acto por D. Emilio José Silva Fernández, auditor de cuentas inscrito en el ROAC con número 23.066, en su condición de administrador único, en adelante, “MindAudit”", false);
   addSpace(2);
   addText("Y de otra parte,", false);
-  addText(`${companyName}, con NIF ${profile.cif}, domicilio social en ${addressBlock}, debidamente representada en este acto por D./Dª ${profile.user.name.toUpperCase()}, en su condición de colaborador, en adelante, “el Colaborador”.`, false);
+  
+  const repName = `${profile.user.name} ${profile.primerApellido || ""} ${profile.segundoApellido || ""}`.trim().toUpperCase();
+  const repDni = profile.dniParticular || "---";
+  const repMandato = profile.mandato === "En representación propia" ? "su propia representación" : `su condición de ${profile.mandato || "colaborador"}`;
+
+  addText(`${companyName}, con NIF ${profile.cif}, domicilio social en ${addressBlock}, debidamente representada en este acto por D./Dª ${repName}, con DNI ${repDni}, en ${repMandato}, en adelante, “el Colaborador”.`, false);
   addSpace(5);
   
   addText("EXPONEN", true, "center");

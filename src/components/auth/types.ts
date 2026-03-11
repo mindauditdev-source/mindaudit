@@ -10,6 +10,11 @@ export interface RegisterFormData {
   cif: string;
   roac: string;
   terms: boolean;
+  // Representative details
+  primerApellido: string;
+  segundoApellido: string;
+  dniParticular: string;
+  mandato: string;
   // Paso 2
   direccion: string;
   provincia: string;

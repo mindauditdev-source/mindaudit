@@ -53,7 +53,12 @@ export function ContractViewerModal({ isOpen, onOpenChange, colaborador }: Contr
     const addressParts = [colaborador.address, colaborador.postalCode, colaborador.city].filter(Boolean);
     const addressLine = addressParts.join(", ");
     const addressStr = addressLine ? (colaborador.province ? `${addressLine} (${colaborador.province})` : addressLine) : "---";
-    const textReunidosColab = `Y de otra parte, el COLABORADOR: ${colaborador.companyName}, con CIF ${colaborador.cif}, domicilio en ${addressStr}, representado por ${colaborador.user.name}.`;
+    
+    const repName = `${colaborador.user.name} ${colaborador.primerApellido || ""} ${colaborador.segundoApellido || ""}`.trim().toUpperCase();
+    const repDni = colaborador.dniParticular || "---";
+    const repMandato = colaborador.mandato === "En representación propia" ? "su propia representación" : `su condición de ${colaborador.mandato || "colaborador"}`;
+
+    const textReunidosColab = `Y de otra parte, el COLABORADOR: ${colaborador.companyName}, con CIF ${colaborador.cif}, domicilio en ${addressStr}, representado por ${repName}, con DNI ${repDni}, en ${repMandato}.`;
     
     let currentY = 52;
     const splitReunidos1 = doc.splitTextToSize(textReunidosMind, 170);
@@ -150,7 +155,7 @@ export function ContractViewerModal({ isOpen, onOpenChange, colaborador }: Contr
             <h2 className="text-xl font-black text-center text-slate-900 border-b pb-4 uppercase tracking-tighter">CONTRATO DE COLABORACIÓN COMERCIAL</h2>
 
             <p className="text-right italic font-bold text-slate-400">
-              Barcelona, a {colaborador.contractSignedAt ? new Date(colaborador.contractSignedAt).toLocaleDateString() : '---'}
+              Barcelona, a {colaborador.contractSignedAt ? new Date(colaborador.contractSignedAt).toLocaleDateString() : new Date().toLocaleDateString()}
             </p>
 
             <section>
@@ -183,7 +188,15 @@ export function ContractViewerModal({ isOpen, onOpenChange, colaborador }: Contr
                   </div>
                   <div>
                     <span className="text-slate-400 font-bold uppercase text-[10px] block mb-1">Representante</span>
-                    <span className="font-black text-slate-900">{colaborador.user.name}</span>
+                    <span className="font-black text-slate-900">
+                      {`${colaborador.user.name} ${colaborador.primerApellido || ""} ${colaborador.segundoApellido || ""}`.trim()}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-bold uppercase text-[10px] block mb-1">DNI / Mandato</span>
+                    <span className="font-black text-slate-900">
+                      {colaborador.dniParticular || "---"} ({colaborador.mandato || "Colaborador"})
+                    </span>
                   </div>
                   <div>
                     <span className="text-slate-400 font-bold uppercase text-[10px] block mb-1">Email</span>

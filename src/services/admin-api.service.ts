@@ -31,6 +31,10 @@ export interface AdminColaborador {
   postalCode: string | null;
   contractSignedAt: string | null;
   contractUrl: string | null;
+  primerApellido: string | null;
+  segundoApellido: string | null;
+  dniParticular: string | null;
+  mandato: string | null;
   createdAt: string;
   user: {
      name: string;

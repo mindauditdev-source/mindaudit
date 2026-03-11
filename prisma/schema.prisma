@@ -51,6 +51,10 @@ model Colaborador {
   province           String?
   postalCode         String?
   website            String?
+  primerApellido     String?
+  segundoApellido    String?
+  dniParticular      String?
+  mandato            String?
   status             ColaboradorStatus @default(PENDING_APPROVAL)
   commissionRate     Decimal           @default(0) @db.Decimal(5, 2)
   totalCommissions   Decimal           @default(0) @db.Decimal(12, 2)
@@ -92,6 +96,10 @@ model Empresa {
   serviceType        String?
   serviceDescription String?
   status             EmpresaStatus        @default(PROSPECT)
+  primerApellido     String?
+  segundoApellido    String?
+  dniParticular      String?
+  mandato            String?
   notes         String?
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt

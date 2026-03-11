@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormInput } from "@/components/ui/form-input";
+import { FormSelect } from "@/components/ui/form-select";
 import { RegisterFormData, RegisterTouched, RegisterErrors } from "./types";
 
 interface Step1Props {
@@ -19,8 +20,8 @@ interface Step1Props {
 export function Step1AccountDetails({ formData, touched, errors, onChange, onNext }: Step1Props) {
   const isColaborador = formData.role === 'COLABORADOR';
 
-  const isStepValid = !errors.nombreCompleto && !errors.email && !errors.password && !errors.confirmPassword && !errors.empresa && !errors.cif && 
-                      formData.nombreCompleto && formData.email && formData.password && formData.confirmPassword && formData.empresa && formData.cif && formData.terms;
+  const isStepValid = !errors.nombreCompleto && !errors.primerApellido && !errors.segundoApellido && !errors.dniParticular && !errors.mandato && !errors.email && !errors.password && !errors.confirmPassword && !errors.empresa && !errors.cif && 
+                      formData.nombreCompleto && formData.primerApellido && formData.segundoApellido && formData.dniParticular && formData.mandato && formData.email && formData.password && formData.confirmPassword && formData.empresa && formData.cif && formData.terms;
 
   return (
     <Card className="border-none shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white">
@@ -39,13 +40,58 @@ export function Step1AccountDetails({ formData, touched, errors, onChange, onNex
         <form className="space-y-8" onSubmit={(e) => { e.preventDefault(); onNext(); }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <FormInput
-              label="Nombre Completo"
+              label="Nombre"
               name="nombreCompleto"
-              placeholder="p. ej. Javier González"
+              placeholder="p. ej. Javier"
               value={formData.nombreCompleto}
               onChange={onChange}
               touched={touched.nombreCompleto}
               error={errors.nombreCompleto}
+            />
+
+            <FormInput
+              label="Primer Apellido"
+              name="primerApellido"
+              placeholder="p. ej. González"
+              value={formData.primerApellido}
+              onChange={onChange}
+              touched={touched.primerApellido}
+              error={errors.primerApellido}
+            />
+
+            <FormInput
+              label="Segundo Apellido"
+              name="segundoApellido"
+              placeholder="p. ej. Ruiz"
+              value={formData.segundoApellido}
+              onChange={onChange}
+              touched={touched.segundoApellido}
+              error={errors.segundoApellido}
+            />
+
+            <FormInput
+              label="DNI Particular"
+              name="dniParticular"
+              placeholder="12345678A"
+              value={formData.dniParticular}
+              onChange={onChange}
+              touched={touched.dniParticular}
+              error={errors.dniParticular}
+            />
+
+            <FormSelect
+              label="Cargo / Mandato"
+              name="mandato"
+              options={[
+                { label: "Socio", value: "Socio" },
+                { label: "Administrador", value: "Administrador" },
+                { label: "Apoderado", value: "Apoderado" },
+                { label: "En representación propia (sólo p. física)", value: "En representación propia" },
+              ]}
+              value={formData.mandato}
+              onChange={onChange as any}
+              touched={touched.mandato}
+              error={errors.mandato}
             />
             
             <FormInput

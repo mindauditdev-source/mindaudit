@@ -23,6 +23,10 @@ export async function GET() {
         postalCode: true,
         website: true,
         iban: true,
+        primerApellido: true,
+        segundoApellido: true,
+        dniParticular: true,
+        mandato: true,
       },
     });
 
@@ -62,6 +66,10 @@ export async function PUT(req: NextRequest) {
       postalCode,
       website,
       iban,
+      primerApellido,
+      segundoApellido,
+      dniParticular,
+      mandato,
     } = body;
 
     const updatedColaborador = await prisma.colaborador.update({
@@ -76,6 +84,10 @@ export async function PUT(req: NextRequest) {
         postalCode,
         website,
         iban,
+        primerApellido,
+        segundoApellido,
+        dniParticular,
+        mandato,
       },
     });
 

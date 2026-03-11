@@ -28,11 +28,23 @@ export type LoginInput = z.infer<typeof loginSchema>
  * Schema para registro de Colaborador (Gestoría/Asesoría)
  */
 export const registerColaboradorSchema = z.object({
-  // Datos del usuario
+  // Datos del usuario (Representante)
   name: z
     .string()
-    .min(1, 'El nombre es obligatorio')
-    .min(3, 'El nombre debe tener al menos 3 caracteres'),
+    .min(1, 'El nombre es obligatorio'),
+  primerApellido: z
+    .string()
+    .min(1, 'El primer apellido es obligatorio'),
+  segundoApellido: z
+    .string()
+    .min(1, 'El segundo apellido es obligatorio'),
+  dniParticular: z
+    .string()
+    .min(1, 'El DNI es obligatorio')
+    .regex(/^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/i, 'Formato de DNI inválido (ej: 12345678A)'),
+  mandato: z
+    .string()
+    .min(1, 'El cargo/mandato es obligatorio'),
   email: z
     .string()
     .min(1, 'El email es obligatorio')
@@ -87,11 +99,23 @@ export type RegisterColaboradorInput = z.infer<typeof registerColaboradorSchema>
  * Schema para registro de Empresa (cliente directo)
  */
 export const registerEmpresaSchema = z.object({
-  // Datos del usuario/contacto
+  // Datos del usuario/contacto (Representante)
   name: z
     .string()
-    .min(1, 'El nombre del contacto es obligatorio')
-    .min(3, 'El nombre debe tener al menos 3 caracteres'),
+    .min(1, 'El nombre del contacto es obligatorio'),
+  primerApellido: z
+    .string()
+    .min(1, 'El primer apellido es obligatorio'),
+  segundoApellido: z
+    .string()
+    .min(1, 'El segundo apellido es obligatorio'),
+  dniParticular: z
+    .string()
+    .min(1, 'El DNI es obligatorio')
+    .regex(/^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/i, 'Formato de DNI inválido (ej: 12345678A)'),
+  mandato: z
+    .string()
+    .min(1, 'El cargo/mandato es obligatorio'),
   email: z
     .string()
     .min(1, 'El email es obligatorio')
