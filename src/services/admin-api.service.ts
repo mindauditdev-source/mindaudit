@@ -140,6 +140,12 @@ export const AdminApiService = {
     });
   },
 
+  suspendColaborador: async (id: string) => {
+    return apiFetch(`/admin/colaboradores/${id}/suspend`, {
+      method: "PATCH",
+    });
+  },
+
   updateCommissionRate: async (id: string, rate: number) => {
     return apiFetch(`/admin/colaboradores/${id}/commission-rate`, {
       method: "PATCH",

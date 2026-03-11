@@ -74,6 +74,10 @@ export default function AuditorAsociadosPage() {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [colabToApprove, setColabToApprove] = useState<AdminColaborador | null>(null);
 
+  // Suspend State
+  const [isSuspendOpen, setIsSuspendOpen] = useState(false);
+  const [colabToSuspend, setColabToSuspend] = useState<AdminColaborador | null>(null);
+
   // Contract View State
   const [isContractOpen, setIsContractOpen] = useState(false);
 
@@ -123,6 +127,27 @@ export default function AuditorAsociadosPage() {
     } finally {
       setSubmitting(false);
       setColabToApprove(null);
+    }
+  };
+
+  const handleOpenSuspend = (colab: AdminColaborador) => {
+    setColabToSuspend(colab);
+    setIsSuspendOpen(true);
+  };
+
+  const handleConfirmSuspend = async () => {
+    if (!colabToSuspend) return;
+    try {
+      setSubmitting(true);
+      await AdminApiService.suspendColaborador(colabToSuspend.id);
+      setIsSuspendOpen(false);
+      loadData();
+      toast.success("La cuenta del asociado ha sido inhabilitada.");
+    } catch {
+      toast.error("Error al inhabilitar la cuenta");
+    } finally {
+      setSubmitting(false);
+      setColabToSuspend(null);
     }
   };
 
@@ -319,7 +344,10 @@ export default function AuditorAsociadosPage() {
                                         </DropdownMenuItem>
                                      )}
                                      {c.status === 'ACTIVE' && (
-                                        <DropdownMenuItem className="text-red-600 font-bold py-2.5 rounded-lg mx-1 focus:bg-red-50">
+                                        <DropdownMenuItem 
+                                           onClick={() => handleOpenSuspend(c)} 
+                                           className="text-red-600 font-bold py-2.5 rounded-lg mx-1 focus:bg-red-50"
+                                        >
                                            Inhabilitar cuenta
                                         </DropdownMenuItem>
                                      )}
@@ -401,7 +429,32 @@ export default function AuditorAsociadosPage() {
          </DialogContent>
       </Dialog>
 
-      {/* Commission Dialog */}
+      {/* Suspend Confirmation Dialog */}
+      <Dialog open={isSuspendOpen} onOpenChange={setIsSuspendOpen}>
+         <DialogContent className="sm:max-w-[400px] rounded-[32px] p-0 overflow-hidden border-none shadow-2xl">
+            <div className="p-8 pb-4 text-center">
+               <div className="mx-auto w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-6">
+                  <ShieldCheck className="h-8 w-8 text-red-600" />
+               </div>
+               <DialogTitle className="text-2xl font-black text-slate-900 leading-tight mb-2">¿Inhabilitar Cuenta?</DialogTitle>
+               <DialogDescription className="text-slate-500 font-medium px-4">
+                   ¿Estás seguro de que deseas inhabilitar la cuenta de <b>{colabToSuspend?.companyName}</b>? El acceso será revocado de inmediato.
+               </DialogDescription>
+            </div>
+            <div className="p-6 pt-2 grid grid-cols-2 gap-3 bg-slate-50 mt-4">
+               <Button variant="ghost" onClick={() => setIsSuspendOpen(false)} className="h-12 rounded-2xl font-bold text-slate-500 hover:bg-white hover:text-slate-900 transition-all">
+                  Cancelar
+               </Button>
+               <Button 
+                  onClick={handleConfirmSuspend} 
+                  className="h-12 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg shadow-red-900/20 transition-all"
+                  disabled={submitting}
+               >
+                  {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Inhabilitar"}
+               </Button>
+            </div>
+         </DialogContent>
+      </Dialog>
       <Dialog open={isCommissionDialogOpen} onOpenChange={setIsCommissionDialogOpen}>
          <DialogContent className="sm:max-w-[425px] rounded-2xl">
             <DialogHeader>
