@@ -25,6 +25,8 @@ export async function middleware(req: NextRequest) {
     '/api/send-contact',
     '/api/send-career',
     '/api/payments/webhook',
+    '/sitemap.xml',
+    '/robots.txt',
   ]
 
   // Verificar si es una ruta pública
