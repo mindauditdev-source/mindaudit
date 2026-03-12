@@ -22,6 +22,7 @@ export function Hero() {
           alt="Background"
           fill
           priority
+          fetchPriority='high'
           className="object-cover opacity-60 mix-blend-multiply"
         />
         
