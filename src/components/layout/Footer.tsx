@@ -22,8 +22,7 @@ export function Footer() {
               </div>
             </Link>
             <p className="text-slate-500 text-sm leading-relaxed">
-              Servicios profesionales de auditoría y consultoría para empresas 
-              que buscan excelencia y transparencia.
+              Servicios integrales de auditoría para despachos profesionales en España
             </p>
             <ul className="space-y-2 pt-2">
               <li>
@@ -45,22 +44,22 @@ export function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link href="/servicios#cuentas" className="text-slate-500 hover:text-[#0f4c81] text-sm font-medium transition-colors">
-                  Auditoría de Cuentas
+                  Auditoría de Cuentas Anuales
                 </Link>
               </li>
               <li>
-                <Link href="/servicios#fiscal" className="text-slate-500 hover:text-[#0f4c81] text-sm font-medium transition-colors">
-                  Consultoría Fiscal
+                <Link href="/servicios#informes-especiales" className="text-slate-500 hover:text-[#0f4c81] text-sm font-medium transition-colors">
+                  Informes Especiales
                 </Link>
               </li>
               <li>
-                <Link href="/servicios#due-diligence" className="text-slate-500 hover:text-[#0f4c81] text-sm font-medium transition-colors">
-                  Due Diligence
+                <Link href="/servicios#informes-sectoriales" className="text-slate-500 hover:text-[#0f4c81] text-sm font-medium transition-colors">
+                  Informes Sectoriales
                 </Link>
               </li>
               <li>
-                <Link href="/servicios#forensic" className="text-slate-500 hover:text-[#0f4c81] text-sm font-medium transition-colors">
-                  Forensic
+                <Link href="/servicios#otros-trabajos-auditoria" className="text-slate-500 hover:text-[#0f4c81] text-sm font-medium transition-colors">
+                  Otros Trabajos de auditoría
                 </Link>
               </li>
             </ul>
@@ -86,8 +85,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/canal-etico" className="text-slate-500 hover:text-[#0f4c81] text-sm font-medium transition-colors">
-                  Canal Ético
+                <Link href="/contacto" className="text-slate-500 hover:text-[#0f4c81] text-sm font-medium transition-colors">
+                  Canal Ético y de denuncias
                 </Link>
               </li>
             </ul>
