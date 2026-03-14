@@ -2,14 +2,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { AnimatedCounter } from '@/components/ui/animated-counter';
 import TrustBox from '../shared/TrustBox';
 
 export function Hero() {
   const stats = [
-    { label: 'Auditorías Realizadas', value: '300+', sublabel: 'Auditorías con éxito' },
-    { label: 'Años de Experiencia', value: '20+', sublabel: 'En el sector' },
-    { label: 'Proceso Digital', value: '100%', sublabel: 'Flujo sin papel' },
-    { label: 'Socios Activos', value: '50+', sublabel: 'Confían en nosotros' },
+    { label: 'Auditorías Realizadas', value: 300, suffix: '+', sublabel: 'Auditorías con éxito' },
+    { label: 'Años de Experiencia', value: 20, suffix: '+', sublabel: 'En el sector' },
+    { label: 'Proceso Digital', value: 100, suffix: '%', sublabel: 'Flujo sin papel' },
+    { label: 'Socios Activos', value: 50, suffix: '+', sublabel: 'Confían en nosotros' },
   ];
 
   return (
@@ -54,20 +55,19 @@ export function Hero() {
           <div className="flex items-center mb-6">
             <div className="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-sm text-blue-300 w-fit">
               <span className="flex h-2 w-2 rounded-full bg-blue-400 mr-2"></span>
-              Excelencia en servicios de auditoría
+              Entidad inscrita en el Registro Oficial de Auditores de Cuentas
             </div>
           </div>
           
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl mb-6 leading-tight">
-            Rigor. <br />
-            Transparencia. <br />
-            <span className="text-blue-400">Tecnología al servicio de la excelencia.</span>
+            Servicios Integrales de Auditoría <br />
+            <span className="text-blue-400">para despachos y agentes profesionales</span>
           </h1>
           
           <p className="mt-4 text-xl text-gray-300 max-w-2xl mb-10 leading-relaxed">
-            Firma de auditoría líder adaptada a la empresa moderna. Combinamos un profundo 
-            conocimiento regulatorio con procesos digitales de vanguardia para ofrecer 
-            servicios de auditoría transparentes y eficientes en todo el país.
+            Equipos de expertos auditores independientes para maximizar la oferta de servicios en vuestra firma.
+            Combinamos un profundo conocimiento del sector con las últimas tecnologías del mercado para
+            potenciar el crecimiento de vuestro despacho profesional. Fácil, rápido y transparente.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4">
@@ -88,7 +88,9 @@ export function Hero() {
             <Card key={index} className="border-none shadow-xl bg-white">
               <CardContent className="p-6 flex flex-col items-start justify-center h-32">
                 <p className="text-sm font-medium text-gray-500 mb-1">{stat.label}</p>
-                <p className="text-4xl font-bold text-blue-900 tracking-tight">{stat.value}</p>
+                <p className="text-4xl font-bold text-blue-900 tracking-tight flex items-center">
+                  <AnimatedCounter value={stat.value} suffix={stat.suffix} duration={2.5} />
+                </p>
               </CardContent>
             </Card>
           ))}
