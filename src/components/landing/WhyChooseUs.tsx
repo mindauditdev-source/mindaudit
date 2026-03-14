@@ -1,22 +1,22 @@
-import { CheckCircle2, Zap, ShieldCheck, Briefcase } from 'lucide-react';
+import { CheckCircle2, ShieldCheck, HeartHandshake, BadgeCheck } from 'lucide-react';
 import Image from 'next/image';
 
 export function WhyChooseUs() {
   const features = [
     {
-      icon: Zap,
-      title: 'Análisis de Precisión',
-      description: 'Nuestra metodología propia reduce los márgenes de error a casi cero utilizando referencias cruzadas automatizadas.'
-    },
-    {
-      icon: Briefcase,
-      title: 'Enfoque Tecnológico',
-      description: 'Sin papeles, seguro e instantáneo. Nuestro portal del cliente le ofrece actualizaciones de estado en tiempo real sobre su proceso de auditoría.'
-    },
-    {
       icon: ShieldCheck,
-      title: 'Expertos Certificados ROAC',
-      description: 'Cada auditoría es supervisada por un socio senior inscrito en el Registro Oficial de Auditores de Cuentas (ROAC).'
+      title: 'Preservamos la Independencia Profesional',
+      description: 'Por encima de todo, somos expertos independientes. Seleccionamos meticulosamente a nuestros partners para garantizar el cumplimiento normativo de ética e independencia de nuestro equipo de auditores.'
+    },
+    {
+      icon: HeartHandshake,
+      title: 'Cuidamos de tu cliente',
+      description: 'Sabemos que los procesos de auditoría no siempre son un camino de rosas. Aumentamos la transparencia y el diálogo en situaciones que requieren discusión o debate.'
+    },
+    {
+      icon: BadgeCheck,
+      title: 'Expertos Cualificados',
+      description: 'Nuestros equipos de auditores ofrecen rigor y profesionalidad. Un equipo joven conocedor de las nuevas tecnologías y con experiencia certificada. Agenda una reunión e infórmate de todos nuestros servicios.'
     }
   ];
 
@@ -29,11 +29,10 @@ export function WhyChooseUs() {
           <div className="flex-1 space-y-8">
             <div>
               <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mb-4">
-                Por qué los líderes de la industria eligen <strong>MindAudit® Spain</strong>.
+                Ofrece Auditoría
               </h2>
               <p className="text-lg text-gray-500 leading-relaxed">
-                No nos limitamos a marcar casillas. Proporcionamos una visión estratégica de su realidad financiera, 
-                empoderando a los responsables de la toma de decisiones con una claridad absoluta.
+                MindAudit aumenta el potencial del despacho profesional dotándolo de profesionales expertos y cualificados para ofertar servicios integrales de auditoría. Usamos herramientas modernas y eficientes para el desarrollo de nuestro trabajo. ¡Colaborar con auditores profesionales nunca fue tan sencillo!
               </p>
             </div>
 
