@@ -198,7 +198,7 @@ export const auditServices: AuditService[] = [
     description: 'Informe prevista en la Ley 16/2022, de 5 de septiembre, reforma el texto refundido de la Ley Concursal en España',
     detailedDescription: 'El informe de mayorías para la Ley Concursal incluye la certificación del auditor de cuentas o, en su defecto, del auditor nombrado por el registro mercantil del domicilio del deudor, a las sociedades que alcancen, con sus acreedores, un acuerdo de refinanciación. Esta certificación debe constatar que la deuda con los acreedores firmantes del acuerdo alcanza, a la fecha del acuerdo de refinanciación.',
     icon: 'Award',
-    featured: true,
+    featured: false,
     category: 'grants',
     features: [
       'Verificación del cómputo de pasivos y créditos afectados por el plan.',

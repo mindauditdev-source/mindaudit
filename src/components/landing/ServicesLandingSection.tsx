@@ -18,7 +18,7 @@ export function ServicesLandingSection() {
 
       <div className="relative z-10 container mx-auto px-4 md:px-6">
         <div className="mb-12">
-          <span className="text-sm font-semibold text-blue-400 uppercase tracking-wide">NUESTRA EXPERIENCIA</span>
+          <span className="text-sm font-semibold text-blue-400 uppercase tracking-wide">Nuestros Servicios</span>
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mt-2">
             Servicios de auditoría especializados
           </h2>
