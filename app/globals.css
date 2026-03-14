@@ -26,6 +26,17 @@
   --radius-sm: calc(var(--radius) - 4px);
   --color-brand-dark: hsl(var(--brand-dark));
   --color-brand-blue: hsl(var(--brand-blue));
+
+  --animate-marquee: marquee 40s linear infinite;
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
 }
 
 :root {
