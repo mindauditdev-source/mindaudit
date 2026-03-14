@@ -1,16 +1,16 @@
 import { LegalLayout } from "@/components/layout/LegalLayout";
 
 export const metadata = {
-  title: "Política de Privacidad | MindAudit",
-  description: "Política de privacidad y protección de datos de MindAudit Spain SLPU.",
+  title: "Aviso Legal | MindAudit",
+  description: "Aviso legal y condiciones de uso del sitio web de MindAudit Spain SLPU.",
 };
 
-export default function PoliticaPrivacidadPage() {
+export default function AvisoLegalPage() {
   return (
     <LegalLayout
-      title="Política de Privacidad"
+      title="Aviso Legal"
       lastUpdated="20/06/2024"
-      icon="privacy"
+      icon="terms"
     >
       <h2>Titular</h2>
       <p><strong>Titular:</strong> Mind Audit Spain SLPU</p>

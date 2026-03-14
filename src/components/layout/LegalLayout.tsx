@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { ChevronRight, Shield, FileText, Calendar, ArrowLeft } from "lucide-react";
-import { cn } from "@/lib/utils";
+
 
 interface LegalLayoutProps {
   title: string;
@@ -59,12 +59,15 @@ export function LegalLayout({ title, lastUpdated, icon = "terms", children }: Le
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
-            <div className="prose prose-slate prose-lg max-w-none 
-              prose-headings:text-brand-dark prose-headings:font-black prose-headings:tracking-tight
-              prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-4 prose-h2:border-b prose-h2:border-slate-100
-              prose-p:text-slate-600 prose-p:leading-relaxed prose-p:mb-6 font-medium
-              prose-strong:text-slate-900 prose-strong:font-black
-              prose-ul:list-disc prose-ul:pl-6 prose-li:mb-2
+            <div className="bg-white rounded-[32px] p-8 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/50 
+              [&>h2]:text-2xl [&>h2]:md:text-3xl [&>h2]:font-black [&>h2]:text-brand-dark [&>h2]:tracking-tight [&>h2]:mt-14 [&>h2]:mb-8 [&>h2]:pb-4 [&>h2]:border-b [&>h2]:border-slate-100 [&>h2:first-child]:mt-0
+              [&>h3]:text-xl [&>h3]:font-bold [&>h3]:text-slate-800 [&>h3]:mt-10 [&>h3]:mb-4
+              [&>p]:text-slate-600 [&>p]:leading-relaxed [&>p]:md:text-lg [&>p]:mb-6 [&>p]:font-medium
+              [&>ul]:list-none [&>ul]:space-y-4 [&>ul]:mb-8 [&>ul]:pl-0
+              [&>ul>li]:relative [&>ul>li]:pl-8 [&>ul>li]:text-slate-600 [&>ul>li]:leading-relaxed [&>ul>li]:md:text-lg [&>ul>li]:font-medium
+              [&>ul>li::before]:content-[''] [&>ul>li::before]:absolute [&>ul>li::before]:left-0 [&>ul>li::before]:top-3 [&>ul>li::before]:w-3 [&>ul>li::before]:h-3 [&>ul>li::before]:bg-blue-100 [&>ul>li::before]:rounded-full [&>ul>li::before]:border-2 [&>ul>li::before]:border-blue-500
+              [&>p>strong]:text-slate-900 [&>p>strong]:font-bold [&>ul>li>strong]:text-slate-900 [&>ul>li>strong]:font-bold
+              [&_a]:text-blue-500 [&_a]:font-semibold [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-blue-700 hover:[&_a]:decoration-2 [&_a]:transition-all
             ">
               {children}
             </div>
