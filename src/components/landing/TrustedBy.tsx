@@ -2,9 +2,10 @@ import Image from 'next/image';
 
 export function TrustedBy() {
   const logos = [
-    { name: 'CRA', path: '/logosya confian/200504_CRA_Positiu_baseline02.png' },
+    { name: 'Ennumera', path: '/logosya confian/ennumera.png', scale: 1.2 },
     { name: 'Aantal', path: '/logosya confian/aantalblack-1.png' },
-    { name: 'Scroos', path: '/logosya confian/scroos redes sociales.jpg' },
+    { name: 'CRA', path: '/logosya confian/200504_CRA_Positiu_baseline02.png' },
+    { name: 'Scroos', path: '/logosya confian/scroos redes sociales.jpg', scale: 1.4 },
     { name: 'Taxavia', path: '/logosya confian/taxavia.png' },
   ];
 
@@ -32,7 +33,10 @@ export function TrustedBy() {
                   key={index}
                   className="flex justify-center items-center w-40 md:w-48 h-20 shrink-0 mx-4 md:mx-8 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 pointer-events-auto"
                 >
-                  <div className="relative w-full h-full">
+                  <div 
+                    className="relative w-full h-full transition-transform duration-300"
+                    style={{ transform: `scale(${logo.scale || 1})` }}
+                  >
                     <Image
                       src={logo.path}
                       alt={`${logo.name} logo`}
