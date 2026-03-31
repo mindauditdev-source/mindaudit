@@ -278,15 +278,21 @@ function LoginForm() {
 
           {/* Footer Links */}
           <div className="flex items-center justify-center gap-6 pt-4 border-t border-slate-50">
-            {["PRIVACIDAD", "TÉRMINOS", "SOPORTE"].map((link) => (
-              <Link
-                key={link}
-                href={`/${link.toLowerCase()}`}
-                className="text-[10px] font-extrabold text-slate-400 tracking-[0.15em] hover:text-slate-600 transition-colors"
-              >
-                {link}
-              </Link>
-            ))}
+            {["PRIVACIDAD", "TÉRMINOS", "SOPORTE"].map((link) => {
+              const href = 
+                link === "SOPORTE" ? "/contacto" : 
+                link === "TÉRMINOS" ? "/legal/terminos" : 
+                `/legal/${link.toLowerCase()}`;
+              return (
+                <Link
+                  key={link}
+                  href={href}
+                  className="text-[10px] font-extrabold text-slate-400 tracking-[0.15em] hover:text-slate-600 transition-colors"
+                >
+                  {link}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>

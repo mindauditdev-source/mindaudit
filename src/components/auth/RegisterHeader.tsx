@@ -26,7 +26,7 @@ export function RegisterHeader({ showHelp }: RegisterHeaderProps) {
           {showHelp ? (
             <>
               <span className="text-slate-500">¿Necesitas ayuda?</span>
-              <Link href="#" className="text-[#0f4c81] font-bold hover:underline">
+              <Link href="/contacto" className="text-[#0f4c81] font-bold hover:underline">
                 Soporte Técnico
               </Link>
             </>

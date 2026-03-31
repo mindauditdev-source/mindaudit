@@ -70,7 +70,7 @@ de vuestra firma
             <p className="text-[11px] text-slate-500 font-medium pb-1">
               Habla con nuestro equipo de onboarding.
             </p>
-            <Link href="#" className="text-xs font-bold text-blue-600 hover:underline inline-flex items-center gap-1">
+            <Link href="/contacto" className="text-xs font-bold text-blue-600 hover:underline inline-flex items-center gap-1">
               Contactar Soporte
               <MessageCircle className="h-3 w-3" />
             </Link>
@@ -92,7 +92,7 @@ export function RegisterFooter() {
           {['Aviso Legal', 'Privacidad', 'Cookies'].map((link) => (
             <Link 
               key={link} 
-              href={`/${link.toLowerCase().replace(' ', '-')}`}
+              href={`/legal/${link.toLowerCase().replace(' ', '-')}`}
               className="text-[13px] font-bold text-slate-500 hover:text-slate-800 transition-colors"
             >
               {link}

@@ -251,7 +251,7 @@ export function ContactContent() {
                             className="h-5 w-5 rounded border-slate-200 text-[#0f4c81] focus:ring-[#0f4c81]" 
                           />
                           <label htmlFor="privacidad_contacto" className="text-xs text-slate-500">
-                              He leído y acepto la <Link href="#" className="underline hover:text-slate-900">política de privacidad</Link>
+                              He leído y acepto la <Link href="/legal/privacidad" className="underline hover:text-slate-900">política de privacidad</Link>
                           </label>
                       </div>
                       <Button 

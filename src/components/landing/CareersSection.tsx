@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -232,6 +233,18 @@ export function CareersSection() {
                             placeholder="¿Por qué quieres unirte a MindAudit?"
                             className="flex min-h-[100px] w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-base ring-offset-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-slate-900"
                           />
+                        </div>
+
+                        <div className="flex items-center gap-3 py-2">
+                          <input 
+                            type="checkbox" 
+                            id="privacidad_career" 
+                            required 
+                            className="h-5 w-5 rounded border-slate-200 text-blue-600 focus:ring-blue-500 cursor-pointer" 
+                          />
+                          <Label htmlFor="privacidad_career" className="text-xs text-slate-500 font-medium cursor-pointer">
+                            He leído y acepto la <Link href="/legal/privacidad" className="underline hover:text-slate-900">política de privacidad</Link>
+                          </Label>
                         </div>
 
                         {error && (

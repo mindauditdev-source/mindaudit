@@ -383,7 +383,7 @@ export default function PresupuestoContent() {
                         className="h-5 w-5 rounded border-slate-200 text-blue-600" 
                       />
                       <label htmlFor="privacy_budget" className="text-xs text-slate-500">
-                          Acepto los <Link href="/terminos" className="underline hover:text-slate-900">términos de servicio</Link> y el tratamiento de mis datos.
+                          Acepto los <Link href="/legal/terminos" className="underline hover:text-slate-900">términos de servicio</Link> y el tratamiento de mis datos.
                       </label>
                   </div>
                   <Button 
