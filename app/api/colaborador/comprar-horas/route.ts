@@ -66,7 +66,7 @@ export async function POST(request: Request) {
           // y usar su ID aquí. Por ahora, lo manejamos mediante tax_id_collection si es posible
           // o simplemente con automatic_tax si está configurado en la cuenta de Stripe.
           // Usamos el ID del Tax Rate creado si no está en el ENV
-          tax_rates: [process.env.STRIPE_TAX_RATE_ID || 'txr_1Sz3E91kgxkDUUNxPCd7zZE6'],
+          tax_rates: process.env.STRIPE_TAX_RATE_ID ? [process.env.STRIPE_TAX_RATE_ID] : [],
         },
       ],
       tax_id_collection: {
