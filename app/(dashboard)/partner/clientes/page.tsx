@@ -104,6 +104,7 @@ export default function PartnerCompaniesPage() {
         }}
         onDismiss={() => {
           setIsContractOpen(false);
+          router.push("/partner/clientes/nuevo");
         }}
         onContinue={() => {
           setIsContractOpen(false);
