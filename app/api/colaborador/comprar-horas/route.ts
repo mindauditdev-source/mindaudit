@@ -58,7 +58,7 @@ export async function POST(request: Request) {
               description: `${paqueteSeleccionado.horas} horas de consultoría${descuento > 0 ? ` (Incluye ${descuento}% de descuento)` : ''}`,
             },
             unit_amount: Math.round(precioFinal * 100),
-            tax_behavior: "inclusive", // El precio ya incluye el IVA
+            tax_behavior: "exclusive", // El precio es sin IVA, el IVA se suma aparte
           },
           quantity: 1,
           // Añadimos el IVA como un item dinámico si no tenemos Tax Rate ID de Stripe
