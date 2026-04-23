@@ -85,7 +85,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/contacto" className="text-slate-500 hover:text-[#0f4c81] text-sm font-medium transition-colors">
+                <Link href="/canal-etico" className="text-slate-500 hover:text-[#0f4c81] text-sm font-medium transition-colors">
                   Canal Ético y de denuncias
                 </Link>
               </li>

@@ -280,22 +280,72 @@ export class EmailService {
     commissionRate: number; 
     user: { name: string; email: string } 
   }) {
+    const subject = `🎉 ¡Bienvenido a MindAudit® Spain!`;
+    const dashboardLink = `${process.env.NEXTAUTH_URL}/login`;
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc; }
+            .card { background: white; border-radius: 12px; padding: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+            .header { text-align: center; margin-bottom: 30px; }
+            .title { color: #0c3a6b; font-size: 28px; font-weight: 800; margin-bottom: 10px; }
+            .greeting { font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 20px; }
+            .content { color: #475569; font-size: 16px; margin-bottom: 24px; }
+            .highlight { color: #dc2626; font-weight: 700; }
+            .list { background: #f1f5f9; border-radius: 8px; padding: 20px; list-style: none; margin: 0 0 24px 0; }
+            .list-item { color: #475569; font-size: 15px; margin-bottom: 8px; }
+            .footer-text { font-size: 16px; font-weight: 600; color: #1e293b; margin-top: 30px; }
+            .btn-container { text-align: center; margin-top: 32px; }
+            .btn { display: inline-block; background: #0c3a6b; color: white !important; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 16px; box-shadow: 0 4px 14px rgba(12, 58, 107, 0.3); }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="card">
+              <div class="header">
+                <div style="font-size: 40px; margin-bottom: 10px;">🎉</div>
+                <h1 class="title">¡Tu cuenta ha sido activada!</h1>
+              </div>
+              
+              <p class="greeting">Hola ${partner.user.name},</p>
+              
+              <div class="content">
+                <p>Nos complace informarte que tu solicitud como colaborador ha sido aprobada.</p>
+                <p>Ya puedes acceder a tu dashboard para <span class="highlight">empezar a gestionar tus encargos de auditoría. Nuestro equipo estará ahí para ayudarte en todo momento</span>.</p>
+              </div>
+
+              <ul class="list">
+                <li class="list-item">
+                  <span style="color: #dc2626; font-weight: bold;">• Tu Tasa de Comisión: ${partner.commissionRate}%</span>
+                </li>
+              </ul>
+
+              <p class="footer-text">
+                ¡Gracias por unirte <span class="highlight">como colaborador de confianza! ¡Mucho éxito en este nuevo camino juntos! 🤝</span>
+              </p>
+
+              <div class="btn-container">
+                <a href="${dashboardLink}" class="btn">Acceder a mi Dashboard</a>
+              </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 24px; color: #94a3b8; font-size: 12px;">
+              © 2026 MindAudit® Spain. Todos los derechos reservados.
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
     return this.sendEmail({
       to: partner.user.email,
-      subject: `🎉 ¡Bienvenido a MindAudit® Spain!`,
-      html: `
-        <div style="font-family: sans-serif; padding: 20px;">
-          <h2 style="color: #0c3a6b;">¡Tu cuenta ha sido activada!</h2>
-          <p>Hola ${partner.user.name},</p>
-          <p>Nos complace informarte que tu solicitud como colaborador ha sido aprobada.</p>
-          <p>Ya puedes acceder a tu dashboard para empezar a registrar clientes y gestionar auditorías.</p>
-          <ul>
-            <li><strong>Tu Tasa de Comisión:</strong> ${partner.commissionRate}%</li>
-          </ul>
-          <p>Gracias por unirte a nuestra red de confianza.</p>
-          <a href="${process.env.NEXTAUTH_URL}/login" style="background: #0c3a6b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Acceder a mi Dashboard</a>
-        </div>
-      `,
+      subject: subject,
+      html,
     });
   }
 
@@ -868,6 +918,90 @@ export class EmailService {
           content: fileContent
         }
       ]
+    });
+  }
+
+  /**
+   * Envío de Comunicación al Canal Ético
+   */
+  static async sendEthicsReport(data: {
+    subject: string;
+    description: string;
+    isAnonymous: boolean;
+    name?: string;
+    email?: string;
+    phone?: string;
+  }) {
+    const targetEmail = 'canal@mindaudit.es';
+    const emailSubject = `[CANAL ÉTICO] ${data.subject}`;
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; }
+            .header { background: #0a3a6b; color: white; padding: 20px; border-radius: 8px 8px 0 0; }
+            .content { padding: 20px; }
+            .field { margin-bottom: 15px; }
+            .label { font-weight: bold; color: #64748b; font-size: 12px; text-transform: uppercase; }
+            .value { background: #f8fafc; padding: 10px; border-radius: 4px; border: 1px solid #e2e8f0; }
+            .anonymous-badge { background: #fef2f2; color: #dc2626; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1 style="margin: 0; font-size: 20px;">🛡️ Nueva Comunicación Ética</h1>
+            </div>
+            <div class="content">
+              <div class="field">
+                <div class="label">Tipo de Comunicación:</div>
+                <div>${data.isAnonymous ? '<span class="anonymous-badge">ANÓNIMA</span>' : '<strong>NOMINATIVA</strong>'}</div>
+              </div>
+              
+              ${!data.isAnonymous ? `
+                <div class="field">
+                  <div class="label">Informante:</div>
+                  <div class="value">${data.name}</div>
+                </div>
+                <div class="field">
+                  <div class="label">Email de contacto:</div>
+                  <div class="value">${data.email}</div>
+                </div>
+                ${data.phone ? `
+                  <div class="field">
+                    <div class="label">Teléfono:</div>
+                    <div class="value">${data.phone}</div>
+                  </div>
+                ` : ''}
+              ` : ''}
+
+              <div class="field">
+                <div class="label">Asunto:</div>
+                <div class="value">${data.subject}</div>
+              </div>
+
+              <div class="field">
+                <div class="label">Descripción de los hechos:</div>
+                <div class="value">${data.description.replace(/\n/g, '<br>')}</div>
+              </div>
+
+              <p style="font-size: 12px; color: #94a3b8; margin-top: 30px;">
+                Esta comunicación ha sido enviada a través del Sistema Interno de Información conforme a la Ley 2/2023.
+              </p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    return this.sendEmail({
+      to: targetEmail,
+      subject: emailSubject,
+      html,
     });
   }
 }
