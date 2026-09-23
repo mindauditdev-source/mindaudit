@@ -25,6 +25,7 @@ export async function middleware(req: NextRequest) {
     '/api/send-contact',
     '/api/send-career',
     '/api/payments/webhook',
+    '/api/cron',
     '/sitemap.xml',
     '/robots.txt',
   ]
