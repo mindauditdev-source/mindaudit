@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const config = await prisma.configuracionSistema.findFirst({ select: { id: true } });
+    console.log(`✅ Keep-alive OK — db: ${config ? "reachable" : "empty"}`);
     return NextResponse.json({ ok: true, db: config ? "reachable" : "empty", at: new Date().toISOString() });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";
